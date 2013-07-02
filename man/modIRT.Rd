@@ -51,9 +51,12 @@ modIRT(coef, var, names, ltparam = FALSE, lparam = FALSE)
 
 	The \code{modIRT} function returns parameter estimates
 	under the usual IRT parameterization, that is,
-	\deqn{\pi_i = c_i + (1 - c_i) \frac{\exp[\beta_{2i} (z - \beta_{1i}^*)]}{1 + 
-	\exp[\beta_{2i} (z - \beta_{1i}^*)]}.}{ \pi_i = c_i + (1 - c_i) *  exp\{\beta_{2i} (z - \beta_{1i}^*)\} / [1 + exp\{\beta_{2i} (z - \beta_{1i}^*)\}].}
-
+	\deqn{\pi_i = c_i + (1 - c_i) \frac{\exp[D a_i (\theta - b_i)]}{1 + 
+	\exp[D a_i (\theta - b_i)]}.}{ \pi_i = c_i + (1 - c_i) *  
+	exp\{D a_i (\theta - b_i)\} / [1 + exp\{D a_i (\theta - b_i)\}],}
+	where \eqn{D a_i = \beta_{2i}}, \eqn{b_i = -\beta_{1i}/\beta_{2i}} and
+	\eqn{\theta = z}.
+	
 	If \code{ltparam} or \code{lparam} are TRUE, the covariance matrix 
 	is calculated using the delta method.
 }

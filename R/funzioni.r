@@ -64,15 +64,15 @@ modIRT<-function(coef,var,names,ltparam=FALSE,lparam=FALSE)
 
 
 
-irtp1<-function(ab,diff,discr,guess)
+irtp1<-function(ab,diff,discr,guess,D)
 {
-	elp<-exp(1.7*discr*(ab-diff))
+	elp<-exp(D*discr*(ab-diff))
 	guess+(1-guess)*elp/(1+elp)
 }
 
 
 
-obj<-function(eqc,P2,ab,a1,b1,c1,met,itmp,wt){
+obj<-function(eqc,P2,ab,a1,b1,c1,met,itmp,wt,D=D){
 	ifelse(itmp==1,A<-1,A<-eqc[1])
 	B<-eqc[2]
 
@@ -82,7 +82,7 @@ obj<-function(eqc,P2,ab,a1,b1,c1,met,itmp,wt){
 	ni<-ncol(P2)
 	P1<-matrix(NA,length(ab),ni)
 	for (i in 1:ni)
-		P1[,i]<-irtp1(ab,diff=b12[i],discr=a12[i],guess=c1[i])
+		P1[,i]<-irtp1(ab,diff=b12[i],discr=a12[i],guess=c1[i],D=D)
 
 	if (met=="Haebara") f<-0.5*sum(rowSums((P2-P1)^2)*wt)
 	if (met=="Stocking-Lord") f<-0.5*sum(((rowSums(P2)-rowSums(P1))^2)*wt)
@@ -90,7 +90,7 @@ obj<-function(eqc,P2,ab,a1,b1,c1,met,itmp,wt){
 }
 
 
-direc<-function(mod1,mod2,method="mean-mean",suff1=".1",suff2=".2",itmp,quadrature=TRUE,nq=30)
+direc<-function(mod1,mod2,method="mean-mean",suff1=".1",suff2=".2",itmp,D=1,quadrature=TRUE,nq=30)
 {
 	if (method!="mean-mean" & method!="mean-sigma" & method!="mean-gmean" & method!="Haebara" & method!="Stocking-Lord") warning("Method not implemented.")
 	if (itmp!=1 & itmp!=2 & itmp!=3) warning("argument itmp should be an integer between 1 and 3")
@@ -145,8 +145,8 @@ direc<-function(mod1,mod2,method="mean-mean",suff1=".1",suff2=".2",itmp,quadratu
 			}
 			P2<-matrix(NA,length(ab),ni)
 			for (i in 1:ni)
-				P2[,i]<-irtp1(ab,diff=b2[i],discr=a2[i],guess=c2[i])
-			par<-nlminb(start=c(1,0),objective=obj,P2=P2,ab=ab,a1=a1,b1=b1,c1=c1,met=method,itmp=itmp,wt=wt)$par
+				P2[,i]<-irtp1(ab,diff=b2[i],discr=a2[i],guess=c2[i],D=D)
+			par<-nlminb(start=c(1,0),objective=obj,P2=P2,ab=ab,a1=a1,b1=b1,c1=c1,met=method,itmp=itmp,wt=wt,D=D)$par
 
 			A<-par[1]
 			B<-par[2]
@@ -154,7 +154,7 @@ direc<-function(mod1,mod2,method="mean-mean",suff1=".1",suff2=".2",itmp,quadratu
 			a12<-a1/A
 			P1<-matrix(NA,length(ab),ni)
 			for (i in 1:ni)
-				P1[,i]<-irtp1(ab,diff=b12[i],discr=a12[i],guess=c1[i])
+				P1[,i]<-irtp1(ab,diff=b12[i],discr=a12[i],guess=c1[i],D=D)
 			}
 		if (method=="mean-sigma") {
 			partialA_b2<-A*sd(b2)^(-2)*(b2-mean(b2))/ni
@@ -201,7 +201,6 @@ direc<-function(mod1,mod2,method="mean-mean",suff1=".1",suff2=".2",itmp,quadratu
 			partialB_c1<-rep(0,ni)
 			}
 		if (method=="Haebara") {
-			D<-1.7
 			P1<-t(P1)
 			P2<-t(P2)
 			tmp<-((c1+1)*P2+c1-2*(P2+c1+1)*P1+3*P1^2)*(P1-c1)/(1-c1)^2*(1-P1)*a1^2*D
@@ -230,7 +229,6 @@ direc<-function(mod1,mod2,method="mean-mean",suff1=".1",suff2=".2",itmp,quadratu
 			partialSIR_c1<-rbind(rowSums(tmp_c1*abMAT),rowSums(tmp_c1))
 			}
 		if (method=="Stocking-Lord") {
-			D<-1.7
 			P1<-t(P1)
 			P2<-t(P2)
 			tmp1<--(P1-c1)/(1-c1)*(1-P1)*a1

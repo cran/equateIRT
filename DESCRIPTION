@@ -3,15 +3,15 @@ Type: Package
 Title: Direct, chain and average equating coefficients with standard
         errors using IRT methods.
 Imports: statmod
-Version: 1.0
-Date: 2013-06-24
+Version: 1.0-1
+Date: 2013-07-02
 Author: Michela Battauz
 Maintainer: Michela Battauz <michela.battauz@uniud.it>
 Description: This package computes direct, chain and average (bisector)
         equating coefficients with standard errors using Item Response
         Theory (IRT) methods for dichotomous items.
 License: GPL (>= 2)
-Packaged: 2013-06-24 15:22:59 UTC; Michela
+Packaged: 2013-07-02 14:15:17 UTC; Michela
 NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2013-06-24 17:42:50
+Date/Publication: 2013-07-04 16:52:08
