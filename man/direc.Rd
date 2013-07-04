@@ -10,7 +10,7 @@
 }
 \usage{
 direc(mod1, mod2, method = "mean-mean", suff1 = ".1", suff2 = ".2", itmp, 
-   quadrature = TRUE, nq = 30)
+   D = 1, quadrature = TRUE, nq = 30)
 }
 \arguments{
 	\item{mod1}{an object of the class \code{modIRT} containing 
@@ -34,6 +34,9 @@ direc(mod1, mod2, method = "mean-mean", suff1 = ".1", suff2 = ".2", itmp,
 	the three-parameter logistic model. It should be coherent with the item parameters
 	contained in \code{mod1} and \code{mod2}.
 	}
+	\item{D}{constant D of the IRT model used to estimate item 
+	parameters. See below for more details.
+	}
 	\item{quadrature}{logical; if TRUE the Gauss-Hermite quadrature is used
 	to approximate the integral in the function that is minimized in the 
 	Haebara and Stocking-Lord methods.
@@ -48,6 +51,20 @@ direc(mod1, mod2, method = "mean-mean", suff1 = ".1", suff2 = ".2", itmp,
 \details{
 	Equating coefficients perform the conversion from the scale of the 
 	first form to the scale of the second form.
+
+	In the three-parameter logistic model  the probability of a 
+	positive response on item \eqn{i} is
+	\deqn{\pi_i = c_i + (1 - c_i) \frac{\exp[D a_i (\theta - b_i)]}{1 + 
+	\exp[D a_i (\theta - b_i)]}.}{ \pi_i = c_i + (1 - c_i) *  
+	exp\{D a_i (\theta - b_i)\} / [1 + exp\{D a_i (\theta - b_i)\}],}
+	where \eqn{a_i} is the item discrimination parameter, \eqn{b_i} is 
+	the item difficulty parameter, \eqn{c_i} is the item guessing parameter 
+	and	\eqn{\theta} is the latent ability.
+	The constant \eqn{D} can be specified using argument \code{D} of the 
+	\code{direc} function.
+	The two-parameter logistic model can be obtained by setting \eqn{c_i} 
+	equal to zero, while the Rasch model can be obtained by setting \eqn{c_i} 
+	equal to zero and \eqn{a_i} equal to 1.
 }
 \value{
 	An object of class \code{eqc} with components
