@@ -8,7 +8,7 @@
 	IRT methods between all pairs of a list of forms.
 }
 \usage{
-alldirec(mods, method = "mean-mean", all = FALSE, itmp, quadrature = TRUE, nq = 30)
+alldirec(mods, method = "mean-mean", all = FALSE, quadrature = TRUE, nq = 30)
 }
 \arguments{
 	\item{mods}{
@@ -24,12 +24,6 @@ alldirec(mods, method = "mean-mean", all = FALSE, itmp, quadrature = TRUE, nq = 
 	\item{all}{
 	logical; if FALSE forms that do not have common items
 	will not appear in the output.
-	}
-	\item{itmp}{
-	number of item parameters of the IRT model. This should be 1
-	for the Rasch model, 2 for the two-parameter logistic model and 3 for 
-	the three-parameter logistic model. It should be coherent with the item parameters
-	contained in \code{mods}.
 	}
 	\item{quadrature}{logical; if TRUE the Gauss-Hermite quadrature is used
 	to approximate the integral in the function that is minimized in the 
@@ -72,8 +66,8 @@ alldirec(mods, method = "mean-mean", all = FALSE, itmp, quadrature = TRUE, nq = 
 # direct equating coefficients using the "Stocking-Lord" method
 data(est3pl)
 test <- paste("test", 1:5, sep = "")
-mod3pl <- modIRT(coef = est3pl$coef, var = est3pl$var, names = test, ltparam = TRUE, lparam = TRUE)
-direclist3pl <- alldirec(mods = mod3pl, method = "Stocking-Lord", itmp = 3)
+mod3pl <- modIRT(coef = est3pl$coef, var = est3pl$var, names = test, display = FALSE)
+direclist3pl <- alldirec(mods = mod3pl, method = "Stocking-Lord")
 summary(direclist3pl)
 summary(direclist3pl$test1.test2)
 
@@ -81,8 +75,8 @@ summary(direclist3pl$test1.test2)
 # direct equating coefficients using the "Haebara" method
 data(est2pl)
 test <- paste("test", 1:5, sep = "")
-mod2pl <- modIRT(coef = est2pl$coef, var = est2pl$var, names = test, ltparam = TRUE)
-direclist2pl <- alldirec(mods = mod2pl, method = "Haebara", itmp = 2)
+mod2pl <- modIRT(coef = est2pl$coef, var = est2pl$var, names = test, display = FALSE)
+direclist2pl <- alldirec(mods = mod2pl, method = "Haebara")
 summary(direclist2pl)
 summary(direclist2pl$test1.test5)
 
@@ -90,8 +84,9 @@ summary(direclist2pl$test1.test5)
 # direct equating coefficients using the "mean-mean" method
 data(estrasch)
 test <- paste("test", 1:5, sep = "")
-modrasch <- modIRT(coef = estrasch$coef, var = estrasch$var, names = test, ltparam = TRUE)
-direclistrasch <- alldirec(mods = modrasch, method = "mean-mean", all = TRUE, itmp = 1)
+modrasch <- modIRT(coef = estrasch$coef, var = estrasch$var, names = test, 
+	display = FALSE)
+direclistrasch <- alldirec(mods = modrasch, method = "mean-mean", all = TRUE)
 summary(direclistrasch)
 summary(direclistrasch$test5.test4)
 }

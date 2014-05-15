@@ -44,7 +44,7 @@ chainec(r, direclist, f1 = NULL, f2 = NULL, pths = NULL)
 	\item{tab1}{item parameters of the first form.}
 	\item{tab2}{item parameters of the last form.}
 	\item{tab}{data frame containing item parameters of the first form (value1),
-		the last form (value2), and the first form converted in the last
+		the last form (value2), and the first form converted in the scale of the last
 		form (value12).}
 	\item{varAll}{covariance matrix of item parameters of all forms used 
 		in the chain.}
@@ -78,8 +78,8 @@ chainec(r, direclist, f1 = NULL, f2 = NULL, pths = NULL)
 # direct equating coefficients using the "Stocking-Lord" method
 data(est3pl)
 test<-paste("test", 1:5, sep = "")
-mod3pl <- modIRT(coef = est3pl$coef, var = est3pl$var, names = test, ltparam = TRUE, lparam = TRUE)
-direclist3pl <- alldirec(mods = mod3pl, method = "Stocking-Lord", itmp = 3)
+mod3pl <- modIRT(coef = est3pl$coef, var = est3pl$var, names = test, display = FALSE)
+direclist3pl <- alldirec(mods = mod3pl, method = "Stocking-Lord")
 # compute all chain equating coefficients of length 4
 chainec4 <- chainec(r = 4, direclist = direclist3pl)
 summary(chainec4)
@@ -98,8 +98,8 @@ summary(chainec4.14)
 # direct equating coefficients using the "Haebara" method
 data(est2pl)
 test<-paste("test", 1:5, sep = "")
-mod2pl <- modIRT(coef = est2pl$coef, var = est2pl$var, names = test, ltparam = TRUE)
-direclist2pl <- alldirec(mods = mod2pl, method = "Haebara", itmp = 2)
+mod2pl <- modIRT(coef = est2pl$coef, var = est2pl$var, names = test, display = FALSE)
+direclist2pl <- alldirec(mods = mod2pl, method = "Haebara")
 # compute chain equating coefficients of a given path
 pth <- c(paste("test", c(1,5,4), sep = ""))
 pth <- data.frame(t(pth), stringsAsFactors = FALSE)
@@ -111,8 +111,9 @@ summary(chainec154)
 # direct equating coefficients using the "mean-mean" method
 data(estrasch)
 test<-paste("test", 1:5, sep = "")
-modrasch <- modIRT(coef = estrasch$coef, var = estrasch$var, names = test, ltparam = TRUE)
-direclistrasch <- alldirec(mods = modrasch, method = "mean-mean", all = TRUE, itmp = 1)
+modrasch <- modIRT(coef = estrasch$coef, var = estrasch$var, names = test, 
+	display = FALSE)
+direclistrasch <- alldirec(mods = modrasch, method = "mean-mean", all = TRUE)
 # compute chain equating coefficients of two given paths
 pth1 <- paste("test", 1:3, sep = "")
 pth1 <- data.frame(t(pth1), stringsAsFactors = FALSE)

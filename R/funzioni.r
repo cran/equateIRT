@@ -9,19 +9,25 @@ linkp<-function(coef)
 	return(out)
 }
 
-modIRT<-function(coef,var,names,ltparam=FALSE,lparam=FALSE)
+
+modIRT<-function(coef,var=NULL,names=NULL,ltparam=TRUE,lparam=TRUE,display=TRUE,digits=2)
 {
 	coef<-lapply(coef,FUN=function(x) x<-as.matrix(x[,colSums(x==1)!=nrow(x)]))
 	coef<-lapply(coef,FUN=function(x) x<-as.matrix(x[,colSums(x==0)!=nrow(x)]))
-	itmp<-ncol(coef[[1]])
-	if (itmp==1 & lparam) warning("logistic parametrization not meaningful")
-	if (itmp==2 & lparam) warning("logistic parametrization not meaningful")
+	itmp<-sapply(coef,ncol)
+	if (length(unique(itmp))!=1) stop("Mixed model types not allowed")
+	itmp<-itmp[1]
+	if (itmp==1 | itmp==2) lparam<-FALSE
+	lc<-length(coef)
+	if (is.null(names)) names<-paste("T",1:lc,sep="")
 	mods<-list()
-	for (i in 1:length(coef)) {
+	for (i in 1:lc) {
 		c0<-c1<-c2<-NULL
 		D1<-D2<-matrix(NA,0,0)
 		coefi<-coef[[i]]
-		vari<-var[[i]]
+		if (!is.null(var)) vari<-var[[i]]
+		else vari<-NULL
+		if (!is.null(vari)) if (any(is.na(vari))) vari<-NULL
 		n1<-nrow(coefi)
 		if (itmp==1)
 			c1<-coefi[,1]
@@ -46,22 +52,34 @@ modIRT<-function(coef,var,names,ltparam=FALSE,lparam=FALSE)
 			D2<-diag(exp(c0)/(1+exp(c0))^2)
 			c0<-exp(c0)/(1+exp(c0))
 		}
-		if ((ltparam | lparam) & itmp>1) {
-			D1<-blockdiag(D2,D1)
-			vari<-t(D1)%*%vari%*%D1
+		if (!lparam & itmp==3) {
+			D2<-diag(1,n1)
+		}
+		if (!is.null(vari)) {
+			if ((ltparam | lparam) & itmp>1) {
+				D1<-blockdiag(D2,D1)
+				vari<-t(D1)%*%vari%*%D1
+			}
 		}
 		if (itmp==3) names(c0)<-paste("Gussng",names(c0),sep=".")
 		names(c1)<-paste("Dffclt",names(c1),sep=".")
 		if (itmp>1) names(c2)<-paste("Dscrmn",names(c2),sep=".")
 		coefi<-c(c0,c1,c2)
-		rownames(vari)<-colnames(vari)<-names(coefi)
-		mods[[i]]<-list(coef=coefi,var=vari)
+		if (!is.null(vari)) rownames(vari)<-colnames(vari)<-names(coefi)
+		mods[[i]]<-list(coef=coefi,var=vari,itmp=itmp)
+		if (display) {
+			if (!is.null(var)) out<-cbind(coefi,diag(vari)^0.5)
+			else out<-cbind(coefi,NA)
+			out<-round(out,digits)
+			colnames(out)<-c("value","std.err")
+			cat("Form:",names[i],"\n")
+			print(out)
+		}
 	}
 	names(mods)<-names
 	class(mods)<-"modIRT"
 	return(mods)
 }
-
 
 
 irtp1<-function(ab,diff,discr,guess,D)
@@ -90,10 +108,9 @@ obj<-function(eqc,P2,ab,a1,b1,c1,met,itmp,wt,D=D){
 }
 
 
-direc<-function(mod1,mod2,method="mean-mean",suff1=".1",suff2=".2",itmp,D=1,quadrature=TRUE,nq=30)
+direc<-function(mod1,mod2,method="mean-mean",suff1=".1",suff2=".2",D=1,quadrature=TRUE,nq=30)
 {
 	if (method!="mean-mean" & method!="mean-sigma" & method!="mean-gmean" & method!="Haebara" & method!="Stocking-Lord") warning("Method not implemented.")
-	if (itmp!=1 & itmp!=2 & itmp!=3) warning("argument itmp should be an integer between 1 and 3")
 	name1<-names(mod1)
 	name2<-names(mod2)
 	forms<-paste(name1,name2,sep=".")
@@ -103,6 +120,10 @@ direc<-function(mod1,mod2,method="mean-mean",suff1=".1",suff2=".2",itmp,D=1,quad
 	tab2<-data.frame(value2=mod2$coef)
 	var1<-mod1$var
 	var2<-mod2$var
+	itmp1<-mod1$itmp
+	itmp2<-mod2$itmp
+	if (itmp1!=itmp2) stop("Mixed type models not allowed")
+	itmp<-itmp1
 	tab<-merge(tab1,tab2,by=0)
 	if (nrow(tab)==0) {
 		warning("no common items")
@@ -155,159 +176,166 @@ direc<-function(mod1,mod2,method="mean-mean",suff1=".1",suff2=".2",itmp,D=1,quad
 			P1<-matrix(NA,length(ab),ni)
 			for (i in 1:ni)
 				P1[,i]<-irtp1(ab,diff=b12[i],discr=a12[i],guess=c1[i],D=D)
+		}
+		if (!is.null(var1) & !is.null(var2)) {
+			if (method=="mean-sigma") {
+				partialA_b2<-A*sd(b2)^(-2)*(b2-mean(b2))/ni
+				partialA_b1<--A*sd(b1)^(-2)*(b1-mean(b1))/ni
+				if (itmp==1) {partialA_b2<-rep(0,ni)
+					partialA_b1<-rep(0,ni)}
+				partialB_b2<-1/ni-partialA_b2*mean(b1)
+				partialB_b1<- -partialA_b1*mean(b1)-A/ni
+				partialA_a2<-rep(0,ni)
+				partialA_a1<-rep(0,ni)
+				partialB_a2<-rep(0,ni)
+				partialB_a1<-rep(0,ni)
+				partialA_c2<-rep(0,ni)
+				partialA_c1<-rep(0,ni)
+				partialB_c2<-rep(0,ni)
+				partialB_c1<-rep(0,ni)
 			}
-		if (method=="mean-sigma") {
-			partialA_b2<-A*sd(b2)^(-2)*(b2-mean(b2))/ni
-			partialA_b1<--A*sd(b1)^(-2)*(b1-mean(b1))/ni
-			if (itmp==1) {partialA_b2<-rep(0,ni)
-				partialA_b1<-rep(0,ni)}
-			partialB_b2<-1/ni-partialA_b2*mean(b1)
-			partialB_b1<- -partialA_b1*mean(b1)-A/ni
-			partialA_a2<-rep(0,ni)
-			partialA_a1<-rep(0,ni)
-			partialB_a2<-rep(0,ni)
-			partialB_a1<-rep(0,ni)
-			partialA_c2<-rep(0,ni)
-			partialA_c1<-rep(0,ni)
-			partialB_c2<-rep(0,ni)
-			partialB_c1<-rep(0,ni)
+			if (method=="mean-mean") {
+				partialA_b2<-rep(0,ni)
+				partialA_b1<-rep(0,ni)
+				partialB_b2<-rep(1/ni,ni)
+				partialB_b1<-rep(-A/ni,ni)
+				partialA_a2<-rep(-sum(a1)/(sum(a2)^2),ni)
+				partialA_a1<-rep(1/sum(a2),ni)
+				partialB_a2<--partialA_a2*mean(b1)
+				partialB_a1<--partialA_a1*mean(b1)
+				partialA_c2<-rep(0,ni)
+				partialA_c1<-rep(0,ni)
+				partialB_c2<-rep(0,ni)
+				partialB_c1<-rep(0,ni)
 			}
-		if (method=="mean-mean") {
-			partialA_b2<-rep(0,ni)
-			partialA_b1<-rep(0,ni)
-			partialB_b2<-rep(1/ni,ni)
-			partialB_b1<-rep(-A/ni,ni)
-			partialA_a2<-rep(-sum(a1)/(sum(a2)^2),ni)
-			partialA_a1<-rep(1/sum(a2),ni)
-			partialB_a2<--partialA_a2*mean(b1)
-			partialB_a1<--partialA_a1*mean(b1)
-			partialA_c2<-rep(0,ni)
-			partialA_c1<-rep(0,ni)
-			partialB_c2<-rep(0,ni)
-			partialB_c1<-rep(0,ni)
+			if (method=="mean-gmean") {
+				partialA_b2<-rep(0,ni)
+				partialA_b1<-rep(0,ni)
+				partialB_b2<-rep(1/ni,ni)
+				partialB_b1<-rep(-A/ni,ni)
+				partialA_a2<--1/ni*A/a2
+				partialA_a1<-1/ni*A/a1
+				partialB_a2<--partialA_a2*mean(b1)
+				partialB_a1<--partialA_a1*mean(b1)
+				partialA_c2<-rep(0,ni)
+				partialA_c1<-rep(0,ni)
+				partialB_c2<-rep(0,ni)
+				partialB_c1<-rep(0,ni)
 			}
-		if (method=="mean-gmean") {
-			partialA_b2<-rep(0,ni)
-			partialA_b1<-rep(0,ni)
-			partialB_b2<-rep(1/ni,ni)
-			partialB_b1<-rep(-A/ni,ni)
-			partialA_a2<--1/ni*A/a2
-			partialA_a1<-1/ni*A/a1
-			partialB_a2<--partialA_a2*mean(b1)
-			partialB_a1<--partialA_a1*mean(b1)
-			partialA_c2<-rep(0,ni)
-			partialA_c1<-rep(0,ni)
-			partialB_c2<-rep(0,ni)
-			partialB_c1<-rep(0,ni)
+			if (method=="Haebara") {
+				P1<-t(P1)
+				P2<-t(P2)
+				tmp<-((c1+1)*P2+c1-2*(P2+c1+1)*P1+3*P1^2)*(P1-c1)/(1-c1)^2*(1-P1)*a1^2*D
+				tmp<-apply(tmp,2,sum)*wt
+				partialSIR_AB<-matrix(0,2,2)
+				for (i in 1:length(ab)) 
+					partialSIR_AB<- partialSIR_AB-tmp[i]*c(ab[i],1)%*%t(c((ab[i]-B)/A^2,1/A))
+				if (itmp==1) {partialSIR_AB[1,]<-0
+					partialSIR_AB[,1]<-0}
+				abMAT<-matx(ab,ni)
+				wtMAT<-matx(wt,ni)
+				tmp<-(P1-c1)/(1-c1)*(1-P1)*a1*(1-P2)/(1-c2)*wtMAT
+				tmp_a2<-tmp*(P2-c2)*D*(abMAT-b2)
+				partialSIR_a2<-rbind(rowSums(tmp_a2*abMAT),rowSums(tmp_a2))
+				tmp_b2<-tmp*(P2-c2)*D*(-a2)
+				partialSIR_b2<-rbind(rowSums(tmp_b2*abMAT),rowSums(tmp_b2))
+				partialSIR_c2<-rbind(rowSums(tmp*abMAT),rowSums(tmp))
+				tmp_a1<-(((c1+1)*P2+c1-2*(P2+c1+1)*P1+3*P1^2)*a1/(1-c1)*
+					D*(abMAT-A*b1-B)/A+P2-P1)*(P1-c1)/(1-c1)*(1-P1)*wtMAT
+				partialSIR_a1<-rbind(rowSums(tmp_a1*abMAT),rowSums(tmp_a1))
+				tmp_b1<-((c1+1)*P2+c1-2*(P2+c1+1)*P1+3*P1^2)*
+					(P1-c1)/(1-c1)^2*(1-P1)*(-D*a1^2)*wtMAT
+				partialSIR_b1<-rbind(rowSums(tmp_b1*abMAT),rowSums(tmp_b1))
+				tmp_c1<-((c1+1)*P2+c1-2*(P2+c1+1)*P1+3*P1^2-(P2-P1)*(1-P1))*
+					(1-P1)*a1/(1-c1)^2*wtMAT
+				partialSIR_c1<-rbind(rowSums(tmp_c1*abMAT),rowSums(tmp_c1))
 			}
-		if (method=="Haebara") {
-			P1<-t(P1)
-			P2<-t(P2)
-			tmp<-((c1+1)*P2+c1-2*(P2+c1+1)*P1+3*P1^2)*(P1-c1)/(1-c1)^2*(1-P1)*a1^2*D
-			tmp<-apply(tmp,2,sum)*wt
-			partialSIR_AB<-matrix(0,2,2)
-			for (i in 1:length(ab)) 
-				partialSIR_AB<- partialSIR_AB-tmp[i]*c(ab[i],1)%*%t(c((ab[i]-B)/A^2,1/A))
-			if (itmp==1) {partialSIR_AB[1,]<-0
-				partialSIR_AB[,1]<-0}
-			abMAT<-matx(ab,ni)
-			wtMAT<-matx(wt,ni)
-			tmp<-(P1-c1)/(1-c1)*(1-P1)*a1*(1-P2)/(1-c2)*wtMAT
-			tmp_a2<-tmp*(P2-c2)*D*(abMAT-b2)
-			partialSIR_a2<-rbind(rowSums(tmp_a2*abMAT),rowSums(tmp_a2))
-			tmp_b2<-tmp*(P2-c2)*D*(-a2)
-			partialSIR_b2<-rbind(rowSums(tmp_b2*abMAT),rowSums(tmp_b2))
-			partialSIR_c2<-rbind(rowSums(tmp*abMAT),rowSums(tmp))
-			tmp_a1<-(((c1+1)*P2+c1-2*(P2+c1+1)*P1+3*P1^2)*a1/(1-c1)*
-				D*(abMAT-A*b1-B)/A+P2-P1)*(P1-c1)/(1-c1)*(1-P1)*wtMAT
-			partialSIR_a1<-rbind(rowSums(tmp_a1*abMAT),rowSums(tmp_a1))
-			tmp_b1<-((c1+1)*P2+c1-2*(P2+c1+1)*P1+3*P1^2)*
-				(P1-c1)/(1-c1)^2*(1-P1)*(-D*a1^2)*wtMAT
-			partialSIR_b1<-rbind(rowSums(tmp_b1*abMAT),rowSums(tmp_b1))
-			tmp_c1<-((c1+1)*P2+c1-2*(P2+c1+1)*P1+3*P1^2-(P2-P1)*(1-P1))*
-				(1-P1)*a1/(1-c1)^2*wtMAT
-			partialSIR_c1<-rbind(rowSums(tmp_c1*abMAT),rowSums(tmp_c1))
-			}
-		if (method=="Stocking-Lord") {
-			P1<-t(P1)
-			P2<-t(P2)
-			tmp1<--(P1-c1)/(1-c1)*(1-P1)*a1
-			tmp2<-P2-P1
-			tmp3<-(1+c1-2*P1)/(1-c1)*a1
-			tmp4<-(P1-c1)/(1-c1)*(1-P1)*a1*D
-			tmp<-colSums(tmp1)*colSums(tmp4)+colSums(tmp2)*colSums(tmp3*tmp4)
-			tmp<-tmp*wt
-			partialSIR_AB<-matrix(0,2,2)
-			for (i in 1:length(ab)) 
-				partialSIR_AB<- partialSIR_AB-tmp[i]*c(ab[i],1)%*%t(c((ab[i]-B)/A^2,1/A))
-			if (itmp==1) {partialSIR_AB[1,]<-0
-				partialSIR_AB[,1]<-0}
-			abMAT<-matrix(rep(ab,each=ni),nrow=ni)
-			abMAT<-matx(ab,ni)
-			wtMAT<-matx(wt,ni)
-			tmp<-(P1-c1)/(1-c1)*(1-P1)*a1
-			tmp<-matx(colSums(tmp),ni)*(1-P2)/(1-c2)*wtMAT
-			tmp_a2<-tmp*(P2-c2)*D*(abMAT-b2)
-			partialSIR_a2<-rbind(rowSums(tmp_a2*abMAT),rowSums(tmp_a2))
-			tmp_b2<-tmp*(P2-c2)*D*(-a2)
-			partialSIR_b2<-rbind(rowSums(tmp_b2*abMAT),rowSums(tmp_b2))
-			partialSIR_c2<-rbind(rowSums(tmp*abMAT),rowSums(tmp))
-			tmp1<--(P1-c1)/(1-c1)*(1-P1)*a1
-			tmp2<-P2-P1
-			tmp3<-(1+c1-2*P1)/(1-c1)*a1
-			tmp4<-D*(abMAT-A*b1-B)/A
-			tmp6<-(P1-c1)/(1-c1)*(1-P1)
-			tmp_a1<-matx(colSums(tmp1),ni)*(tmp4*tmp6)+matx(colSums(tmp2),ni)*(tmp3*tmp4*tmp6)+matx(colSums(tmp2),ni)*(tmp6)
-			tmp_a1<-tmp_a1*wtMAT
-			partialSIR_a1<-rbind(rowSums(tmp_a1*abMAT),rowSums(tmp_a1))
-			tmp61<- -tmp6*D*a1
-			tmp_b1<-matx(colSums(tmp1),ni)*tmp61+matx(colSums(tmp2),ni)*(tmp3*tmp61)
-			tmp_b1<-tmp_b1*wtMAT
-			partialSIR_b1<-rbind(rowSums(tmp_b1*abMAT),rowSums(tmp_b1))
-			tmp7<-(P1-c1)/(1-c1)*a1
-			tmp8<-(1-P1)/(1-c1)
-			tmp_c1<-matx(colSums(tmp1),ni)*tmp8-matx(colSums(tmp2),ni)*(tmp7*tmp8)
-			tmp_c1<-tmp_c1*wtMAT
-			partialSIR_c1<-rbind(rowSums(tmp_c1*abMAT),rowSums(tmp_c1))
+			if (method=="Stocking-Lord") {
+				P1<-t(P1)
+				P2<-t(P2)
+				tmp1<--(P1-c1)/(1-c1)*(1-P1)*a1
+				tmp2<-P2-P1
+				tmp3<-(1+c1-2*P1)/(1-c1)*a1
+				tmp4<-(P1-c1)/(1-c1)*(1-P1)*a1*D
+				tmp<-colSums(tmp1)*colSums(tmp4)+colSums(tmp2)*colSums(tmp3*tmp4)
+				tmp<-tmp*wt
+				partialSIR_AB<-matrix(0,2,2)
+				for (i in 1:length(ab)) 
+					partialSIR_AB<- partialSIR_AB-tmp[i]*c(ab[i],1)%*%t(c((ab[i]-B)/A^2,1/A))
+				if (itmp==1) {partialSIR_AB[1,]<-0
+					partialSIR_AB[,1]<-0}
+				abMAT<-matrix(rep(ab,each=ni),nrow=ni)
+				abMAT<-matx(ab,ni)
+				wtMAT<-matx(wt,ni)
+				tmp<-(P1-c1)/(1-c1)*(1-P1)*a1
+				tmp<-matx(colSums(tmp),ni)*(1-P2)/(1-c2)*wtMAT
+				tmp_a2<-tmp*(P2-c2)*D*(abMAT-b2)
+				partialSIR_a2<-rbind(rowSums(tmp_a2*abMAT),rowSums(tmp_a2))
+				tmp_b2<-tmp*(P2-c2)*D*(-a2)
+				partialSIR_b2<-rbind(rowSums(tmp_b2*abMAT),rowSums(tmp_b2))
+				partialSIR_c2<-rbind(rowSums(tmp*abMAT),rowSums(tmp))
+				tmp1<--(P1-c1)/(1-c1)*(1-P1)*a1
+				tmp2<-P2-P1
+				tmp3<-(1+c1-2*P1)/(1-c1)*a1
+				tmp4<-D*(abMAT-A*b1-B)/A
+				tmp6<-(P1-c1)/(1-c1)*(1-P1)
+				tmp_a1<-matx(colSums(tmp1),ni)*(tmp4*tmp6)+matx(colSums(tmp2),ni)*(tmp3*tmp4*tmp6)+matx(colSums(tmp2),ni)*(tmp6)
+				tmp_a1<-tmp_a1*wtMAT
+				partialSIR_a1<-rbind(rowSums(tmp_a1*abMAT),rowSums(tmp_a1))
+				tmp61<- -tmp6*D*a1
+				tmp_b1<-matx(colSums(tmp1),ni)*tmp61+matx(colSums(tmp2),ni)*(tmp3*tmp61)
+				tmp_b1<-tmp_b1*wtMAT
+				partialSIR_b1<-rbind(rowSums(tmp_b1*abMAT),rowSums(tmp_b1))
+				tmp7<-(P1-c1)/(1-c1)*a1
+				tmp8<-(1-P1)/(1-c1)
+				tmp_c1<-matx(colSums(tmp1),ni)*tmp8-matx(colSums(tmp2),ni)*(tmp7*tmp8)
+				tmp_c1<-tmp_c1*wtMAT
+				partialSIR_c1<-rbind(rowSums(tmp_c1*abMAT),rowSums(tmp_c1))
 			}
 
-		if (method=="mean-mean" | method=="mean-sigma" | method=="mean-gmean") { 
-			if (itmp==1) mat<-cbind(
-				c(partialA_b1,partialA_b2),
-				c(partialB_b1,partialB_b2))
-			if (itmp==2) mat<-cbind(
-				c(partialA_b1,partialA_a1,partialA_b2,partialA_a2),
-				c(partialB_b1,partialB_a1,partialB_b2,partialB_a2))
-			if (itmp==3) mat<-cbind(
-				c(partialA_b1,partialA_a1,partialA_c1,partialA_b2,partialA_a2,partialA_c2),
-				c(partialB_b1,partialB_a1,partialB_c1,partialB_b2,partialB_a2,partialB_c2))
-		}
-		if (method=="Haebara" | method=="Stocking-Lord") {
-			if (itmp==1) partialSIR_gamma<-cbind(partialSIR_b1,partialSIR_b2)
-			if (itmp==1) partialSIR_gamma[1,]<-0
-			if (itmp==2) partialSIR_gamma<-cbind(partialSIR_b1,partialSIR_a1,partialSIR_b2,partialSIR_a2)
-			if (itmp==3) partialSIR_gamma<-cbind(partialSIR_b1,partialSIR_a1,partialSIR_c1,partialSIR_b2,partialSIR_a2,partialSIR_c2)
-			if (itmp==1) {invpartialSIR_AB<-partialSIR_AB
-				invpartialSIR_AB[2,2]<-1/invpartialSIR_AB[2,2]}
-			if (itmp==1) mat1<--invpartialSIR_AB%*%partialSIR_gamma
-			if (itmp>1) mat1<--solve(partialSIR_AB)%*%partialSIR_gamma
-			mat<-t(mat1)
-		}
-		if (ni==0) mat<-matrix(NA,2,2)
-		colnames(mat)<-c("A","B")
-		rownames(mat)<-c(paste(comuni,suff1,sep=""),paste(comuni,suff2,sep=""))
-		if (ni>0) {
-			var1<-var1[tab$Row.names,tab$Row.names]
-			var2<-var2[tab$Row.names,tab$Row.names]
-			rownames(var1)<-colnames(var1)<-paste(rownames(var1),suff1,sep="")
-			rownames(var2)<-colnames(var2)<-paste(rownames(var2),suff2,sep="")
-			var12<-blockdiag(var1,var2)
-			varAB<-t(mat)%*%var12%*%mat
+			if (method=="mean-mean" | method=="mean-sigma" | method=="mean-gmean") { 
+				if (itmp==1) mat<-cbind(
+					c(partialA_b1,partialA_b2),
+					c(partialB_b1,partialB_b2))
+				if (itmp==2) mat<-cbind(
+					c(partialA_b1,partialA_a1,partialA_b2,partialA_a2),
+					c(partialB_b1,partialB_a1,partialB_b2,partialB_a2))
+				if (itmp==3) mat<-cbind(
+					c(partialA_b1,partialA_a1,partialA_c1,partialA_b2,partialA_a2,partialA_c2),
+					c(partialB_b1,partialB_a1,partialB_c1,partialB_b2,partialB_a2,partialB_c2))
 			}
-		else { 
+			if (method=="Haebara" | method=="Stocking-Lord") {
+				if (itmp==1) partialSIR_gamma<-cbind(partialSIR_b1,partialSIR_b2)
+				if (itmp==1) partialSIR_gamma[1,]<-0
+				if (itmp==2) partialSIR_gamma<-cbind(partialSIR_b1,partialSIR_a1,partialSIR_b2,partialSIR_a2)
+				if (itmp==3) partialSIR_gamma<-cbind(partialSIR_b1,partialSIR_a1,partialSIR_c1,partialSIR_b2,partialSIR_a2,partialSIR_c2)
+				if (itmp==1) {invpartialSIR_AB<-partialSIR_AB
+					invpartialSIR_AB[2,2]<-1/invpartialSIR_AB[2,2]}
+				if (itmp==1) mat1<--invpartialSIR_AB%*%partialSIR_gamma
+				if (itmp>1) mat1<--solve(partialSIR_AB)%*%partialSIR_gamma
+				mat<-t(mat1)
+			}
+			if (ni==0) mat<-matrix(NA,2,2)
+			colnames(mat)<-c("A","B")
+			rownames(mat)<-c(paste(comuni,suff1,sep=""),paste(comuni,suff2,sep=""))
+			if (ni>0) {
+				var1<-var1[tab$Row.names,tab$Row.names]
+				var2<-var2[tab$Row.names,tab$Row.names]
+				rownames(var1)<-colnames(var1)<-paste(rownames(var1),suff1,sep="")
+				rownames(var2)<-colnames(var2)<-paste(rownames(var2),suff2,sep="")
+				var12<-blockdiag(var1,var2)
+				varAB<-t(mat)%*%var12%*%mat
+			}
+			else { 
+				varAB<-matrix(NA,2,2)
+				var12<-NULL 
+			}
+		}
+		if (is.null(var1) | is.null(var2)) {
+			var12<-NULL
+			mat<-NULL
 			varAB<-matrix(NA,2,2)
-			var12<-NULL 
-			}
+		}
 		taball$value12<-NA
 		taball$value12[1:niall]<-A*taball$value1[1:niall]+B
 		if (itmp>1) taball$value12[(niall+1):(2*niall)]<-taball$value1[(niall+1):(2*niall)]/A
@@ -321,6 +349,8 @@ direc<-function(mod1,mod2,method="mean-mean",suff1=".1",suff2=".2",itmp,D=1,quad
 	class(out) <- "eqc"
 	return(out)
 }
+
+
 
 matx<-function(vect,n) {
 	rep(1,n)%x%t(vect)
@@ -349,7 +379,8 @@ print.summary.eqc <- function(x, ...)
 	else cat("no common items\n")
 }
 
-alldirec<-function(mods,method="mean-mean",all=FALSE,itmp,quadrature=TRUE,nq=30)
+
+alldirec<-function(mods,method="mean-mean",all=FALSE,quadrature=TRUE,nq=30)
 {
 	options(warn=-1)
 	nt<-length(mods)
@@ -358,7 +389,7 @@ alldirec<-function(mods,method="mean-mean",all=FALSE,itmp,quadrature=TRUE,nq=30)
 	for (i in 1:nt) {
 		for (j in 1:nt) {
 			if (i!=j) {
-			tmp<-direc(mods[i],mods[j],suff1=paste(".",i,sep=""),suff2=paste(".",j,sep=""),method=method,itmp=itmp,quadrature=quadrature,nq=nq)
+			tmp<-direc(mods[i],mods[j],suff1=paste(".",i,sep=""),suff2=paste(".",j,sep=""),method=method,quadrature=quadrature,nq=nq)
 			if (tmp$ni>0 | all) {
 				direclist[[k]]<-tmp
 				names(direclist)[[k]]<-tmp$forms
@@ -369,6 +400,7 @@ alldirec<-function(mods,method="mean-mean",all=FALSE,itmp,quadrature=TRUE,nq=30)
 	options(warn=0)
 	return(direclist)
 }
+
 
 summary.eqclist <- function(object, ...)
 {
@@ -386,6 +418,7 @@ print.summary.eqclist<-function(x, ...)
 		cat("\n\n")
 	}
 }
+
 
 chainec<-function(r,direclist,f1=NULL,f2=NULL,pths=NULL)
 {
@@ -424,6 +457,7 @@ chainec<-function(r,direclist,f1=NULL,f2=NULL,pths=NULL)
 		varAll<-matrix(0,0,0)
 		comuni<-list()
 		missing<-FALSE
+		varNULL<-FALSE
 		for (k in 1:(r-1)) {
 			nome<-paste(pths[j,k],pths[j,k+1],sep=".")
 			link<-direclist[[nome]]
@@ -442,20 +476,22 @@ chainec<-function(r,direclist,f1=NULL,f2=NULL,pths=NULL)
 
 					A<-link$A*A  #A1...k=Ak-1k*A1...k-1
 					B<-link$B+link$A*B #B1...k=Bkk-1+Akk-1*B1...k-1
-
-					varAll<-blockdiag(varAll,link$var12)
+					
+					if (!is.null(link$var12)) varAll<-blockdiag(varAll,link$var12)
+					if (is.null(link$var12)) varNULL<-TRUE
 					comuni[[k]]<-link$commonitem[[1]]
-					}
+				}
 				else {
 					warning("forms ",nome," have no common items\n")
 					missing<-TRUE
-					}
+				}
 			}
 			if (is.null(link)) {
 				warning("link of forms ",nome," is missing\n")
 				missing<-TRUE
-				ni<-c(ni,0)}
-				}
+				ni<-c(ni,0)
+			}
+		}
 
 		if (!missing) {
 			partialA<-tapply(partialA,names(partialA),sum)
@@ -469,7 +505,8 @@ chainec<-function(r,direclist,f1=NULL,f2=NULL,pths=NULL)
 			mat<-as.matrix(mat)
 			sel<-unique(rownames(varAll))
 			varAB<-t(mat[sel,])%*%varAll[sel,sel]%*%mat[sel,]
-	
+			if(varNULL) varAB<-matrix(NA,2,2)
+			#if (is.null(link$var12))
 			taball<-merge(tab1,tab2,by=0,suffixes=c(.1,.2),all=T)
 			niall<-nrow(taball)/link$itmp
 			taball$value12<-NA
@@ -485,7 +522,7 @@ chainec<-function(r,direclist,f1=NULL,f2=NULL,pths=NULL)
 			out[[j]]$B<-B
 			out[[j]]$varAB<-varAB
 			out[[j]]$commonitem<-comuni
-			}
+		}
 		out[[j]]$ni<-ni
 		out[[j]]$forms<-nomi[j]
 		if (!is.null(link)) out[[j]]$method<-link$method
@@ -503,15 +540,24 @@ chainec<-function(r,direclist,f1=NULL,f2=NULL,pths=NULL)
 bisectorec<-function(ecall,mods,weighted=TRUE,unweighted=TRUE)
 {
 	if (length(table(sapply(ecall,FUN=function(x) x$method)))!=1) warning("ecall contains different methods")
-	part<-lapply(ecall,FUN=function(x) data.frame(A=x$partial[,1],
-				B=x$partial[,2],stringsAsFactors = FALSE))
-	for (i in 1:length(part)) {
-		part[[i]]$path<-names(part)[i]
-		part[[i]]$par<-rownames(part[[i]])
+	varNULL<-FALSE
+	if (any(sapply(ecall,FUN=function(x) is.na(x$varAB)))) varNULL<-TRUE
+	if (varNULL & weighted) {
+		warning("weighted bisector unfeasible with NULL covariance matrix")
+		weighted<-FALSE
 	}
-	partall<-part[[1]]
-	for (i in 2:length(part))  partall<-rbind(partall,part[[i]])
-	partall$link<-path2link(partall$path)
+	if (!varNULL) {
+		part<-lapply(ecall,FUN=function(x) data.frame(A=x$partial[,1],
+					B=x$partial[,2],stringsAsFactors = FALSE))
+		for (i in 1:length(part)) {
+			part[[i]]$path<-names(part)[i]
+			part[[i]]$par<-rownames(part[[i]])
+		}
+		partall<-part[[1]]
+		for (i in 2:length(part))  partall<-rbind(partall,part[[i]])
+		partall$link<-path2link(partall$path)
+	}
+	else partall<-NULL
 	coall<-data.frame(t(sapply(ecall,FUN=function(x) x[c("A","B")])))
 	coall$sdA<-sapply(ecall,FUN=function(x) x$varAB[1,1]^0.5)
 	coall$sdB<-sapply(ecall,FUN=function(x) x$varAB[2,2]^0.5)
@@ -521,7 +567,8 @@ bisectorec<-function(ecall,mods,weighted=TRUE,unweighted=TRUE)
 
 	coall$weights<-NA
 	links<-sort(unique(coall$link))
-	VarAll<-VarExt(mods)
+	if (!varNULL) VarAll<-VarExt(mods)
+	else VarAll<-NULL
 	if (unweighted) {
 		coall$weights<-1
 		bis<-bisco(coall,VarAll,partall)
@@ -547,6 +594,7 @@ bisectorec<-function(ecall,mods,weighted=TRUE,unweighted=TRUE)
 	class(meq)<-"meqc"
 	return(meq)
 }
+
 
 summary.meqc <- function(object, ...)
 {
@@ -593,34 +641,36 @@ bisco<-function(coall,VarAll,partall)
 	coall$W<-W[coall$link]
 	coall$mA<-mA[coall$link]
 	coall$mB<-mB[coall$link]
-	coall$partAA<-((1-coall$A^2/(1+coall$A^2))*coall$w*coall$W+
-					coall$mA*coall$W*coall$weights*coall$A*(1+coall$A^2)^(-1.5))/
-					coall$W^2
-	coall$partBA<- -(coall$A*coall$B/(1+coall$A^2)*coall$w*coall$W+
-					coall$mB*coall$W*coall$weights*coall$A*(1+coall$A^2)^(-1.5))/
-					coall$W^2
-	coall$partBB<- coall$w/coall$W
-
 	out<-data.frame(link=names(mA),A=mA,B=mB,sdA=NA,sdB=NA,corAB=NA,path="bisector",weights=NA)
-	links<-unique(coall$link)
-	for (i in links){
-		coi<-coall[coall$link==i,]
-		parti<-partall[partall$link==i,]
-		parti$partAA<-coi[parti$path,]$partAA
-		parti$partBA<-coi[parti$path,]$partBA
-		parti$partBB<-coi[parti$path,]$partBB
+	if (!is.null(VarAll)) {
+		coall$partAA<-((1-coall$A^2/(1+coall$A^2))*coall$w*coall$W+
+						coall$mA*coall$W*coall$weights*coall$A*(1+coall$A^2)^(-1.5))/
+						coall$W^2
+		coall$partBA<- -(coall$A*coall$B/(1+coall$A^2)*coall$w*coall$W+
+						coall$mB*coall$W*coall$weights*coall$A*(1+coall$A^2)^(-1.5))/
+						coall$W^2
+		coall$partBB<- coall$w/coall$W
 
-		partialAmean<-tapply(parti$partAA*parti$A,parti$par,FUN=sum)
-		partialBmean<-tapply(parti$partBA*parti$A+parti$partBB*parti$B,parti$par,FUN=sum)
-		partialmean<-cbind(partialAmean,partialBmean)
-		sel<-rownames(partialmean)
-		varAB<-t(partialmean)%*%VarAll[sel,sel]%*%partialmean
-		sdA<-varAB[1,1]^0.5
-		sdB<-varAB[2,2]^0.5
-		out[i,]$sdA<-sdA
-		out[i,]$sdB<-sdB
-		out[i,]$corAB<-varAB[1,2]/(sdA*sdB)
+		links<-unique(coall$link)
+		for (i in links){
+			coi<-coall[coall$link==i,]
+			parti<-partall[partall$link==i,]
+			parti$partAA<-coi[parti$path,]$partAA
+			parti$partBA<-coi[parti$path,]$partBA
+			parti$partBB<-coi[parti$path,]$partBB
+
+			partialAmean<-tapply(parti$partAA*parti$A,parti$par,FUN=sum)
+			partialBmean<-tapply(parti$partBA*parti$A+parti$partBB*parti$B,parti$par,FUN=sum)
+			partialmean<-cbind(partialAmean,partialBmean)
+			sel<-rownames(partialmean)
+			varAB<-t(partialmean)%*%VarAll[sel,sel]%*%partialmean
+			sdA<-varAB[1,1]^0.5
+			sdB<-varAB[2,2]^0.5
+			out[i,]$sdA<-sdA
+			out[i,]$sdB<-sdB
+			out[i,]$corAB<-varAB[1,2]/(sdA*sdB)
 		}
+	}
 	return(out)
 }
  
@@ -702,16 +752,200 @@ blockdiag<-function(m1,m2)
 } 
 
 
-convert<-function(A,B,coef)
+convert<-function(A,B,coef=NULL,person.par=NULL)
 {
-	itms<-names(coef)
-	Dffclt<-coef[substr(itms,1,6)=="Dffclt"]
-	Dscrmn<-coef[substr(itms,1,6)=="Dscrmn"]
-	Gussng<-coef[substr(itms,1,6)=="Gussng"]
+	if (!is.null(coef)) {
+		itms<-names(coef)
+		Dffclt<-coef[substr(itms,1,6)=="Dffclt"]
+		Dscrmn<-coef[substr(itms,1,6)=="Dscrmn"]
+		Gussng<-coef[substr(itms,1,6)=="Gussng"]
+		Dffclt<-Dffclt*A+B
+		if (length(Dscrmn)>0) Dscrmn<-Dscrmn/A
+		coef1<-c(Dffclt,Dscrmn,Gussng)
+	}
+	else coef1<-NULL
+	if (!is.null(person.par)) person.par1<-person.par*A+B
+	else person.par1<-NULL
+	return(list(coef=coef1,person.par=person.par1))
+}
 
-	Dffclt<-Dffclt*A+B
-	if (length(Dscrmn)>0) Dscrmn<-Dscrmn/A
-	return(c(Dffclt,Dscrmn,Gussng))
+
+import.flexmirt<-function(fnamep,fnamev=NULL,param.number=NULL,fixed=NULL,display=TRUE,digits=2) {
+	par<-read.table(fnamep,fill=TRUE)
+	ngr<-sum(par$V1==0,na.rm=TRUE)
+	if (ngr>1) stop("Cannot handle multiple groups")
+	if(max(par$V4,na.rm=TRUE)>1) stop("Cannot handle multiple factors")
+	if(max(par$V6,na.rm=TRUE)>2) stop("Cannot handle multiple response models")
+	par<-par[par$V1!=0 & !is.na(par$V1),]
+	if(length(unique(par$V5))>1) stop("Cannot handle mixed item types")
+	if(unique(par$V5)==3) stop("Cannot handle nominal categories models")
+	if(unique(par$V5)==2) itmp=2
+	if(unique(par$V5)==1) itmp=3
+	if(length(unique(par$V8))==1) itmp=1
+	ifelse(all(par$V8==1),Rasch<-TRUE,Rasch<-FALSE)
+	if (itmp==1 | itmp==2) {p<-par[,c(7,8)]
+		colnames(p)<-c("c","a")}
+	if (itmp==3) {p<-par[,7:9]
+		colnames(p)<-c("logit-g","c","a")}
+	rownames(p)<-par$V2
+	p<-as.matrix(p)
+
+	if (!is.null(fnamev)) {
+		vm<-read.table(fnamev,sep=",")
+		vm<-as.matrix(vm[,colSums(is.na(vm))!=nrow(vm)])
+		colnames(vm)<-NULL
+		n<-nrow(p)
+		if (itmp==1 & !Rasch) reord<-c((n+1):(2*n),1:n)
+		if (itmp==1 & Rasch) reord<-1:n
+		if (itmp==2) reord<-c((n+1):(2*n),1:n)
+		if (itmp==3) reord<-c((2*n+1):(3*n),(n+1):(2*n),1:n)
+		if (is.null(param.number)) {
+			if (Rasch) param.number<-1:n
+			if (itmp==1 & !Rasch) param.number<-c(rep(n+1,n),1:n)
+			if (itmp==2) param.number<-c(1:n*2,1:n*2-1)
+			if (itmp==3) param.number<-c(1:n*3,1:n*3-1,1:n*3-2)
+		}
+		if (!is.null(fixed)) {
+			nf<-length(fixed)
+			nvm1<-nrow(vm)+nf
+			vm1<-matrix(0,nvm1,nvm1)
+			vm1[!(1:nvm1)%in%fixed,!(1:nvm1)%in%fixed]<-vm
+			vm<-vm1
+		}
+		vm<-vm[param.number,param.number]
+		if (!Rasch & n*ncol(p)!=nrow(vm)) stop("number of parameters and dimension of the covariance matrix do not match")
+		if (Rasch & n!=nrow(vm)) stop("number of parameters and dimension of the covariance matrix do not match")
+		vm<-vm[reord,reord]
+	}
+	else vm<-NULL
+	if (display) {
+		out<-matrix(NA,nrow(p),ncol(p)*3)
+		out[,seq(2,ncol(out),by=3)]<-p
+		se<-diag(vm)^0.5
+		if (!is.null(vm)) out[,seq(3,ncol(out),by=3)]<-se
+		if (!is.null(vm)) out[,seq(1,ncol(out),by=3)]<-param.number[reord]
+		if (itmp==1) colnames(out)<-c("par.num.","c","s.e.","par.num.","a","s.e.")
+		if (itmp==2) colnames(out)<-c("par.num.","c","s.e.","par.num.","a","s.e.")
+		if (itmp==3) colnames(out)<-c("par.num.","logit-g","s.e.","par.num.","c","s.e.","par.num.","a","s.e.")
+		if (Rasch) out[,c(4,6)]<-NA
+		rownames(out)<-par$V2
+		out<-round(out,digits)
+		print(out)
+	}
+	return(list(coef=p,var=vm))
+}
+
+
+import.irtpro<-function(fnamep,fnamev=NULL,param.number=NULL,fixed=NULL,display=TRUE,digits=2) {
+	par<-read.table(fnamep,fill=TRUE)
+	ngr<-sum(par$V3==0,na.rm=TRUE)
+	if (ngr>1) stop("Cannot handle multiple groups")
+	if(max(par$V2,na.rm=TRUE)>1) stop("Cannot handle multiple factors")
+	if(max(par$V4,na.rm=TRUE)>2) stop("Cannot handle multiple response models")
+	par<-par[par$V3!=0 & !is.na(par$V3),]
+	if(length(unique(par$V3))>1) stop("Cannot handle mixed item types")
+	if(unique(par$V3)==2) itmp=2
+	if(unique(par$V3)==1) itmp=3
+	if(length(unique(par$V5))==1) itmp=1
+	ifelse(all(par$V5==1),Rasch<-TRUE,Rasch<-FALSE)
+	if (itmp==1 | itmp==2) {p<-par[,c(6,5)]
+		colnames(p)<-c("c","a")}
+	if (itmp==3) {p<-par[,c(7,6,5)]
+		colnames(p)<-c("g","c","a")}
+	rownames(p)<-par$V1
+	p<-as.matrix(p)
+
+	if (!is.null(fnamev)) {
+		vm<-read.table(fnamev,sep=",")
+		vm<-as.matrix(vm[,colSums(is.na(vm))!=nrow(vm)])
+		colnames(vm)<-NULL
+		n<-nrow(p)
+		if (itmp==1 & !Rasch) reord<-c((n+1):(2*n),1:n)
+		if (itmp==1 & Rasch) reord<-1:n
+		if (itmp==2) reord<-c((n+1):(2*n),1:n)
+		if (itmp==3) reord<-c((2*n+1):(3*n),(n+1):(2*n),1:n)
+		if (is.null(param.number)) {
+			if (Rasch) param.number<-1:n
+			if (itmp==1 & !Rasch) param.number<-c(rep(n+1,n),1:n)
+			if (itmp==2) param.number<-c(1:n*2,1:n*2-1)
+			if (itmp==3) param.number<-c(1:n*3,1:n*3-1,1:n*3-2)
+		}
+		if (!is.null(fixed)) {
+			nf<-length(fixed)
+			nvm1<-nrow(vm)+nf
+			vm1<-matrix(0,nvm1,nvm1)
+			vm1[!(1:nvm1)%in%fixed,!(1:nvm1)%in%fixed]<-vm
+			vm<-vm1
+		}
+		vm<-vm[param.number,param.number]
+		if (!Rasch & n*ncol(p)!=nrow(vm)) stop("number of parameters and dimension of the covariance matrix do not match")
+		if (Rasch & n!=nrow(vm)) stop("number of parameters and dimension of the covariance matrix do not match")
+		vm<-vm[reord,reord]
+	}
+	else vm<-NULL
+	if (display) {
+		out<-matrix(NA,nrow(p),ncol(p)*3)
+		out[,seq(2,ncol(out),by=3)]<-p
+		se<-diag(vm)^0.5
+		if (!is.null(vm)) out[,seq(3,ncol(out),by=3)]<-se
+		if (!is.null(vm)) out[,seq(1,ncol(out),by=3)]<-param.number[reord]
+		if (itmp==1) colnames(out)<-c("par.num.","c","s.e.","par.num.","a","s.e.")
+		if (itmp==2) colnames(out)<-c("par.num.","c","s.e.","par.num.","a","s.e.")
+		if (itmp==3) colnames(out)<-c("par.num.","g","s.e.","par.num.","c","s.e.","par.num.","a","s.e.")
+		if (Rasch) out[,c(4,6)]<-NA
+		rownames(out)<-par$V1
+		out<-round(out,digits)
+		print(out)
+	}
+	return(list(coef=p,var=vm))
+}
+
+
+import.ltm<-function(mod,display=TRUE,digits=4) {
+	if (class(mod)=="grm") stop("Cannot handle multiple response models")
+	if (class(mod)=="gpcm") stop("Cannot handle multiple response models")
+	if (class(mod)=="ltm") if (mod$ltst$factors>1) stop("Cannot handle multiple factors")
+	if (class(mod)=="ltm") if (ncol(mod$coef)>2) stop("Cannot handle not IRT models")
+	p<-mod$coef
+	vm<-solve(mod$hessian)
+	if (!is.null(mod$constraint) & class(mod)=="rasch") {
+		if (!all(p[,ncol(p)]==1)) {
+			cstr<-mod$constraint
+			nf<-nrow(cstr)
+			fixed<-cstr[,1]
+			nvm1<-nrow(vm)+nf
+			vm1<-matrix(0,nvm1,nvm1)
+			vm1[!(1:nvm1)%in%fixed,!(1:nvm1)%in%fixed]<-vm
+			vm<-vm1
+		}
+	}
+	if (!is.null(mod$constraint) & (class(mod)=="ltm" | class(mod)=="tpm")) {
+		cstr<-mod$constraint
+		nf<-nrow(cstr)
+		fixed<-cstr[,1]+(cstr[,2]-1)*nrow(p)
+		nvm1<-nrow(vm)+nf
+		vm1<-matrix(0,nvm1,nvm1)
+		vm1[!(1:nvm1)%in%fixed,!(1:nvm1)%in%fixed]<-vm
+		vm<-vm1
+	}
+	if (length(unique(p[,ncol(p)]))==1 & !all(p[,ncol(p)]==1)) {
+		nv<-nrow(vm)-1
+		vm<-vm[c(1:nv,rep(nv+1,nrow(p))),c(1:nv,rep(nv+1,nrow(p)))]
+	}
+	if (display) {
+		out<-matrix(NA,nrow(p),ncol(p)*2)
+		out[,seq(1,ncol(out),by=2)]<-p
+		se<-diag(vm)^0.5
+		if (!is.null(vm)) out[,seq(2,ncol(out),by=2)]<-se
+		if (all(p[,ncol(p)]==1)) out[,ncol(out)]<-0
+		rownames(out)<-rownames(p)
+		colnames(out)<-1:ncol(out)
+		colnames(out)[seq(1,ncol(out),by=2)]<-colnames(p)
+		colnames(out)[seq(2,ncol(out),by=2)]<-rep("s.e.",ncol(p))
+		out<-round(out,digits)
+		print(out)
+	}
+	return(list(coef=p,var=vm))
 }
 
 

@@ -9,7 +9,7 @@
 	IRT methods.
 }
 \usage{
-direc(mod1, mod2, method = "mean-mean", suff1 = ".1", suff2 = ".2", itmp, 
+direc(mod1, mod2, method = "mean-mean", suff1 = ".1", suff2 = ".2",
    D = 1, quadrature = TRUE, nq = 30)
 }
 \arguments{
@@ -28,11 +28,6 @@ direc(mod1, mod2, method = "mean-mean", suff1 = ".1", suff2 = ".2", itmp,
 	\item{suff1}{suffix to identify the first form to be equated.
 	}
 	\item{suff2}{suffix to identify the second form to be equated.
-	}
-	\item{itmp}{number of item parameters of the IRT model. This should be 1
-	for the Rasch model, 2 for the two-parameter logistic model and 3 for 
-	the three-parameter logistic model. It should be coherent with the item parameters
-	contained in \code{mod1} and \code{mod2}.
 	}
 	\item{D}{constant D of the IRT model used to estimate item 
 	parameters. See below for more details.
@@ -63,7 +58,9 @@ direc(mod1, mod2, method = "mean-mean", suff1 = ".1", suff2 = ".2", itmp,
 	The constant \eqn{D} can be specified using argument \code{D} of the 
 	\code{direc} function.
 	The two-parameter logistic model can be obtained by setting \eqn{c_i} 
-	equal to zero, while the Rasch model can be obtained by setting \eqn{c_i} 
+	equal to zero, the one-parameter logistic model can be obtained 
+	by setting \eqn{c_i} equal to zero and \eqn{a_i} costant across items,
+	while the Rasch model can be obtained by setting \eqn{c_i} 
 	equal to zero and \eqn{a_i} equal to 1.
 }
 \value{
@@ -71,7 +68,7 @@ direc(mod1, mod2, method = "mean-mean", suff1 = ".1", suff2 = ".2", itmp,
 	\item{tab1}{item parameters of the first form.}
 	\item{tab2}{item parameters of the second form.}
 	\item{tab}{data frame containing item parameters of the first form (value1),
-		the second form (value2), and the first form converted in the second
+		the second form (value2), and the first form converted in the scale of the second
 		form (value12).}
 	\item{var12}{covariance matrix of item parameters of the first 
 		and the second form.}
@@ -109,24 +106,25 @@ direc(mod1, mod2, method = "mean-mean", suff1 = ".1", suff2 = ".2", itmp,
 # direct equating coefficients between forms 1 and 2 using the Stocking-Lord method
 data(est3pl)
 test <- paste("test", 1:5, sep = "")
-mod3pl <- modIRT(coef = est3pl$coef, var = est3pl$var, names = test, ltparam = TRUE, lparam = TRUE)
-l12 <- direc(mod1 = mod3pl[1], mod2 = mod3pl[2], method = "Stocking-Lord", itmp = 3)
+mod3pl <- modIRT(coef = est3pl$coef, var = est3pl$var, names = test, display = FALSE)
+l12 <- direc(mod1 = mod3pl[1], mod2 = mod3pl[2], method = "Stocking-Lord")
 summary(l12)
 
 # two-parameter logistic model
 # direct equating coefficients between forms 1 and 5 using the Haebara method
 data(est2pl)
 test <- paste("test", 1:5, sep = "")
-mod2pl <- modIRT(coef = est2pl$coef, var = est2pl$var, names = test, ltparam = TRUE)
-l15 <- direc(mod1 = mod2pl[1], mod2 = mod2pl[5], method = "Haebara", itmp = 2)
+mod2pl <- modIRT(coef = est2pl$coef, var = est2pl$var, names = test, display = FALSE)
+l15 <- direc(mod1 = mod2pl[1], mod2 = mod2pl[5], method = "Haebara")
 summary(l15)
 
 # Rasch model
 # direct equating coefficients between forms 5 and 4 using the mean-mean method
 data(estrasch)
 test <- paste("test", 1:5, sep = "")
-modrasch <- modIRT(coef = estrasch$coef, var = estrasch$var, names = test, ltparam = TRUE)
-l54 <- direc(mod1 = modrasch[5], mod2 = modrasch[4], method = "mean-mean", itmp = 1)
+modrasch <- modIRT(coef = estrasch$coef, var = estrasch$var, names = test, 
+	display = FALSE)
+l54 <- direc(mod1 = modrasch[5], mod2 = modrasch[4], method = "mean-mean")
 summary(l54)
 }
 

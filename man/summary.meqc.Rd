@@ -44,8 +44,8 @@
 # direct equating coefficients using the "Stocking-Lord" method
 data(est3pl)
 test <- paste("test", 1:5, sep = "")
-mod3pl <- modIRT(coef = est3pl$coef, var = est3pl$var, names = test, ltparam = TRUE, lparam = TRUE)
-direclist3pl <- alldirec(mods = mod3pl, method = "Stocking-Lord", itmp = 3)
+mod3pl <- modIRT(coef = est3pl$coef, var = est3pl$var, names = test, display = FALSE)
+direclist3pl <- alldirec(mods = mod3pl, method = "Stocking-Lord")
 # compute chain equating coefficients for path 1,2,3,4
 pth1 <- paste("test", 1:4, sep = "")
 pth1 <- data.frame(t(pth1), stringsAsFactors = FALSE)
@@ -61,6 +61,6 @@ chainec3 <- chainec(r = 5, direclist = direclist3pl, pths = pth3)
 # create a list of objects of class \code{eqc}
 ecall <- c(chainec1, chainec2, chainec3, direclist3pl["test1.test5"])
 # compute bisector and weighted bisector coefficients
-allec <- bisectorec(ecall = ecall, mod = mod3pl, weighted = TRUE, unweighted = TRUE)
+allec <- bisectorec(ecall = ecall, mods = mod3pl, weighted = TRUE, unweighted = TRUE)
 summary(allec)
 }

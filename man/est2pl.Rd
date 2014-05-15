@@ -7,6 +7,7 @@
 \description{
 	This dataset includes item parameter estimates and covariance matrices of a
 	two-parameter logistic model applied to 5 simulated datasets with common items.
+	The dichotomous item responses can be found in the dataset \code{data2pl}.
 	See details for more information on the linkage plan.
 }
 \usage{
@@ -19,7 +20,7 @@ data(est2pl)
 		estimates. Each matrix presents 2 columns; the first column contains 
 		difficulty parameters and the second
 		column contains discrimination parameters. See details for information on
-		the parametrization used. Names of rows correspond to the
+		the parameterization used. Names of rows correspond to the
 		names of the items.}
 	\item{\code{var}}{a list of length 5 containing the covariance matrices of 
 		item parameter estimates.}
@@ -31,15 +32,16 @@ data(est2pl)
 	Use \code{\link{linkp}} to obtain a matrix with elements equal to the
 	number of common items between different forms.
 
-	Item parameters are given under the parametrization used in the \code{ltm} package. 
-	Under this parametrization, the two-parameter logistic model is as follows
+	Item parameters are given under the parameterization used in the \code{ltm} package. 
+	Under this parameterization, the two-parameter logistic model is as follows
 	\deqn{\pi_i = \frac{\exp(\beta_{1i} + \beta_{2i} z)}{1 + 
-    \exp(\beta_{1i} + \beta_{2i} z)},}{ \pi_i = \{exp(\beta_{1i} + \beta_{2i} z)\}/
+	\exp(\beta_{1i} + \beta_{2i} z)},}{ \pi_i = \{exp(\beta_{1i} + \beta_{2i} z)\}/
 	\{1 + exp(\beta_{1i} + \beta_{2i} z)\}, } where 
-    \eqn{\pi_i} denotes the conditional probability of responding correctly to the \eqn{i}th item given \eqn{z}, 
-    \eqn{\beta_{1i}} is the easiness parameter, 
-    \eqn{\beta_{2i}} is the discrimination parameter, and \eqn{z} denotes the 
-    latent ability.
+	\eqn{\pi_i} denotes the conditional probability of responding 
+	correctly to the \eqn{i}th item given \eqn{z}, 
+	\eqn{\beta_{1i}} is the easiness parameter, 
+	\eqn{\beta_{2i}} is the discrimination parameter, and \eqn{z} denotes the 
+	latent ability.
 
 }
 \author{
@@ -47,7 +49,7 @@ data(est2pl)
 }
 
 \seealso{
-	\code{\link{linkp}}, \code{\link{modIRT}}
+	\code{\link{data2pl}}, \code{\link{linkp}}, \code{\link{modIRT}}
 }
 \examples{
 data(est2pl)

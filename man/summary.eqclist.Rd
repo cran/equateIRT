@@ -40,7 +40,8 @@
 # direct equating coefficients using the "mean-mean" method
 data(estrasch)
 test<-paste("test", 1:5, sep = "")
-modrasch <- modIRT(coef = estrasch$coef, var = estrasch$var, names = test, ltparam = TRUE)
-direclistrasch <- alldirec(mods = modrasch, method = "mean-mean", all = TRUE, itmp = 1)
+modrasch <- modIRT(coef = estrasch$coef, var = estrasch$var, names = test, 
+	display = FALSE)
+direclistrasch <- alldirec(mods = modrasch, method = "mean-mean", all = TRUE)
 summary(direclistrasch)
 }

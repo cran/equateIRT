@@ -12,8 +12,8 @@ linkp(coef)
 }
 \arguments{
 	\item{coef}{list of matrices (one for each form) containing item
-		parameter estimates. The name of the rows of each matrix should 
-		be the name of the item.
+		parameter estimates. The names of the rows of each matrix should 
+		be the names of the items.
 	}
 }
 \value{

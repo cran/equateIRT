@@ -4,10 +4,10 @@
 	Item parameters conversion
 }
 \description{
-	Converts item parameters using equating coefficients.
+	Converts item and person parameters using equating coefficients.
 }
 \usage{
-convert(A, B, coef)
+convert(A, B, coef = NULL, person.par = NULL)
 }
 \arguments{
 	\item{A}{
@@ -19,14 +19,21 @@ convert(A, B, coef)
 	\item{coef}{
 		vector of item parameters return by function \code{\link{modIRT}}.
 	}
+	\item{person.par}{
+		vector of person parameters estimates.
+	}
 }
 \details{
 	Difficulty parameters \eqn{b} are converted using transformation \eqn{b \cdot A+B}{b*A+B};
 	discrimination parameters \eqn{a} are converted using transformation \eqn{a/A};
 	guessing parameters c are not transformed.
+	
+	Person parameters \eqn{\theta} are converted using transformation \eqn{\theta \cdot A+B}{\theta*A+B}.
 }
 \value{
-	vector of coefficients transformed.
+	A list with components
+	\item{coef}{vector of item parameters transformed.}
+	\item{person.par}{vector of person parameters transformed}
 }
 \references{
 	Kolen, M.J. and Brennan, R.L. (2004). \emph{Test equating, scaling, 
@@ -44,10 +51,10 @@ convert(A, B, coef)
 # direct equating coefficients between forms 1 and 2 using the Stocking-Lord method
 data(est3pl)
 test <- paste("test", 1:5, sep = "")
-mod3pl <- modIRT(coef = est3pl$coef, var = est3pl$var, names = test, ltparam = TRUE, lparam = TRUE)
-l12 <- direc(mod1 = mod3pl[1], mod2 = mod3pl[2], method = "Stocking-Lord", itmp = 3)
+mod3pl <- modIRT(coef = est3pl$coef, var = est3pl$var, names = test, display = FALSE)
+l12 <- direc(mod1 = mod3pl[1], mod2 = mod3pl[2], method = "Stocking-Lord")
 convert(A = l12$A, B = l12$B, coef = mod3pl$test1$coef)
-# the conversion is given also in
+# the conversion of item parameters is given also in
 l12$tab
 
 # conversion using bisector coefficients
@@ -55,8 +62,8 @@ l12$tab
 # direct equating coefficients using the "Haebara" method
 data(est2pl)
 test <- paste("test", 1:5, sep = "")
-mod2pl <- modIRT(coef = est2pl$coef, var = est2pl$var, names = test, ltparam = TRUE)
-direclist2pl <- alldirec(mods = mod2pl, method = "Haebara", itmp = 2)
+mod2pl <- modIRT(coef = est2pl$coef, var = est2pl$var, names = test, display = FALSE)
+direclist2pl <- alldirec(mods = mod2pl, method = "Haebara")
 # compute chain equating coefficients for path 1,2,3,4
 pth1 <- paste("test", 1:4, sep = "")
 pth1 <- data.frame(t(pth1), stringsAsFactors = FALSE)
@@ -72,10 +79,10 @@ chainec3 <- chainec(r = 5, direclist = direclist2pl, pths = pth3)
 # create a list of objects of class \code{eqc} 
 ecall <- c(chainec1, chainec2, chainec3, direclist2pl["test1.test5"])
 # compute bisector and weighted bisector coefficients
-allec <- bisectorec(ecall = ecall, mod = mod2pl, weighted = TRUE, unweighted = TRUE)
+allec <- bisectorec(ecall = ecall, mods = mod2pl, weighted = TRUE, unweighted = TRUE)
 summary(allec)
 Ab<-allec$coef[allec$coef$link=="test1.test4" & allec$coef$path=="bisector", ]$A
 Bb<-allec$coef[allec$coef$link=="test1.test4" & allec$coef$path=="bisector", ]$B
-convert(A = Ab, B = Bb, coef = mod2pl$test1$coef)
+convert(A = Ab, B = Bb, coef = mod2pl$test1$coef, person.par = seq(-3, 3, 0.5))
 }
 

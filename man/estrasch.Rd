@@ -18,7 +18,7 @@ data(estrasch)
 	\item{\code{coef}}{a list of length 5 containing the matrices of item parameter 
 		estimates. Each matrix presents 2 columns; the first column contains 
 		difficulty parameters and the second column is equal to 1. 
-		See details for information on the parametrization used. 
+		See details for information on the parameterization used. 
 		Names of rows correspond to the	names of the items.}
 	\item{\code{var}}{a list of length 5 containing the covariance matrices of 
 		item parameter estimates.}
@@ -30,8 +30,8 @@ data(estrasch)
 	Use \code{\link{linkp}} to obtain a matrix with elements equal to the
 	number of common items between different forms.
 
-	Item parameters are given under the parametrization used in the \code{ltm} package. 
-	Under this parametrization, the Rasch model is as follows
+	Item parameters are given under the parameterization used in the \code{ltm} package. 
+	Under this parameterization, the Rasch model is as follows
 	\deqn{\pi_i = \frac{\exp(\beta_{1i} + z)}{1 + \exp(\beta_{1i} + z)},}{ \pi_i = \{exp(\beta_{1i} + z)\}/\{1 + exp(\beta_{1i} + z)\}, } 
 	where \eqn{\pi_i} denotes the conditional probability of responding correctly to the \eqn{i}th item given \eqn{z}, 
     \eqn{\beta_{1i}} is the easiness parameter, and \eqn{z} denotes the 

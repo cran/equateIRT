@@ -2,7 +2,7 @@
 importFrom('statmod', "gauss.quad.prob")
 
 # Exported functions
-export(linkp, modIRT, direc, alldirec, chainec, bisectorec, convert)
+export(linkp, modIRT, direc, alldirec, chainec, bisectorec, convert, import.ltm, import.flexmirt, import.irtpro)
 
 
 # S3 methods

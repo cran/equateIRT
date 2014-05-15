@@ -19,7 +19,7 @@ data(est3pl)
 		estimates. Each matrix presents 3 columns; the first column contains guessing
 		parameters, the second column contains difficulty parameters and the third
 		column contains discrimination parameters. See details for information on
-		the parametrization used. Names of rows correspond to the
+		the parameterization used. Names of rows correspond to the
 		names of the items.}
 	\item{\code{var}}{a list of length 5 containing the covariance matrices of 
 		item parameter estimates.}
@@ -31,8 +31,8 @@ data(est3pl)
 	Use \code{\link{linkp}} to obtain a matrix with elements equal to the
 	number of common items between different forms.
 
-	Item parameters are given under the parametrization used in the \code{ltm} package. 
-	Under this parametrization, the three-parameter logistic model is as follows
+	Item parameters are given under the parameterization used in the \code{ltm} package. 
+	Under this parameterization, the three-parameter logistic model is as follows
 	\deqn{\pi_i = c_i + (1 - c_i) \frac{\exp(\beta_{1i} + \beta_{2i} z)}{1 + 
     \exp(\beta_{1i} + \beta_{2i} z)},}{ \pi_i = c_i + (1 - c_i) * \{exp(\beta_{1i} + \beta_{2i} z)\}/
 	\{1 + exp(\beta_{1i} + \beta_{2i} z)\}, } where 
@@ -40,7 +40,7 @@ data(est3pl)
     \eqn{c_i} denotes the guessing parameter, \eqn{\beta_{1i}} is the easiness parameter, 
     \eqn{\beta_{2i}} is the discrimination parameter, and \eqn{z} denotes the 
     latent ability.
-	Furthermore, the guessing parameters are given under this parametrization
+	Furthermore, the guessing parameters are given under this parameterization
 	\deqn{c_i = \frac{\exp(c_i^*)}{1+\exp(c_i^*)}. }{c_i = exp(c_i^*)/{1+exp(c_i^*)}. }
 }
 \author{

@@ -9,22 +9,29 @@
 \description{
 	This package computes direct, chain and average (bisector) equating coefficients 
 	with standard errors using IRT methods for dichotomous items. 
+	The IRT models included are the three-parameter logistic model,
+	the two-parameter logistic model, the one-parameter logistic model and the
+	Rasch model.
 }
 \details{
 \tabular{ll}{
 Package: \tab equateIRT\cr
 Type: \tab Package\cr
-Version: \tab 1.0-1\cr
-Date: \tab 2013-07-02\cr
+Version: \tab 1.1\cr
+Date: \tab 2014-05-15\cr
 License: \tab GPL (>= 2)\cr
 }
 Direct equating coefficients and their standard errors
 between forms presenting common items  
 can be computed using function \code{direc}.
 The equating methods implemented are 
-"mean-mean", "mean-gmean", "mean-sigma", "Haebara" and "Stocking-Lord".
-Data containing item parameter estimates and their covariance
-matrix should be previously organized using function \code{modIRT}.
+"mean-mean", "mean-geometric mean", "mean-sigma", "Haebara" and "Stocking-Lord".
+Estimates of item parameters and their covariance matrix can be imported
+from the R package \code{ltm} or from the IRT programs IRTPRO and flexMIRT using
+functions \code{import.ltm}, \code{import.irtpro} and \code{import.flexmirt}.
+Item parameter estimates from other software can be imported as well
+by the user.
+Data should be previously organized using function \code{modIRT}.
 Function \code{alldirec} computes all direct equating coefficients
 (with standard errors) between all pairs of a list of forms.
 Function \code{chainec} computes chain equating coefficients
@@ -39,6 +46,8 @@ covariance matrix. In particular, \code{est3pl} concerns a
 three-parameter logistic model, \code{est2pl} regards a 
 two-parameter logistic model, and \code{estrasch} refers to
 a Rasch model.
+The estimates included in \code{est2pl} are obtained from the
+dataset \code{data2pl}, also contained in the package.
 }
 \author{
 	Michela Battauz
@@ -48,6 +57,12 @@ a Rasch model.
 \references{
 	Battauz, M. (2013). IRT Test Equating in Complex Linkage Plans. 
 	\emph{Psychometrika}, \bold{78}, 464--480.
+
+	Cai L. (2013). \emph{FlexMIRT version 2: Flexible Multilevel Multidimensional Item Analysis and
+	Test Scoring [Computer Software]}. Chapel Hill, NC: Vector Psychometric Group.
+	
+	Cai, L., du Toit, S. H. C., Thissen, D. (2011). \emph{IRTPRO: Flexible, multidimensional, multiple 
+	categorical IRT modeling [Computer software]}. Chicago: Scientific Software International.
 
 	Holland, P.W. and Strawderman, W.E. (2011). How to average equating 
 	functions if you must. In A.A. von Davier (Ed.), \emph{Statistical models for 

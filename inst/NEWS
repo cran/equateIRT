@@ -1,6 +1,18 @@
-Changes in version: equateIRT_1.0-1
+Changes in version: equateIRT_1.1
 
-	* Added argument D in function direc.
-	* Some changes in Rd files.
+* Added functions import.ltm, import.flexmirt and import.irtpro 
+  to import item parameters estimates and covariance matrices 
+  from the R package ltm, and external programs flexmirt and irtpro.
+* In function modIRT:
+	- the default value of arguments ltparam and lparam is TRUE.
+	- argument var can be set to NULL, that is the default value.
+	- argument names can be set to NULL, that is the default value.
+	- added arguments display and digits.
+* In functions direc and alldirec:
+	- removed argument itmp.
+* In function convert:
+	- implemented conversion of person parameters.
+* Added dataset data2pl.
+* Some changes in Rd files.
 
 
