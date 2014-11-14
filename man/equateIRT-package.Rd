@@ -3,8 +3,8 @@
 \alias{equateIRT}
 \docType{package}
 \title{
-	Direct, chain and average equating coefficients with standard errors
-	using IRT methods.
+	Direct, Chain and Average Equating Coefficients with Standard Errors
+	Using IRT Methods.
 }
 \description{
 	This package computes direct, chain and average (bisector) equating coefficients 
@@ -17,8 +17,8 @@
 \tabular{ll}{
 Package: \tab equateIRT\cr
 Type: \tab Package\cr
-Version: \tab 1.1\cr
-Date: \tab 2014-05-15\cr
+Version: \tab 1.2\cr
+Date: \tab 2014-11-14\cr
 License: \tab GPL (>= 2)\cr
 }
 Direct equating coefficients and their standard errors
@@ -27,8 +27,8 @@ can be computed using function \code{direc}.
 The equating methods implemented are 
 "mean-mean", "mean-geometric mean", "mean-sigma", "Haebara" and "Stocking-Lord".
 Estimates of item parameters and their covariance matrix can be imported
-from the R package \code{ltm} or from the IRT programs IRTPRO and flexMIRT using
-functions \code{import.ltm}, \code{import.irtpro} and \code{import.flexmirt}.
+from the R packages \code{ltm} and \code{mirt} or from the IRT programs IRTPRO and flexMIRT using
+functions \code{import.ltm}, \code{import.mirt}, \code{import.irtpro} and \code{import.flexmirt}.
 Item parameter estimates from other software can be imported as well
 by the user.
 Data should be previously organized using function \code{modIRT}.
@@ -64,6 +64,10 @@ dataset \code{data2pl}, also contained in the package.
 	Cai, L., du Toit, S. H. C., Thissen, D. (2011). \emph{IRTPRO: Flexible, multidimensional, multiple 
 	categorical IRT modeling [Computer software]}. Chicago: Scientific Software International.
 
+	Chalmers, R. P. (2012). mirt: A Multidimensional Item Response Theory Package for the 
+	R Environment. \emph{Journal of Statistical Software}, 
+	\bold{48}, 1--29.
+	
 	Holland, P.W. and Strawderman, W.E. (2011). How to average equating 
 	functions if you must. In A.A. von Davier (Ed.), \emph{Statistical models for 
 	test equating, scaling, and linking} (pp. 89--107). New York: Springer.
@@ -78,4 +82,8 @@ dataset \code{data2pl}, also contained in the package.
 	Ogasawara, H. (2001). Standard Errors of Item Response Theory Equating/Linking
 	by Response Function Methods. \emph{Applied Psychological Measurement}, 
 	\bold{25}, 53--67.
+
+	Rizopoulos, D. (2006). ltm: an R package for latent variable modelling 
+	and item response theory analyses. \emph{Journal of Statistical Software}, 
+	\bold{17}, 1--25.
 }

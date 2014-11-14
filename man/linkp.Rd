@@ -2,7 +2,7 @@
 \alias{linkp}
 
 \title{
-	Linkage plan
+	Linkage Plan
 }
 \description{
 	Calculates the number of common items between a list of forms.

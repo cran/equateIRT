@@ -1,19 +1,21 @@
 \name{chainec}
 \alias{chainec}
+\alias{ceqc}
 \title{
-	Chain equating coefficients
+	Chain Equating Coefficients
 }
 \description{
 	Calculates chain (indirect) equating coefficients and standard errors using 
 	IRT methods.
 }
 \usage{
-chainec(r, direclist, f1 = NULL, f2 = NULL, pths = NULL)
+chainec(r = NULL, direclist, f1 = NULL, f2 = NULL, pths = NULL)
 }
 \arguments{
 	  \item{r}{
 		length of the chain, that is the number of forms used for equating
-		including extremes. It should be at least 3.
+		including extremes. It should be at least 3. It does not need to
+		be specified if argument \code{pths} is not NULL.
 	}
 	  \item{direclist}{
 		an object of the class \code{eqclist} return by function \code{\link{alldirec}}
@@ -38,14 +40,16 @@ chainec(r, direclist, f1 = NULL, f2 = NULL, pths = NULL)
 	first form to the scale of the last form of the path.
 }
 \value{
-	An object of class \code{eqclist} consisting in a list with length 
+	An object of class \code{ceqclist} consisting in a list with length 
 	equal to the number of chain equating coefficients computed. 
-	Each component of the list is an object of class \code{eqc} with components
+	Each component of the list is an object of class \code{ceqc} with components
 	\item{tab1}{item parameters of the first form.}
 	\item{tab2}{item parameters of the last form.}
-	\item{tab}{data frame containing item parameters of the first form (value1),
-		the last form (value2), and the first form converted in the scale of the last
-		form (value12).}
+	\item{tab}{Data frame containing item names (\code{Item}), 
+	item parameters of the first form (e.g. \code{test1}), 
+	item parameters of the last form (e.g. \code{test3}), 
+	and item parameters of the first form converted 
+	in the scale of the last form (e.g. \code{test1.as.test3}).}
 	\item{varAll}{covariance matrix of item parameters of all forms used 
 		in the chain.}
 	\item{partial}{partial derivatives of equating coefficients A and B
@@ -71,7 +75,7 @@ chainec(r, direclist, f1 = NULL, f2 = NULL, pths = NULL)
 	Michela Battauz
 }
 \seealso{
-	\code{\link{alldirec}}
+	\code{\link{alldirec}}, \code{\link{eqc}}, \code{\link{itm}}, \code{\link{summary.ceqc}}, \code{\link{summary.ceqclist}}
 }
 \examples{
 # three-parameter logistic model
@@ -103,7 +107,7 @@ direclist2pl <- alldirec(mods = mod2pl, method = "Haebara")
 # compute chain equating coefficients of a given path
 pth <- c(paste("test", c(1,5,4), sep = ""))
 pth <- data.frame(t(pth), stringsAsFactors = FALSE)
-chainec154 <- chainec(r = 3, direclist = direclist2pl, pths = pth)
+chainec154 <- chainec(direclist = direclist2pl, pths = pth)
 summary(chainec154)
 
 
@@ -120,6 +124,6 @@ pth1 <- data.frame(t(pth1), stringsAsFactors = FALSE)
 pth2 <- c(paste("test", c(1,5,4), sep = ""))
 pth2 <- data.frame(t(pth2), stringsAsFactors = FALSE)
 pths <- rbind(pth1, pth2)
-chainec1 <- chainec(r = 3, direclist = direclistrasch, pths = pths)
+chainec1 <- chainec(direclist = direclistrasch, pths = pths)
 summary(chainec1)
 }

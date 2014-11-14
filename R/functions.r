@@ -66,7 +66,7 @@ modIRT<-function(coef,var=NULL,names=NULL,ltparam=TRUE,lparam=TRUE,display=TRUE,
 		if (itmp>1) names(c2)<-paste("Dscrmn",names(c2),sep=".")
 		coefi<-c(c0,c1,c2)
 		if (!is.null(vari)) rownames(vari)<-colnames(vari)<-names(coefi)
-		mods[[i]]<-list(coef=coefi,var=vari,itmp=itmp)
+		mods[[i]]<-list(coefficients=coefi,var=vari,itmp=itmp)
 		if (display) {
 			if (!is.null(var)) out<-cbind(coefi,diag(vari)^0.5)
 			else out<-cbind(coefi,NA)
@@ -340,6 +340,7 @@ direc<-function(mod1,mod2,method="mean-mean",suff1=".1",suff2=".2",D=1,quadratur
 		taball$value12[1:niall]<-A*taball$value1[1:niall]+B
 		if (itmp>1) taball$value12[(niall+1):(2*niall)]<-taball$value1[(niall+1):(2*niall)]/A
 		if (itmp==3) taball$value12[(2*niall+1):(3*niall)]<-taball$value1[(2*niall+1):(3*niall)]
+		colnames(taball)<-c("Item",name1,name2,paste(name1,name2,sep=".as."))
 		out<-list(tab1=tab1,tab2=tab2,tab=taball,var12=var12,
 		partial=mat,A=A,B=B,varAB=varAB,commonitem=list(comuni),ni=ni)
 	}
@@ -356,6 +357,17 @@ matx<-function(vect,n) {
 	rep(1,n)%x%t(vect)
 }
 
+
+print.eqc<-function(x, ...)
+{
+	cat("Direct equating coefficients \n")
+	cat("Method: ")
+	cat(x$method,"\n")
+	cat("Link: ")
+	cat(x$forms,"\n")
+}
+
+
 summary.eqc <- function(object, ...)
 {
 	if (sum(object$ni>0)==length(object$ni)) {
@@ -370,7 +382,7 @@ summary.eqc <- function(object, ...)
 
 print.summary.eqc <- function(x, ...)
 {
-	cat("Forms: ")
+	cat("Link: ")
 	cat(x$forms,"\n")
 	cat("Method: ")
 	cat(x$method,"\n")
@@ -401,12 +413,25 @@ alldirec<-function(mods,method="mean-mean",all=FALSE,quadrature=TRUE,nq=30)
 	return(direclist)
 }
 
-
-summary.eqclist <- function(object, ...)
+print.eqclist<-function(x, ...)
 {
+	cat("Direct equating coefficients \n")
+	cat("Method: ")
+	cat(x[[1]]$method,"\n")
+	cat("Links: \n")
+	for (i in 1:length(x)) cat(x[[i]]$forms,"\n")
+}
+
+summary.eqclist <- function(object, link=NULL, ...)
+{
+	if(is.null(link)) link<-sapply(object,FUN=function(x) x$forms)
 	out<-list()
+	j<-1
 	for (i in 1:length(object))
-		out[[i]]<-summary(object[[i]])
+		if (object[[i]]$forms%in%link) {
+			out[[j]]<-summary(object[[i]])
+			j<-j+1
+		}
 	class(out)<-"summary.eqclist"
 	return(out)
 }
@@ -420,9 +445,11 @@ print.summary.eqclist<-function(x, ...)
 }
 
 
-chainec<-function(r,direclist,f1=NULL,f2=NULL,pths=NULL)
+chainec<-function(r=NULL,direclist,f1=NULL,f2=NULL,pths=NULL)
 {
-	if (r<3) warning("r should be at least 3")
+	if (is.null(r) & is.null(pths)) stop("argument \"r\" needs to be specified if argument \"pths\" is NULL")
+	if (is.null(r) & !is.null(pths)) r<-ncol(pths)
+	if (r<3) stop("r should be at least 3")
 	if (is.null(pths)) {
 		sel<-sapply(direclist,FUN= function(x)(x$ni!=0))
 		nl<-names(direclist)[sel]
@@ -449,6 +476,8 @@ chainec<-function(r,direclist,f1=NULL,f2=NULL,pths=NULL)
 	for (k in 2:r) nomi<-paste(nomi,pths[,k],sep=".")
 	out<- vector("list", nrow(pths))
 	for (j in 1:nrow(pths)) {
+		name1<-as.character(pths[j,1])
+		name2<-as.character(pths[j,r])
 		ni<-c()
 		A<-1
 		B<-0
@@ -513,6 +542,7 @@ chainec<-function(r,direclist,f1=NULL,f2=NULL,pths=NULL)
 			taball$value12[1:niall]<-A*taball$value1[1:niall]+B
 			if (link$itmp>1) taball$value12[(niall+1):(2*niall)]<-taball$value1[(niall+1):(2*niall)]/A
 			if (link$itmp==3) taball$value12[(2*niall+1):(3*niall)]<-taball$value1[(2*niall+1):(3*niall)]
+			colnames(taball)<-c("Item",name1,name2,paste(name1,name2,sep=".as."))
 			out[[j]]$tab1<-tab1
 			out[[j]]$tab2<-tab2
 			out[[j]]$tab<-taball
@@ -528,13 +558,77 @@ chainec<-function(r,direclist,f1=NULL,f2=NULL,pths=NULL)
 		if (!is.null(link)) out[[j]]$method<-link$method
 		if (!is.null(link)) out[[j]]$itmp<-link$itmp
 		else out[[j]]$method<-""
-		class(out[[j]])<-"eqc"
+		class(out[[j]])<-"ceqc"
 	} 
 	names(out)<-nomi
-	class(out) <- "eqclist"
+	class(out) <- "ceqclist"
 	return(out)
 }
 
+print.ceqc<-function(x, ...)
+{
+	cat("Chain equating coefficients \n")
+	cat("Method: ")
+	cat(x$method,"\n")
+	cat("Path: ")
+	cat(x$forms,"\n")
+}
+
+
+summary.ceqc <- function(object, ...)
+{
+	if (sum(object$ni>0)==length(object$ni)) {
+		ct<-cbind(Estimate=c(object$A,object$B),StdErr=c(sqrt(diag(object$varAB))))
+		rownames(ct)<-c("A","B")
+	}
+	else ct<-NULL
+	out<-list(forms=object$forms,method=object$method,coefficients=ct)
+	class(out)<-"summary.ceqc"
+	return(out)
+}
+
+print.summary.ceqc <- function(x, ...)
+{
+	cat("Path: ")
+	cat(x$forms,"\n")
+	cat("Method: ")
+	cat(x$method,"\n")
+	if (!is.null(x$coefficients)) { cat("Equating coefficients:\n")
+		print(x$coefficients,digits=5)}
+	else cat("no common items\n")
+}
+
+print.ceqclist<-function(x, ...)
+{
+	cat("Chain equating coefficients \n")
+	cat("Method: ")
+	cat(x[[1]]$method,"\n")
+	cat("Paths: \n")
+	for (i in 1:length(x)) cat(x[[i]]$forms,"\n")
+}
+
+summary.ceqclist <- function(object, path=NULL, ...)
+{
+	if(is.null(path)) path<-sapply(object,FUN=function(x) x$forms)
+	out<-list()
+	j<-1
+	for (i in 1:length(object))
+		if (object[[i]]$forms%in%path) {
+			out[[j]]<-summary(object[[i]])
+			j<-j+1
+		}
+	class(out)<-"summary.ceqclist"
+	return(out)
+}
+
+
+print.summary.ceqclist<-function(x, ...)
+{
+	for (i in 1:length(x)) {
+		print(x[[i]])
+		cat("\n\n")
+	}
+}
 
 
 bisectorec<-function(ecall,mods,weighted=TRUE,unweighted=TRUE)
@@ -559,8 +653,8 @@ bisectorec<-function(ecall,mods,weighted=TRUE,unweighted=TRUE)
 	}
 	else partall<-NULL
 	coall<-data.frame(t(sapply(ecall,FUN=function(x) x[c("A","B")])))
-	coall$sdA<-sapply(ecall,FUN=function(x) x$varAB[1,1]^0.5)
-	coall$sdB<-sapply(ecall,FUN=function(x) x$varAB[2,2]^0.5)
+	coall$seA<-sapply(ecall,FUN=function(x) x$varAB[1,1]^0.5)
+	coall$seB<-sapply(ecall,FUN=function(x) x$varAB[2,2]^0.5)
 	for (i in 1:4) coall[,i]<-unlist(coall[,i])
 	coall$path<-rownames(coall)
 	coall$link<-path2link(coall$path)
@@ -585,7 +679,7 @@ bisectorec<-function(ecall,mods,weighted=TRUE,unweighted=TRUE)
 	wbis<-bisco(coall,VarAll,partall)
 	wbis$path<-"weighted bisector"
 	}
-	sel<-c("link","path","A","B","sdA","sdB","weights")
+	sel<-c("link","path","A","B","seA","seB","weights")
 	if (unweighted) coall<-rbind(coall[,sel],bis[,sel])
 	if (weighted) coall<-rbind(coall[,sel],wbis[,sel])
 	coall<-coall[order(coall[,1]),]
@@ -595,6 +689,27 @@ bisectorec<-function(ecall,mods,weighted=TRUE,unweighted=TRUE)
 	return(meq)
 }
 
+
+print.meqc<-function(x, ...)
+{
+	bis<-any(x$coef$path=="bisector")
+	wbis<-any(x$coef$path=="weighted bisector")
+	if (bis & !wbis) cat("Bisector equating coefficients \n")
+	if (!bis & wbis) cat("Weighted bisector equating coefficients \n")
+	if (bis & wbis) cat("Bisector and weighted bisector equating coefficients \n")
+	cat("Method: ")
+	cat(x$method,"\n")
+	links<-unique(x$coef$link)
+	for (i in links) {
+		cat("\n")
+		cat("Link: ")
+		cat(i, "\n")
+		cat("  Paths: \n")
+		paths<-x$coef$path[x$coef$link==i]
+		paths<-paths[paths!="bisector" & paths!="weighted bisector"]
+		for (j in paths) cat(" ",j, "\n")
+	}
+}
 
 summary.meqc <- function(object, ...)
 {
@@ -606,8 +721,8 @@ summary.meqc <- function(object, ...)
 		objecti<-object[object$link==link[i],]
 		objecti$coefA<-"A"
 		objecti$coefB<-"B"
-		objecti1<-objecti[,c("coefA","path","A","sdA")]
-		objecti2<-objecti[,c("coefB","path","B","sdB")]
+		objecti1<-objecti[,c("coefA","path","A","seA")]
+		objecti2<-objecti[,c("coefB","path","B","seB")]
 		colnames(objecti1)<-colnames(objecti2)<-c("","Path","Estimate","StdErr")
 		tab[[i]]<-rbind(objecti1,objecti2)
 	}
@@ -641,7 +756,7 @@ bisco<-function(coall,VarAll,partall)
 	coall$W<-W[coall$link]
 	coall$mA<-mA[coall$link]
 	coall$mB<-mB[coall$link]
-	out<-data.frame(link=names(mA),A=mA,B=mB,sdA=NA,sdB=NA,corAB=NA,path="bisector",weights=NA)
+	out<-data.frame(link=names(mA),A=mA,B=mB,seA=NA,seB=NA,corAB=NA,path="bisector",weights=NA)
 	if (!is.null(VarAll)) {
 		coall$partAA<-((1-coall$A^2/(1+coall$A^2))*coall$w*coall$W+
 						coall$mA*coall$W*coall$weights*coall$A*(1+coall$A^2)^(-1.5))/
@@ -664,11 +779,11 @@ bisco<-function(coall,VarAll,partall)
 			partialmean<-cbind(partialAmean,partialBmean)
 			sel<-rownames(partialmean)
 			varAB<-t(partialmean)%*%VarAll[sel,sel]%*%partialmean
-			sdA<-varAB[1,1]^0.5
-			sdB<-varAB[2,2]^0.5
-			out[i,]$sdA<-sdA
-			out[i,]$sdB<-sdB
-			out[i,]$corAB<-varAB[1,2]/(sdA*sdB)
+			seA<-varAB[1,1]^0.5
+			seB<-varAB[2,2]^0.5
+			out[i,]$seA<-seA
+			out[i,]$seB<-seB
+			out[i,]$corAB<-varAB[1,2]/(seA*seB)
 		}
 	}
 	return(out)
@@ -770,7 +885,7 @@ convert<-function(A,B,coef=NULL,person.par=NULL)
 }
 
 
-import.flexmirt<-function(fnamep,fnamev=NULL,param.number=NULL,fixed=NULL,display=TRUE,digits=2) {
+import.flexmirt<-function(fnamep,fnamev=NULL,fnameirt=NULL,display=TRUE,digits=2) {
 	par<-read.table(fnamep,fill=TRUE)
 	ngr<-sum(par$V1==0,na.rm=TRUE)
 	if (ngr>1) stop("Cannot handle multiple groups")
@@ -791,6 +906,7 @@ import.flexmirt<-function(fnamep,fnamev=NULL,param.number=NULL,fixed=NULL,displa
 	p<-as.matrix(p)
 
 	if (!is.null(fnamev)) {
+		if (is.null(fnameirt)) stop("fnameirt required if fnamev is not NULL")
 		vm<-read.table(fnamev,sep=",")
 		vm<-as.matrix(vm[,colSums(is.na(vm))!=nrow(vm)])
 		colnames(vm)<-NULL
@@ -799,19 +915,28 @@ import.flexmirt<-function(fnamep,fnamev=NULL,param.number=NULL,fixed=NULL,displa
 		if (itmp==1 & Rasch) reord<-1:n
 		if (itmp==2) reord<-c((n+1):(2*n),1:n)
 		if (itmp==3) reord<-c((2*n+1):(3*n),(n+1):(2*n),1:n)
-		if (is.null(param.number)) {
-			if (Rasch) param.number<-1:n
-			if (itmp==1 & !Rasch) param.number<-c(rep(n+1,n),1:n)
-			if (itmp==2) param.number<-c(1:n*2,1:n*2-1)
-			if (itmp==3) param.number<-c(1:n*3,1:n*3-1,1:n*3-2)
-		}
-		if (!is.null(fixed)) {
+		
+		irt <- readLines(fnameirt)
+		startRow <- grep(" *Item *Label *P# ", irt)
+		nm <- unlist(strsplit(irt[startRow], " +"))[-1]
+		widths <- strsplit(irt[startRow], "(?<=[A-Za-z#.])(?=\\s)", perl = TRUE)[[1]]
+		widths <- sapply(widths, nchar)
+		tab <- read.fwf(fnameirt, widths, skip = startRow, na.strings = "----",
+			col.names = nm, comment.char = "", sep = ",", 
+			nrows = as.numeric(n), strip.white = TRUE, check.names = FALSE)
+		param.number <- unlist(tab[, names(tab) == "P#"])
+		pn.max<-max(param.number,na.rm=TRUE)
+		num.na<-sum(is.na(param.number))
+		if (num.na>0 & !Rasch) {
+			fixed<-(pn.max+1):(pn.max+num.na)
+			param.number[is.na(param.number)]<-fixed
 			nf<-length(fixed)
 			nvm1<-nrow(vm)+nf
 			vm1<-matrix(0,nvm1,nvm1)
 			vm1[!(1:nvm1)%in%fixed,!(1:nvm1)%in%fixed]<-vm
 			vm<-vm1
 		}
+		if (num.na>0 & Rasch) param.number<-param.number[!is.na(param.number)]
 		vm<-vm[param.number,param.number]
 		if (!Rasch & n*ncol(p)!=nrow(vm)) stop("number of parameters and dimension of the covariance matrix do not match")
 		if (Rasch & n!=nrow(vm)) stop("number of parameters and dimension of the covariance matrix do not match")
@@ -836,7 +961,7 @@ import.flexmirt<-function(fnamep,fnamev=NULL,param.number=NULL,fixed=NULL,displa
 }
 
 
-import.irtpro<-function(fnamep,fnamev=NULL,param.number=NULL,fixed=NULL,display=TRUE,digits=2) {
+import.irtpro<-function(fnamep,fnamev=NULL,fnameirt=NULL,display=TRUE,digits=2) {
 	par<-read.table(fnamep,fill=TRUE)
 	ngr<-sum(par$V3==0,na.rm=TRUE)
 	if (ngr>1) stop("Cannot handle multiple groups")
@@ -856,6 +981,7 @@ import.irtpro<-function(fnamep,fnamev=NULL,param.number=NULL,fixed=NULL,display=
 	p<-as.matrix(p)
 
 	if (!is.null(fnamev)) {
+		if (is.null(fnameirt)) stop("fnameirt required if fnamev is not NULL")
 		vm<-read.table(fnamev,sep=",")
 		vm<-as.matrix(vm[,colSums(is.na(vm))!=nrow(vm)])
 		colnames(vm)<-NULL
@@ -864,19 +990,27 @@ import.irtpro<-function(fnamep,fnamev=NULL,param.number=NULL,fixed=NULL,display=
 		if (itmp==1 & Rasch) reord<-1:n
 		if (itmp==2) reord<-c((n+1):(2*n),1:n)
 		if (itmp==3) reord<-c((2*n+1):(3*n),(n+1):(2*n),1:n)
-		if (is.null(param.number)) {
-			if (Rasch) param.number<-1:n
-			if (itmp==1 & !Rasch) param.number<-c(rep(n+1,n),1:n)
-			if (itmp==2) param.number<-c(1:n*2,1:n*2-1)
-			if (itmp==3) param.number<-c(1:n*3,1:n*3-1,1:n*3-2)
-		}
-		if (!is.null(fixed)) {
+		irt <- readLines(fnameirt)
+		startRow <- grep(" *Item *Label *P# ", irt)
+		nm <- unlist(strsplit(irt[startRow], " +"))[-1]
+		widths <- strsplit(irt[startRow], "(?<=[A-Za-z#.])(?=\\s)", perl = TRUE)[[1]]
+		widths <- sapply(widths, nchar)
+		tab <- read.fwf(fnameirt, widths, skip = startRow, na.strings = "----",
+			col.names = nm, comment.char = "", sep = ",", 
+			nrows = as.numeric(n), strip.white = TRUE, check.names = FALSE)
+		param.number <- unlist(tab[, names(tab) == "P#"])
+		pn.max<-max(param.number,na.rm=TRUE)
+		num.na<-sum(is.na(param.number))
+		if (num.na>0 & !Rasch) {
+			fixed<-(pn.max+1):(pn.max+num.na)
+			param.number[is.na(param.number)]<-fixed
 			nf<-length(fixed)
 			nvm1<-nrow(vm)+nf
 			vm1<-matrix(0,nvm1,nvm1)
 			vm1[!(1:nvm1)%in%fixed,!(1:nvm1)%in%fixed]<-vm
 			vm<-vm1
 		}
+		if (num.na>0 & Rasch) param.number<-param.number[!is.na(param.number)]
 		vm<-vm[param.number,param.number]
 		if (!Rasch & n*ncol(p)!=nrow(vm)) stop("number of parameters and dimension of the covariance matrix do not match")
 		if (Rasch & n!=nrow(vm)) stop("number of parameters and dimension of the covariance matrix do not match")
@@ -899,6 +1033,8 @@ import.irtpro<-function(fnamep,fnamev=NULL,param.number=NULL,fixed=NULL,display=
 	}
 	return(list(coef=p,var=vm))
 }
+
+
 
 
 import.ltm<-function(mod,display=TRUE,digits=4) {
@@ -946,6 +1082,182 @@ import.ltm<-function(mod,display=TRUE,digits=4) {
 		print(out)
 	}
 	return(list(coef=p,var=vm))
+}
+
+
+
+import.mirt<-function(mod,display=TRUE,digits=3) {
+	if (mod@Data$ngroups>1) stop("Cannot handle multiple groups")
+	if (mod@nfact>1) stop("Cannot handle multiple factors")
+	itemtype<-mod@itemtype
+	if (length(unique(itemtype))>1) stop("Cannot handle mixed item types")
+	itemtype<-itemtype[1]
+	if (itemtype!="Rasch" & itemtype!="2PL" & itemtype!="3PL") stop(paste("Cannot handle the",itemtype,"model"))
+	#ifelse(itemtype=="Rasch",Rasch<-TRUE,Rasch<-FALSE)
+	#if (itemtype=="Rasch") itmp<-1
+	#if (itemtype=="2PL") itmp<-2
+	#if (itemtype=="3PL") itmp<-3
+	constrain<-mod@constrain
+	mpars<-mod@pars
+	ni<-mod@Data$nitems
+	itemnames<-colnames(mod@Data$data)
+	par<-c()
+	for (i in 1:ni) {
+		if (mpars[[i]]@nfact>1) stop("Cannot handle multiple factors")
+		if (mpars[[i]]@ncat>2) stop("Cannot handle multiple response models")
+		if (mpars[[i]]@class!="dich") stop("Cannot handle multiple response models")
+		tmp<-cbind(itemnames[i],names(mpars[[i]]@par),mpars[[i]]@par,mpars[[i]]@est,mpars[[i]]@parnum)
+		par<-rbind(par,tmp)
+		mpars[[i]]@constr
+	}
+	par<-data.frame(par,row.names=NULL,stringsAsFactors=FALSE)
+	colnames(par)<-c("item","name","par","est","parnum")
+	par$par<-as.numeric(par$par)
+	par$fixed<-FALSE
+	if (any(par$name=="g" & par$par> -998)) par[par$name=="g",]$fixed<-TRUE
+	if (any(par$fixed)) itemtype<-"3PL"
+	par<-par[par$est==TRUE | par$fixed==TRUE,]
+	#p<-par$par
+	#if (length(unique(par[par$name=="a1",]$par))==1) itemtype<-"1PL"
+	hess<-mod@information
+	if (all(dim(hess)>c(1,1))) {
+		hess<-hess[!apply(is.na(hess),1,all),]
+		hess<-hess[,!apply(is.na(hess),2,all)]
+		vm<-solve(hess)
+		rnvm<-rownames(vm)
+		rnvm<-sub(pattern="a1.",x=rnvm,replacement="")
+		rnvm<-sub(pattern="d.",x=rnvm,replacement="")
+		rnvm<-sub(pattern="g.",x=rnvm,replacement="")
+		rnvm<-sub(pattern="u.",x=rnvm,replacement="")
+		rownames(vm)<-colnames(vm)<-rnvm
+		if (any(par$fixed)) {
+			rnvm<-rownames(vm)
+			#cstr<-constrain[[i]]
+			nf<-sum(par$fixed)
+			rnvm1<-c(rnvm,par$parnum[par$fixed])
+			nrvm<-nrow(vm)
+			vm1<-matrix(0,nrvm+nf,nrvm+nf)
+			vm1[1:nrvm,1:nrvm]<-vm
+			colnames(vm1)<-rownames(vm1)<-rnvm1
+			vm<-vm1
+		}
+		if (length(constrain)>0) {
+			for (i in 1:length(constrain)) {
+				rnvm<-rownames(vm)
+				cstr<-constrain[[i]]
+				nf<-length(cstr)
+				nc<-cstr[1]
+				for (j in 2:nf) nc<-paste(nc,cstr[j],sep=".")
+				rnvm1<-c(rnvm,rep(nc,nf-1))
+				vm<-vm[rnvm1,rnvm1]
+				par[par$parnum%in%cstr,]$parnum<-nc
+			}
+		}
+	vm<-vm[par$parnum,par$parnum]
+	}
+	else vm<-NULL
+	if (!is.null(vm)) par$SE<-diag(vm)^0.5
+	else par$SE<-NA
+	out<-reshape(par,direction="wide",idvar="item",timevar="name",drop=c("est"))
+	rownames(out)<-out$item
+	out$item<-c()
+	pn<-c(out$parnum.g,out$parnum.d,out$parnum.a1)
+	vm<-vm[pn,pn]
+	rownames(vm)<-colnames(vm)<-NULL
+	if (itemtype=="Rasch") out<-out[,c("par.d","SE.d")]
+	if (itemtype=="2PL") out<-out[,c("par.d","SE.d","par.a1","SE.a1")]
+	if (itemtype=="3PL") out<-out[,c("par.g","SE.g","par.d","SE.d","par.a1","SE.a1")]
+	p<-out
+	p$SE.g<-c()
+	p$SE.d<-c()
+	p$SE.a1<-c()
+	p<-as.matrix(p)
+	#as.matrix(out[,seq(1,ncol(out),by=2)])
+	if (display) {
+		if (!is.null(vm)) out<-round(out,digits)
+		if (is.null(vm)) out[,seq(1,ncol(out),by=2)]<-round(out[,seq(1,ncol(out),by=2)],digits)
+		print(out)
+	}
+	return(list(coef=p,var=vm))
+}
+
+
+
+
+itm <- function(x, ...) UseMethod("itm")
+
+itm.eqc<-function(x, ...) x$tab
+
+itm.eqclist<-function(x,link, ...)
+{
+	return(x[[link]]$tab)
+}
+
+itm.ceqc<-function(x, ...) x$tab
+
+itm.ceqclist<-function(x,path, ...)
+{
+	return(x[[path]]$tab)
+}
+
+
+
+
+eqc <- function(x, ...) UseMethod("eqc")
+
+eqc.eqc<-function(x, ...)
+{
+	link<-x$forms
+	A1<-x$A
+	B1<-x$B
+	out<-data.frame(link=link,A=A1,B=B1)
+	rownames(out)<-NULL
+	return(out)
+}
+
+eqc.eqclist<-function(x,link=NULL, ...)
+{
+	link1<-sapply(x,FUN=function(x) x$forms)
+	A1<-sapply(x,FUN=function(x) x$A)
+	B1<-sapply(x,FUN=function(x) x$B)
+	out<-data.frame(link=link1,A=A1,B=B1)
+	if (is.null(link)) link<-out$link
+	out<-out[out$link%in%link,]
+	rownames(out)<-NULL
+	return(out)
+}
+
+eqc.ceqc<-function(x, ...)
+{
+	path<-x$forms
+	A1<-x$A
+	B1<-x$B
+	out<-data.frame(path=path,A=A1,B=B1)
+	rownames(out)<-NULL
+	return(out)
+}
+
+eqc.ceqclist<-function(x,link=NULL,path=NULL, ...)
+{
+	path1<-sapply(x,FUN=function(x) x$forms)
+	link1<-path2link(path1)
+	A1<-sapply(x,FUN=function(x) x$A)
+	B1<-sapply(x,FUN=function(x) x$B)
+	out<-data.frame(link=link1,path=path1,A=A1,B=B1)
+	if (is.null(link)) link<-out$link
+	if (is.null(path)) path<-out$path
+	out<-out[out$link%in%link & out$path%in%path,]
+	rownames(out)<-NULL
+	return(out)
+}
+
+eqc.meqc<-function(x,link=NULL,path=NULL, ...)
+{
+	if (is.null(link)) link<-x$coef$link
+	if (is.null(path)) path<-x$coef$path
+	out<-x$coef[x$coef$link%in%link & x$coef$path%in%path,1:4]
+	rownames(out)<-NULL
+	return(out)
 }
 
 

@@ -2,7 +2,7 @@
 \alias{data2pl}
 \docType{data}
 \title{
-	Simulated data sets
+	Simulated Data Sets
 }
 \description{
 	Five simulated data sets from a two-parameter logistic model.

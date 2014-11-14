@@ -2,7 +2,7 @@
 \alias{summary.meqc}
 \alias{print.summary.meqc}
 \title{
-	Summarizing bisector equating coefficients
+	Summarizing Bisector Equating Coefficients
 }
 \description{
 	\code{summary} method for class \code{meqc}.
@@ -18,7 +18,7 @@
 		\code{\link{bisectorec}}.
 	}
 	\item{x}{
-		an object of class \code{summary.meqc}, a result of a call to summary.meqc.
+		an object of class \code{summary.meqc}, a result of a call to \code{summary.meqc}.
 	}
 	\item{\dots}{
 		further arguments passed to or from other methods.
@@ -49,16 +49,16 @@ direclist3pl <- alldirec(mods = mod3pl, method = "Stocking-Lord")
 # compute chain equating coefficients for path 1,2,3,4
 pth1 <- paste("test", 1:4, sep = "")
 pth1 <- data.frame(t(pth1), stringsAsFactors = FALSE)
-chainec1 <- chainec(r = 4, direclist = direclist3pl, pths = pth1)
+chainec1 <- chainec(direclist = direclist3pl, pths = pth1)
 # compute chain equating coefficients for path 1,5,4
 pth2 <- c(paste("test", c(1,5,4), sep = ""))
 pth2 <- data.frame(t(pth2), stringsAsFactors = FALSE)
-chainec2 <- chainec(r = 3, direclist = direclist3pl, pths = pth2)
+chainec2 <- chainec(direclist = direclist3pl, pths = pth2)
 # compute chain equating coefficients for path 1,2,3,4,5
 pth3 <- paste("test", 1:5, sep = "")
 pth3 <- data.frame(t(pth3), stringsAsFactors = FALSE)
-chainec3 <- chainec(r = 5, direclist = direclist3pl, pths = pth3)
-# create a list of objects of class \code{eqc}
+chainec3 <- chainec(direclist = direclist3pl, pths = pth3)
+# create a list of objects of class eqc or ceqc
 ecall <- c(chainec1, chainec2, chainec3, direclist3pl["test1.test5"])
 # compute bisector and weighted bisector coefficients
 allec <- bisectorec(ecall = ecall, mods = mod3pl, weighted = TRUE, unweighted = TRUE)

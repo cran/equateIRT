@@ -1,7 +1,8 @@
 \name{alldirec}
 \alias{alldirec}
+\alias{print.eqclist}
 \title{
-	Direct equating coefficients between all pairs of a list of forms
+	Direct Equating Coefficients Between All Pairs of a List of Forms
 }
 \description{
 	Calculates direct equating coefficients and standard errors using 
@@ -59,7 +60,7 @@ alldirec(mods, method = "mean-mean", all = FALSE, quadrature = TRUE, nq = 30)
 }
 
 \seealso{
-	\code{\link{direc}}, \code{\link{modIRT}}, \code{\link{summary.eqclist}}
+	\code{\link{direc}}, \code{\link{eqc}}, \code{\link{itm}}, \code{\link{modIRT}}, \code{\link{summary.eqclist}}
 }
 \examples{
 # three-parameter logistic model

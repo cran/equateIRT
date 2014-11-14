@@ -1,8 +1,9 @@
 \name{direc}
 \alias{direc}
+\alias{print.eqc}
 
 \title{
-	Direct equating coefficients
+	Direct Equating Coefficients
 }
 \description{
 	Calculates direct equating coefficients and standard errors using 
@@ -62,14 +63,19 @@ direc(mod1, mod2, method = "mean-mean", suff1 = ".1", suff2 = ".2",
 	by setting \eqn{c_i} equal to zero and \eqn{a_i} costant across items,
 	while the Rasch model can be obtained by setting \eqn{c_i} 
 	equal to zero and \eqn{a_i} equal to 1.
+	
+	The type of IRT model does not need to be specified as it is obtained 
+	from arguments \code{mod1} and \code{mod2}. 
 }
 \value{
 	An object of class \code{eqc} with components
 	\item{tab1}{item parameters of the first form.}
 	\item{tab2}{item parameters of the second form.}
-	\item{tab}{data frame containing item parameters of the first form (value1),
-		the second form (value2), and the first form converted in the scale of the second
-		form (value12).}
+	\item{tab}{Data frame containing item names (\code{Item}), 
+	item parameters of the first form (e.g. \code{test1}), 
+	item parameters of the second form (e.g. \code{test2}), 
+	and item parameters of the first form converted 
+	in the scale of the second form (e.g. \code{test1.as.test2}).}
 	\item{var12}{covariance matrix of item parameters of the first 
 		and the second form.}
 	\item{partial}{partial derivatives of equating coefficients A and B
@@ -99,7 +105,7 @@ direc(mod1, mod2, method = "mean-mean", suff1 = ".1", suff2 = ".2",
 	Michela Battauz
 }
 \seealso{
-	\code{\link{modIRT}}, \code{\link{summary.eqc}}
+	\code{\link{eqc}}, \code{\link{itm}}, \code{\link{modIRT}}, \code{\link{summary.eqc}}
 }
 \examples{
 # three-parameter logistic model

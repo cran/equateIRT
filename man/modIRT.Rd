@@ -2,7 +2,7 @@
 \alias{modIRT}
 
 \title{
-	Estimated coefficients and covariance matrix of IRT models 
+	Estimated Coefficients and Covariance Matrix of IRT Models 
 }
 \description{
 	Creates an object of the class \code{modIRT} containing estimated
@@ -65,7 +65,7 @@ modIRT(coef, var = NULL, names = NULL, ltparam = TRUE, lparam = TRUE,
 	The \code{modIRT} function returns parameter estimates
 	under the usual IRT parameterization, that is,
 	\deqn{\pi_i = c_i + (1 - c_i) \frac{\exp[D a_i (\theta - b_i)]}{1 + 
-	\exp[D a_i (\theta - b_i)]}.}{ \pi_i = c_i + (1 - c_i) *  
+	\exp[D a_i (\theta - b_i)]},}{ \pi_i = c_i + (1 - c_i) *  
 	exp\{D a_i (\theta - b_i)\} / [1 + exp\{D a_i (\theta - b_i)\}],}
 	where \eqn{D a_i = \beta_{2i}}, \eqn{b_i = -\beta_{1i}/\beta_{2i}} and
 	\eqn{\theta = z}.
@@ -79,7 +79,7 @@ modIRT(coef, var = NULL, names = NULL, ltparam = TRUE, lparam = TRUE,
 \value{
 	An object of class \code{modIRT} consisting in a list with length equal
 	to the number of forms containing lists with components
-	\item{coef}{item parameter estimates.}
+	\item{coefficients}{item parameter estimates.}
 	\item{var}{covariance matrix of item parameter estimates.}
 	\item{itmp}{number of item parameters of the IRT model. This is 1 for the 
 	Rasch model, 2 for the one-parameter logistic model, 2 for the
@@ -100,7 +100,7 @@ modIRT(coef, var = NULL, names = NULL, ltparam = TRUE, lparam = TRUE,
 }
 
 \seealso{
-	\code{\link{direc}}
+	\code{\link{direc}}, \code{\link{import.ltm}}
 }
 \examples{
 # three-parameter logistic model
@@ -119,7 +119,7 @@ test <- paste("test", 1:5, sep = "")
 modrasch <- modIRT(coef = estrasch$coef, var = estrasch$var, names = test, 
 	display = FALSE)
 
-# one-parameter logistic model imported from ltm
+# one-parameter logistic model imported from the R package ltm
 \dontrun{
 library(ltm)
 mod1pl <- rasch(LSAT)

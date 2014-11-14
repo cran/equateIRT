@@ -1,7 +1,7 @@
 \name{convert}
 \alias{convert}
 \title{
-	Item parameters conversion
+	Item Parameters Conversion
 }
 \description{
 	Converts item and person parameters using equating coefficients.
@@ -43,7 +43,7 @@ convert(A, B, coef = NULL, person.par = NULL)
 	Michela Battauz
 }
 \seealso{
-	\code{\link{modIRT}}
+	\code{\link{itm}}, \code{\link{modIRT}}
 }
 \examples{
 # conversion using direct coefficients
@@ -53,9 +53,9 @@ data(est3pl)
 test <- paste("test", 1:5, sep = "")
 mod3pl <- modIRT(coef = est3pl$coef, var = est3pl$var, names = test, display = FALSE)
 l12 <- direc(mod1 = mod3pl[1], mod2 = mod3pl[2], method = "Stocking-Lord")
-convert(A = l12$A, B = l12$B, coef = mod3pl$test1$coef)
-# the conversion of item parameters is given also in
-l12$tab
+convert(A = l12$A, B = l12$B, coef = coef(mod3pl$test1))
+# the conversion of item parameters is obtained also using
+itm(l12)
 
 # conversion using bisector coefficients
 # two-parameter logistic model
@@ -67,22 +67,18 @@ direclist2pl <- alldirec(mods = mod2pl, method = "Haebara")
 # compute chain equating coefficients for path 1,2,3,4
 pth1 <- paste("test", 1:4, sep = "")
 pth1 <- data.frame(t(pth1), stringsAsFactors = FALSE)
-chainec1 <- chainec(r = 4, direclist = direclist2pl, pths = pth1)
+chainec1 <- chainec(direclist = direclist2pl, pths = pth1)
 # compute chain equating coefficients for path 1,5,4
 pth2 <- c(paste("test", c(1,5,4), sep = ""))
 pth2 <- data.frame(t(pth2), stringsAsFactors = FALSE)
-chainec2 <- chainec(r = 3, direclist = direclist2pl, pths = pth2)
-# compute chain equating coefficients for path 1,2,3,4,5
-pth3 <- paste("test", 1:5, sep = "")
-pth3 <- data.frame(t(pth3), stringsAsFactors = FALSE)
-chainec3 <- chainec(r = 5, direclist = direclist2pl, pths = pth3)
-# create a list of objects of class \code{eqc} 
-ecall <- c(chainec1, chainec2, chainec3, direclist2pl["test1.test5"])
+chainec2 <- chainec(direclist = direclist2pl, pths = pth2)
+# create a list of objects of class ceqc
+ecall <- c(chainec1, chainec2)
 # compute bisector and weighted bisector coefficients
 allec <- bisectorec(ecall = ecall, mods = mod2pl, weighted = TRUE, unweighted = TRUE)
 summary(allec)
-Ab<-allec$coef[allec$coef$link=="test1.test4" & allec$coef$path=="bisector", ]$A
-Bb<-allec$coef[allec$coef$link=="test1.test4" & allec$coef$path=="bisector", ]$B
-convert(A = Ab, B = Bb, coef = mod2pl$test1$coef, person.par = seq(-3, 3, 0.5))
+eqc14<-eqc(allec, link = "test1.test4", path = "bisector")
+convert(A = eqc14$A, B = eqc14$B, coef = coef(mod2pl$test1), person.par = seq(-3, 3, 0.5))
 }
+
 

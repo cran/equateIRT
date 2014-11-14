@@ -2,7 +2,7 @@
 \alias{estrasch}
 \docType{data}
 \title{
-	Item parameter estimates and covariance matrices of a Rasch model
+	Item Parameter Estimates and Covariance Matrices of a Rasch Model
 }
 \description{
 	This dataset includes item parameter estimates and covariance matrices of a

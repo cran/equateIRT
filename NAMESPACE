@@ -2,13 +2,32 @@
 importFrom('statmod', "gauss.quad.prob")
 
 # Exported functions
-export(linkp, modIRT, direc, alldirec, chainec, bisectorec, convert, import.ltm, import.flexmirt, import.irtpro)
+export(linkp, modIRT, direc, alldirec, chainec, bisectorec, convert, import.ltm, import.mirt, import.flexmirt, import.irtpro, itm, eqc)
 
 
 # S3 methods
 S3method(summary, eqc)
 S3method(summary, eqclist)
+S3method(summary, ceqc)
+S3method(summary, ceqclist)
 S3method(summary, meqc)
 S3method(print, summary.eqc)
 S3method(print, summary.eqclist)
+S3method(print, summary.ceqc)
+S3method(print, summary.ceqclist)
 S3method(print, summary.meqc)
+S3method(print, eqc)
+S3method(print, eqclist)
+S3method(print, ceqc)
+S3method(print, ceqclist)
+S3method(print, meqc)
+S3method(itm, eqc)
+S3method(itm, eqclist)
+S3method(itm, ceqc)
+S3method(itm, ceqclist)
+S3method(eqc, eqc)
+S3method(eqc, eqclist)
+S3method(eqc, ceqc)
+S3method(eqc, ceqclist)
+S3method(eqc, meqc)
+
