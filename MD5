@@ -1,11 +1,15 @@
-aedfc4b149c9f35dc611690bfd6d95ee *DESCRIPTION
-8a57585343e4b85de882b3ba71892587 *NAMESPACE
+76ca14c42f7e0613687c3f312fac453b *DESCRIPTION
+794eef1ed7dc0ed63e4edec409c8e1c5 *NAMESPACE
 51e0f558179a12ecbf6a75d9deb35278 *R/functions.r
+0971cfac7cc42ee217fab56065636987 *build/vignette.rds
 da4fadbe9fa9f481560faa629030ddd9 *data/data2pl.rda
 ddb31b4e8144bdcca5cd6c3b712c8ad7 *data/est2pl.rda
 55ae5f9ecbcccb14ac72130cd1c223b9 *data/est3pl.rda
 99e51e69216e0412931fa38dfcbdaebd *data/estrasch.rda
-0ecee04c2100aad7d0acca7e6400d2c4 *inst/NEWS
+b9d85c50fc6d387522650cf881e3f6db *inst/NEWS
+a0e453a13b185284a4e995ee00ad27d0 *inst/doc/equateIRT5_JSS.R
+0544d7302524788d0960e8c94590249f *inst/doc/equateIRT5_JSS.Rnw
+8f8ef4c20f2a410739ab5ebafb88d292 *inst/doc/equateIRT5_JSS.pdf
 5420855150cf89b7b44295a453051d3a *man/alldirec.Rd
 8e05f696532a5a4bca6131cdb2ea126e *man/bisectorec.Rd
 d978592f6aa4e31aed796b1fd81423cf *man/chainec.Rd
@@ -14,7 +18,7 @@ e7f98977c3b298c2e7fe160265ab5b9b *man/data2pl.Rd
 cf40a2143569f1753de2ae0db4226ca6 *man/direc.Rd
 d1db13034e9ec47945671ef2580e90c2 *man/eqc.Rd
 9e82baf5b14da129945a40b60ae174c0 *man/equateIRT-internal.Rd
-bf97a46870e4e5e968f61f9b29886ba0 *man/equateIRT-package.Rd
+c5e62032fe9f0df065250d79a871fd76 *man/equateIRT-package.Rd
 74502ccad8d01a38532cf2a885df6571 *man/est2pl.Rd
 8f9af830dc2dafb364f53cb2a4d817ce *man/est3pl.Rd
 1a94a3d5c3c8be740e53db553bfb3335 *man/estrasch.Rd
@@ -27,3 +31,6 @@ d5f8ee9a059149fe44e4cc818250ceb8 *man/linkp.Rd
 434dcb80501de92a69789bf2647b8422 *man/summary.eqc.Rd
 752abd870346b376fb340c9440062291 *man/summary.eqclist.Rd
 79a52f3808ab34f1ede96e2d792111ad *man/summary.meqc.Rd
+db4164b60a0d8c8d273d16f082d275e4 *vignettes/equateIRT.bib
+0544d7302524788d0960e8c94590249f *vignettes/equateIRT5_JSS.Rnw
+b9564ddd59a06782310989e8f33db55e *vignettes/jsslogo.jpg

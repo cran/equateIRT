@@ -1,11 +1,4 @@
-Changes in version: equateIRT_1.2
+Changes in version: equateIRT_1.2-1
 
-* Added function import.mirt.
-* In functions import.flexmirt and import.irtpro added argument
-  fnameirt and deleted arguments param.number and fixed.
-* Added new functions itm and eqc.
-* Added print methods for classes eqc, eqclist, ceqc, ceqclist and meqc.
-* In function chainec argument r is not required when argument pths is not NULL.
-* Some changes in .Rd files.
-
+* Added vignette
 

@@ -1,9 +1,10 @@
 # Imported functions
 importFrom('statmod', "gauss.quad.prob")
+importFrom('stats', "nlminb", "optim", "reshape", "sd")
+importFrom('utils', "read.fwf", "read.table")
 
 # Exported functions
 export(linkp, modIRT, direc, alldirec, chainec, bisectorec, convert, import.ltm, import.mirt, import.flexmirt, import.irtpro, itm, eqc)
-
 
 # S3 methods
 S3method(summary, eqc)

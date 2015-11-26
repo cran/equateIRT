@@ -1,0 +1,947 @@
+\documentclass[article]{jss}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath,amsbsy}
+
+%\VignetteIndexEntry{equateIRT: An R Package for IRT Test Equating}
+
+\def\ba{\boldsymbol\alpha}
+\def\gg{{g-1, \, g}}
+\def\g{{g-1}}
+\def\acov{\mathsf{ACOV}}
+\def\pth{\mathcal{P}}
+\def\bA{{\bf A}}
+\def\bB{{\bf B}}
+
+
+%% almost as usual
+\author{Michela Battauz\\Universit\`a degli Studi di Udine}
+\title{\pkg{equateIRT}: An \proglang{R} Package for IRT Test Equating}
+
+%% for pretty printing and a nice hypersummary also set:
+\Plainauthor{Michela Battauz} %% comma-separated
+\Plaintitle{equateIRT: An R Package for IRT Test Equating} %% without formatting
+\Shorttitle{\pkg{equateIRT}: An \proglang{R} Package for IRT Test Equating} %% a short title (if necessary)
+
+%% an abstract and keywords
+\Abstract{
+The \proglang{R} package \pkg{equateIRT} implements item response theory (IRT) 
+methods for equating different forms
+composed of dichotomous items. In particular, the IRT models included are 
+the three-parameter logistic model, the two-parameter logistic model,
+the one-parameter logistic model and the Rasch model.
+Forms can be equated when they present common items (direct equating) 
+or when they can be linked through a chain of forms that present common items in pairs (indirect or chain equating).
+When two forms can be equated through different paths, a single conversion can be obtained by averaging
+the equating coefficients. 
+The package calculates direct and chain equating coefficients. The averaging of direct and chain 
+coefficients that link the same two forms is performed through the bisector method.
+Furthermore, the package provides analytic standard errors of direct, chain and average equating coefficients.
+}
+\Keywords{bisector, chain, equating, equating coefficients, IRT, Rasch, standard errors}
+\Plainkeywords{bisector, chain, equating, equating coefficients, IRT, Rasch, standard errors} %% without formatting
+%% at least one keyword must be supplied
+
+%% publication information
+%% NOTE: Typically, this can be left commented and will be filled out by the technical editor
+%% \Volume{50}
+%% \Issue{9}
+%% \Month{June}
+%% \Year{2012}
+%% \Submitdate{2012-06-04}
+%% \Acceptdate{2012-06-04}
+
+%% The address of (at least) one author should be given
+%% in the following format:
+\Address{
+  Michela Battauz\\
+  Department of Economics and Statistics\\
+  Universit\`a degli Studi di Udine\\
+  via Tomadini 30/A\\
+  33100 Udine, Italy\\
+  E-mail: \email{michela.battauz@uniud.it}\\
+  URL: \url{http://www.dies.uniud.it/battauz.it.html}
+}
+%% It is also possible to add a telephone and fax number
+%% before the e-mail in the following format:
+%% Telephone: +43/512/507-7103
+%% Fax: +43/512/507-2851
+
+%% for those who use Sweave please include the following line (with % symbols):
+%% need no \usepackage{Sweave.sty}
+
+
+%% end of declarations %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%\SweaveOpts{echo=true}
+
+\begin{document}
+
+%% include your article here, just as usual
+%% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
+
+
+
+\section{Introduction}
+
+In many testing programs, security reasons require that test forms are composed of different items,
+making test scores not comparable across different administrations.
+The equating process permits the comparison of scores obtained from taking different forms.
+The term equating traditionally refers to the adjustment of scores from parallel forms, that are as
+similar as possible in content and statistical characteristics
+\citep[][\S 1.1.2 and \S 1.2.3]{Kole:Bren:test:2004}. 
+The methods presented in this paper,
+implemented in the \proglang{R} \citep{erre} package \pkg{equateIRT},
+allow more general forms of equating, such as horizontal
+and vertical scaling.
+For example, vertical scaling is intended to make comparable scores across different educational grades, 
+where the content of the tests differs accordingly to the educational level.
+
+
+
+Various statistical methods have been proposed to perform equating 
+\citep[for a broad review, see][]{Kole:Bren:test:2004}. 
+The \proglang{R} package \pkg{equateIRT} focuses on
+item response theory (IRT) methods for dichotomous items. 
+IRT models are statistical models that have as response variable the responses given to the items of
+a questionnaire or test. 
+These responses are modeled as function of a latent trait, for example the ability level,
+and the item parameters that are related to some characteristics of the items,
+such as the difficulty.
+The purpose of IRT models is to provide a measure of the latent trait under investigation.
+For a broad review of IRT models see  \citet{Lind:Hamb:hand:1997}.
+The IRT models included in the \pkg{equateIRT} package are
+the three-parameter logistic model, the two-parameter logistic model,
+the one-parameter logistic model and the Rasch model.
+When the parameters of the IRT model are estimated separately for each
+group of people taking a different test form, they are not comparable
+because the origin of the measurement scale is not identifiable.
+However, when two forms present a subset of common items, the parameters can be put on the same scale.
+There are two methods to pursue this end. Concurrent calibration consists of estimating the item parameters 
+together and yields measurements directly on a common metric.
+Alternatively, item parameters are estimated separately for each test form (separate calibration) 
+and the estimates of the
+item parameters for the common items can be used to estimate the scale transformation.
+Both approaches can be extended to the case of multiple test forms, provided that
+the forms can be linked through common items.
+Concurrent calibration presents the advantage of not requiring any conversion 
+after the estimation of the parameters as they are already expressed on the same scale.
+However, this approach requires the combination of the data from each form in a single data set that could
+become quite large when there are many forms or when each form is administered to very large
+number of people. In some cases, the large dimension of the data set makes the estimation very
+slow or even unfeasible.
+Instead, by equating the coefficients of separate calibrations, it is not necessary to estimate again
+the parameters of previous administrations, thus avoiding the construction of a single data set.
+
+
+
+The conversion of parameters estimates is attained by applying a linear transformation and
+the coefficients of this transformation are called equating coefficients. 
+For each pair of forms presenting common items, direct equating coefficients can be calculated.
+Suppose that Forms 1 and 2 have common items and that Forms 2 and 3 have common items.
+Forms 1 and 3 can then be equated employing the chain going through Form 2. In this case,
+indirect equating coefficients linking Forms 1 and 3 can be calculated as a function of direct
+equating coefficients linking pairs of forms with common items. In general, when two forms can be
+linked through a chain of forms that present common items in pairs, indirect equating coefficients
+can be calculated that permit the conversion of parameter estimates of one form into the scale of
+the other form using a linear transformation. These coefficients are a function of direct equating
+coefficients. Furthermore, some linkage designs are quite complex and two forms can be linked
+through different chains and possibly a direct link. For every path that links the same two forms
+the equating coefficients can be computed, thus yielding different scale conversions. In this case,
+the equating coefficients can be averaged in order to obtain a single transformation.
+
+
+
+For the computation of direct equating coefficients, the \pkg{equateIRT} package implements both methods
+based on moments of item parameters, that are the mean-sigma \citep{Marc:item:1977}, 
+the mean-mean \citep{Loyd:vert:1980}, and the mean-geometric mean \citep{Misl:bilo:1990}
+methods, and response function methods, that are the Haebara \citep{Haeb:equa:1980} 
+and the Stocking-Lord \citep{Stoc:deve:1983} methods.
+The package computes also indirect equating coefficients through a chain of forms.
+The bisector method is used to average equating coefficients derived from different paths
+\citep{Holl:howt:2011, batt:irtt:2013}.
+
+Since the estimated equating coefficients are subject to sampling variation,
+it is important to assess the magnitude of this variability in order to
+evaluate the accuracy of the equating process \citep{Ogas:appl:2011}.
+This objective can be accomplished by observing the asymptotic standard errors of the
+equating coefficients. 
+Despite the importance of verifying the precision of the equating performed,
+the equating software generally does not provide standard errors of equating coefficients.
+To the best of my knowledge, just a few computer programs calculate standard errors 
+by using bootstrap techniques. The computation of analytic standard errors of IRT equating coefficients
+is not implemented in any software, with the only exception of a set of subroutines that 
+implement the methods developed by \citet{Ogas:asym:2000} and \citet{Ogas:stan:2001}
+for direct equating coefficients, available from the author.
+Instead, the \pkg{equateIRT} package provides analytical standard errors for direct, 
+chain and average equating coefficients.
+It is important to note that analytical standard errors of equating coefficients can only be computed
+if the covariance matrix of item parameter estimates is available. This covariance matrix should be
+obtained from the software used to estimate the item parameters. The package provides functions to
+import data from flexMIRT \citep{flexmirt}, 
+IRTPRO \citep{irtpro} and the \proglang{R} packages \pkg{ltm} \citep{ltm} and \pkg{mirt} \citep{mirt}.
+All of these IRT programs supply the covariance matrix of item parameter estimates.
+
+Other \proglang{R} packages provide implementation of IRT equating methods. 
+The package \pkg{irtoys} \citep{irtoys} performs IRT equating
+for dichotomous items and the package \pkg{plink} \citep{plink} implements
+unidimensional and multidimensional IRT equating for both dichotomous and polytomous items.
+The \pkg{plink} package performs chain equating by providing direct equating coefficients between forms
+that present common items, but does not provide indirect equating coefficients that permit the conversion
+from the first form into the last form of the path. Chain equating is not included in the \pkg{irtoys} package.
+Furthermore, the packages \pkg{irtoys} and \pkg{plink} do not provide average equating coefficients
+nor standard errors of direct, indirect and average coefficients.
+
+The paper is structured as follows.
+The theory on IRT test equating is summarized in Section \ref{IRTte}.
+Section \ref{equateIRTpkg} illustrates the \pkg{equateIRT} package and 
+Section \ref{con} concludes the paper.
+
+
+
+\section{IRT test equating}
+\label{IRTte}
+
+Consider a single test form that is denoted by $g$.
+In the three-parameter logistic model,
+the probability of a positive response on item $j$ in form $g$ 
+for a person with ability
+$\theta$ is given by
+\begin{equation}
+\label{pr}
+p_{gj}(\theta_{(g)}; a_{gj}, b_{gj}, c_{gj})=c_{gj}+(1-c_{gj})
+\frac{\exp \left \{ D a_{gj}(\theta_{(g)}-b_{gj}) \right \} }
+{1+\exp \left \{ D a_{gj}(\theta_{(g)}-b_{gj}) \right \} },
+\end{equation}
+where $a_{gj}$ is the item discrimination parameter, $b_{gj}$ is the item
+difficulty parameter, $c_{gj}$ is the item guessing parameter and $D$ is a
+constant typically set to 1.7.
+We define the parameter vector of form $g$
+as $\ba_g=(\ba_{g1}^\top,\dots ,\ba_{gn_g}^\top)^\top$,
+where $\ba_{gj}=(a_{gj},b_{gj},c_{gj})^\top, j=1,\dots,n_g$,
+and $n_g$ is the number of items of form $g$.
+Item parameters are estimated separately for each form
+by using the marginal maximum likelihood method
+\citep{Bock:Aitk:marg:1981}, regarding the person parameter $\theta$ as a 
+random variable with standard normal distribution.
+
+
+\subsection{Direct equating}
+\label{deq}
+
+
+Let $g-1$ be another form that presents $n_\gg$ items in common with Form $g$.
+The parameters estimated for Form $g-1$ can be transformed to the scale
+of Form $g$ by using the following equations
+\begin{equation}
+\label{tet}
+\theta_g = A_\gg \, \theta_\g+B_\gg \, ,
+\end{equation}
+\begin{equation}
+\label{tea}
+a_g = \frac{a_\g}{A_\gg} 
+\end{equation}
+and
+\begin{equation}
+\label{teb}
+b_g = A_\gg \, b_\g+B_\gg \, ,
+\end{equation}
+where $A_\gg$ and $B_\gg$ are the equating coefficients.
+These coefficients can be estimated by using moments of
+item parameters \citep[][\S 6.3.2]{Kole:Bren:test:2004},
+or response function methods \citep[][\S 6.3.3]{Kole:Bren:test:2004}.
+In any case, direct equating coefficients are estimated using only the item parameter estimates for
+the items in common between two forms, irrespective of the items in common with other forms.
+
+The mean-sigma, mean-mean and 
+mean-geometric mean methods are based on moments of item parameters.
+In particular, the equating coefficient $A_\gg$ is given by
+\begin{equation}
+\label{ms}
+A_\gg = \sqrt{\frac{\sum_{j=1}^{n_\gg} b_{gj}^2-\frac{1}{n_\gg}\left ( \sum_{j=1}^{n_\gg} b_{gj} \right )^2}{\sum_{j=1}^{n_\gg} b_{\g j}^2-\frac{1}{n_\gg}\left ( \sum_{j=1}^{n_\gg} b_{\g j} \right )^2}}
+\end{equation}
+using the mean-sigma method,
+\begin{equation}
+\label{mm}
+A_\gg = \frac{\sum_{j=1}^{n_\gg} a_{\g j}}{\sum_{j=1}^{n_\gg} a_{gj}}
+\end{equation}
+using the mean-mean method, and
+\begin{equation}
+\label{mg}
+A_\gg = \left ( \prod_{j=1}^{n_\gg} \frac{a_{\g j}}{a_{gj}} \right )^{\frac{1}{n_\gg}}
+\end{equation}
+using the mean-geometric mean method,
+while the equating coefficient $B_\gg$ is given by
+\begin{equation}
+\label{b}
+B_\gg = \frac{1}{n_\gg}\sum_{j=1}^{n_\gg} b_{gj}- A_\gg \; \frac{1}{n_\gg}\sum_{j=1}^{n_\gg} b_{\g j}
+\end{equation}
+for all methods.
+
+
+
+
+The Haebara  and Stocking-Lord methods are based
+on the response function.
+The equating coefficients using the Haebara method are obtained by minimizing the following function
+\begin{equation}
+\label{h}
+f_H = \frac{1}{2}\int_{-\infty}^{+\infty}\sum_{j=1}^{n_\gg} \left [ p_{gj}(\theta; a_{gj}, b_{gj}, c_{gj}) - 
+p_{\g j}(\theta; a^*_{\g j}, b^*_{\g j}, c_{\g j}) \right ]^2 h(\theta) d\theta
+\end{equation}
+where $h(\theta)$ is the density of a standard normal variable, $a^*_{\g j}=a_{\g j}/A_\gg$ and
+$b^*_{\g j}=A_\gg \, b_{\g j} + B_\gg$.
+The Stocking-Lord method requires, instead, the minimization of the function
+\begin{equation}
+\label{sl}
+f_{SL} = \frac{1}{2}\int_{-\infty}^{+\infty}\left\{\sum_{j=1}^{n_\gg} \left [ p_{gj}(\theta; a_{gj}, b_{gj}, c_{gj}) - 
+p_{\g j}(\theta; a^*_{\g j}, b^*_{\g j}, c_{\g j}) \right ]\right\}^2 h(\theta) d\theta.
+\end{equation}
+The integrals in equations~(\ref{h}) and~(\ref{sl}) do not have an analytical solution and they are generally
+approximated by using Gaussian quadrature.
+
+
+
+
+Using the delta method, \citep{Ogas:asym:2000} and \citep{Ogas:stan:2001} derived 
+the asymptotic covariance matrix for
+the vector of estimates $(\hat A_\gg,\hat B_\gg)^\top$, that is given by
+\begin{equation}
+\acov(\hat A_\gg,\hat B_\gg)^\top=\frac{\partial (A_\gg,B_\gg)^\top}{\partial \ba_\gg^\top}
+\acov(\hat \ba_\gg)\frac{\partial (A_\gg,B_\gg)}{\partial \ba_\gg} \, ,
+\end{equation}
+where $\ba_\gg=(\ba_g^\top,\ba_{g-1}^\top)^\top$ is a vector containing all the item parameters
+related to Forms $g-1$ and $g$
+and $\acov(\hat \ba_\gg)$ is the asymptotic covariance matrix
+of $\hat \ba_\gg$.
+The derivatives depend on the method used to determine the equating coefficients 
+and are given in \citet{Ogas:asym:2000, Ogas:appl:2011} for methods
+based on moments, and in \citet{Ogas:stan:2001} for response function methods.
+
+
+\subsection{Equating chains}
+\label{ech}
+
+Suppose that two forms are linked through
+a chain of forms that present
+common items in pairs.
+Define the path from Form $0$ to Form $l$
+as $p=\{ 0,1,\dots,l \}$.
+According to \citet{batt:irtt:2013},
+it is possible to obtain
+the equating coefficients transforming the
+scale of $\theta_0$ to that of $\theta_l$ as function of the direct equating coefficients
+that link the forms with common items.
+These coefficients will be referred to as indirect or chain equating
+coefficients and they are given by
+\begin{equation}
+A_p=A_{0,1,\dots,l}=\prod_{g=1}^l A_{\gg}
+\end{equation}
+and
+\begin{equation}
+B_p=B_{0,1,\dots,l}=\sum_{g=1}^l B_{\gg} \; A_{g, \dots, l} \, ,
+\end{equation} 	
+where $A_{g, \dots, l}=\prod_{h=g+1}^l A_{h-1, \, h}$ is the coefficient 
+that links Form $g$ to Form $l$.
+
+
+Similarly to the case of a direct link,
+the delta method can be exploited
+to obtain the asymptotic covariance matrix
+of the vector of estimates $(\hat A_p, \hat B_p)^\top$,
+that is
+\begin{equation}
+\label{ind}
+\acov(\hat A_p,\hat B_p)^\top=\frac{\partial (A_p,B_p)^\top}{\partial \ba_p^\top}
+\acov(\hat \ba_p)\frac{\partial (A_p,B_p)}{\partial \ba_p},
+\end{equation}
+where $\ba_p=(\ba_0^\top,\ba_1^\top,\dots,\ba_l^\top)^\top$ 
+is the vector containing all the item parameters
+related to the forms that compose the path
+and $\acov(\hat \ba_p)$ is the asymptotic covariance
+matrix of the estimate $\hat \ba_p$.
+The derivatives are given in \citet{batt:irtt:2013}.
+
+The computation of chain equating coefficients is then performed in two steps: first, the calculation
+of direct equating coefficients between consecutive forms of a path and second, the determination
+of indirect equating coefficients as a function of direct equating coefficients. Thus, in this process,
+only the items in common between two consecutive forms of a given chain are used. If, for example,
+Forms $0$ and $2$ present common items, this information is not used to estimate the chain equating
+coefficients for path $p=\{ 0,1,\dots,l \}$. This link can be used to constitute a further path that connects
+Forms $0$ and $l$ and a different scale conversion can be derived for this path. In this case, there
+are two different equatings for the same two forms, and they can be averaged as explained in the
+following subsection.
+
+
+
+
+\subsection{Average equating coefficients}
+\label{aec}
+
+
+Suppose that two forms are linked through different paths.
+Define the set of paths that link two
+Forms $0$ and $l$ as $\pth_{0l}$ and the linking coefficients
+related to path $p$ as $A_p$ and $B_p$, $p\in\pth_{0l}$. 
+The equations that transform the scale of $\theta_0$ to that of $\theta_l$ are then
+\begin{equation}
+\label{lt}
+\theta_l^{p}=A_{p}\;\theta_0+B_{p}, \quad p \in \pth_{0l}.
+\end{equation}
+As observed by  \citet[][p. 280]{Kole:Bren:test:2004} and
+\citet[p. 44]{Brau:obse:1982}, the equating relationships
+provided by each path could be averaged to produce a single
+conversion that is expected to be more accurate.
+\citet{batt:irtt:2013} proposed using the bisector method, 
+suggested by \citet{Holl:howt:2011} 
+to average the equating functions obtained by using
+different equating methods.
+The angle bisector, in case of two linear functions that intersect
+at a point, is the 
+linear function that bisects the angle between them.
+The bisector method satisfies the symmetry property, which
+requires that the inverse function of the average equating function equals
+the average of the inverse functions.
+Instead, the (weighted) mean of the equating functions does not satisfy the symmetry property,
+making the bisector method preferable.
+The bisector method yields a weighted average of the linear transformations~(\ref{lt})
+\begin{equation}
+\label{ave}
+\theta_l^{*} = \sum_{p\in\pth_{0l}} w_p \,\theta_l^p,
+\end{equation}
+where
+\begin{equation}
+w_p=\frac{n_p(1+A_p^2)^{-1/2}}{\sum_{b\in\pth_{0l}} n_b(1+A_b^2)^{-1/2}},
+\end{equation}
+and $n_p$ are optional weights associated with each path.
+The average equating coefficients are then
+\begin{equation}
+A^{*}_{0l}=\sum_{p\in\pth_{0l}} A_p w_p
+\end{equation}
+and
+\begin{equation}
+B^{*}_{0l}=\sum_{p\in\pth_{0l}} B_p w_p.
+\end{equation}
+
+The asymptotic covariance matrix of the vector of estimates
+$(\hat A^*_{0l}, \hat B^*_{0l})^\top$
+can then be obtained by using the delta method as follows
+\begin{equation}
+\acov(\hat A^*_{0l},\hat B^*_{0l})^\top=\frac{\partial (A^*_{0l},B^*_{0l})^\top}{\partial \ba^\top}
+\acov(\hat \ba)\frac{\partial (A^*_{0l},B^*_{0l})}{\partial \ba},
+\end{equation}
+where $\ba=(\ba_p)_{p\in\pth_{0l}}$ is the vector containing all the item parameters
+used in the equating process in at least one of the paths in $\pth_{0l}$
+and $\acov(\hat \ba)$ is a block diagonal matrix composed of all 
+$\acov(\hat \ba_p)$, $p\in\pth_{0l}$, and it is
+the asymptotic covariance matrix of the
+estimate $\hat \ba$.
+The derivatives are given in \citet{batt:irtt:2013}.
+
+
+Obtaining average equating coefficients is then a process that takes place over three phases. First,
+the estimation of direct equating coefficients, then the calculation of chain equating coefficients
+for more than one path connecting two forms, and finally the computation of average equating
+coefficients. The distribution of common items across forms determines which forms can be directly
+linked in the first phase. From this follows the composition of paths connecting each pair of forms
+and the computation of chain equating coefficients. There are no restrictions on these connections:
+different paths can share some parts, or the same item can be used to link more than one form.
+The relationship between the average coefficients and the item parameters used to compute them
+is reflected in the derivatives
+$\frac{\partial (A^*_{0l},B^*_{0l})^\top}{\partial \ba^\top}$,
+that determine the covariance matrix of the average equating coefficients.
+
+
+A further issue concerns which weights $n_p$ to use in averaging.
+\citet{batt:irtt:2013} proposed determining weights by
+minimizing the average variance of $\theta^*_l$,
+namely
+\begin{equation}
+\label{of}
+\E_{\theta_0} \left [\VAR(\hat A^*_{0l} \, \theta_0 + \hat B^*_{0l} \big\vert\theta_0 ) \right ] = 
+\VAR(\hat A^*_{0l})+\VAR(\hat B^*_{0l}),
+\end{equation}
+assuming that $\theta_0$ has zero mean and variance equal to one.
+
+
+\section[The equateIRT package]{The \pkg{equateIRT} package}
+\label{equateIRTpkg}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+<<echo=FALSE>>=
+options(prompt = "R> ", continue = "+  ", width = 70, useFancyQuotes = FALSE)
+@
+
+In order to perform equating with the \pkg{equateIRT} package, 
+it is necessary to have previously estimated item parameters.
+Item parameters can be estimated using \proglang{R} packages,
+or using external software and
+then import them in \proglang{R}.
+To calculate standard errors of equating coefficients it is 
+also necessary to have estimated the covariance matrix of the item 
+parameter estimates. If the program used to estimate the IRT
+model does not provide the covariance matrix of
+item parameter estimates or the user is not interested in 
+standard errors of equating coefficients, the covariance
+matrix can be set to \texttt{NULL}.
+
+
+\subsection{Data preparation}
+
+To the best of my knowledge, the computer programs for IRT model estimation
+that export the covariance matrix of parameter estimates are flexMIRT, IRTPRO and
+the \proglang{R} packages \pkg{ltm} and \pkg{mirt}.
+The \pkg{equateIRT} package provides functions to import data from these programs.
+Item parameters and the covariance matrices can be also imported from other software.
+In this case, the user should import item parameter estimates and the covariance matrices
+by using the general \proglang{R} function \texttt{read.table}.
+
+For item parameter estimation, the software flexMIRT, IRTPRO and the packages \pkg{ltm} and \pkg{mirt}
+formulate the three-parameter logistic model as a latent trait model \citep{Barth:late:2011},
+\begin{equation}
+\label{ltpar}
+\pi_j=c_j + (1 - c_j) \frac{\exp(\beta_{1j} + \beta_{2j} z)}{1 + \exp(\beta_{1j} + \beta_{2j} z)},
+\end{equation}
+where $\pi_j$ is the probability of a positive response in the $j$th item,
+$\beta_{j1} = - D \cdot a_j \cdot b_j$ are easiness parameters, $\beta_{2j} = D \cdot a_j$ are the discrimination
+parameters, $c_j$ are guessing parameters and $z = \theta$ is the latent ability.
+In the following, this parameterization will be referred to as the \emph{latent trait parameterization}.
+The two-parameter logistic model, the one-parameter logistic model and the Rasch model present the same formulation.
+The two-parameter logistic model can be obtained by setting $c_j = 0$, the one-parameter logistic model
+can be obtained by constraining also $\beta_{2j}$ to be constant across items, and the Rasch model can be obtained by setting $c_j = 0$ and $\beta_{2j}=1$.
+Furthermore, for a three-parameter logistic model, the guessing parameters are given under this parameterization
+\begin{equation}
+\label{lpar}
+c_j = \frac{\exp(c^*_j)}{1+\exp(c^*_j)},
+\end{equation}
+that will be called the \emph{logistic parameterization} in the following.
+The IRT programs estimate the parameters $(c_j^*, \beta_{1j}, \beta_{2j})$,
+for every item $j$, and then calculate the item parameters of the usual IRT parameterization 
+given in equation~(\ref{pr}) using equation~(\ref{lpar}) and the equations 
+\begin{equation}
+b_j=-\frac{\beta_{1j}}{D a_j} \qquad \textrm{and} \qquad a_j=\frac{\beta_{2j}}{D}.
+\end{equation}
+The covariance matrix of parameter estimates exported by the programs is related to 
+the vector of parameters $(c_j^*, \beta_{1j}, \beta_{2j})$. The covariance matrix of 
+$(c_j, b_j, a_j)$ can be obtained on the basis of the covariance matrix provided by the IRT software
+by applying the delta method. The \pkg{equateIRT} package provides this functionality.
+
+The functions provided by the \pkg{equateIRT} package to import item parameter estimates and 
+the covariance matrix are \texttt{import.ltm}, \texttt{import.mirt}, \texttt{import.flexmirt} and \texttt{import.irtpro}.
+Since \pkg{ltm} and \pkg{mirt} are \proglang{R} packages, functions \texttt{import.ltm} and \texttt{import.mirt} 
+just extract item parameter
+estimates and the covariance matrix from an object previously created with these packages.
+The arguments of the functions are
+\begin{description}
+\item[\texttt{mod}:] Output object from functions \texttt{rasch}, \texttt{ltm}, or \texttt{tpm} 
+of the \pkg{ltm} package, or from function \texttt{mirt} of the \pkg{mirt} package.
+\item[\texttt{display}:] Logical value indicating whether the coefficients and the standard errors
+should be printed. The default is \texttt{TRUE}.
+\item[\texttt{digits}:] Integer value indicating the number of decimal places to be used if display is \texttt{TRUE}.
+\end{description}
+Instead, functions \texttt{import.flexmirt} and \texttt{import.irtpro} read external files
+previously created with the programs flexMIRT or IRTPRO.
+The arguments of the functions are
+\begin{description}
+\item[\texttt{fnamep}:] The name of the file containing the item parameter estimates.
+This is a file whose name ends with ``-prm.txt".
+\item[\texttt{fnamev}:] The name of the file containing the covariance matrix of item parameter estimates.
+This is the file ending with ``-cov.txt".
+\item[\texttt{fnameirt}:] The name of the file containing additional information to link item parameters with
+the covariance matrix and to identify parameters that have been constrained to a fixed value.
+This is a file ending with ``-irt.txt".
+\item[\texttt{display}:] Logical value indicating whether the coefficients and the standard errors
+should be printed. The default is \texttt{TRUE}.
+\item[\texttt{digits}:] Integer value indicating the number of decimal places to be used if display is \texttt{TRUE}.
+\end{description}
+
+The functions return a list with components 
+\begin{description}
+\item[\texttt{coef}:] A matrix with item parameter estimates.
+\item[\texttt{var}:] The covariance matrix of item parameter estimates.
+\end{description}
+
+Item parameters are imported under the parameterization given in Equations~(\ref{ltpar}) and~(\ref{lpar}). 
+The usual IRT parameterization can be obtained later by using function \texttt{modIRT}.
+An example of importing data from the \pkg{ltm} package is given in Appendix~\ref{app}.
+
+The \pkg{equateIRT} package does not handle mixed item types, but 
+this issue can be easily overcome by using the more general model and introducing constraints on some parameters.
+For example, in the case of some items responses modeled as a two-parameter
+logistic model and others as a three-parameter logistic model, the user can specify a three-parameter logistic
+model for all the items and fix the guessing parameter to zero for some items.
+
+If item parameter estimates are obtained with IRT programs other than flexMIRT, IRTPRO, \pkg{ltm} or \pkg{mirt},
+the user has to create a matrix containing item parameter estimates. These can be provided using typical
+IRT parameterization~(\ref{pr}) or with parameterization~(\ref{ltpar}) and/or~(\ref{lpar}).
+In this matrix guessing, difficulty and discrimination parameters should strictly be given in this order and they are contained in different columns of the matrix. It is important that the names of the rows of the matrix 
+are the names of the items because this information is used to link different forms.
+The covariance matrix is necessary only if the user is interested in obtaining the 
+standard errors of the equating coefficients.
+It is important that the order of the items in the covariance matrix is the same of the matrix with 
+item parameter estimates. So, there are first guessing parameter, then difficulty parameters and
+finally discrimination parameters.
+An example of item parameters and covariance matrices organized in this way is given
+in the data sets contained in the \pkg{equateIRT} package.
+The package includes three simulated data sets for 
+illustrative purposes containing item parameter estimates
+and covariance matrices of 5 forms. The item parameter estimates 
+were obtained with the package \pkg{ltm}.
+In particular,
+\texttt{est3pl} contains parameters of a three-parameter logistic model, 
+\texttt{est2pl} contains parameters of a two-parameter logistic model and
+\texttt{estrasch} contains parameters of a Rasch model. 
+Each dataset is composed of a list of length 2 with components
+\begin{description}
+\item[\texttt{coef}:] a list of length 5 containing the matrices 
+of item parameter estimates. 
+\item[\texttt{var}:] a list of length 5 containing the covariance 
+matrices of item parameter estimates.
+\end{description}
+
+The following section explains how to obtain the equating coefficients.
+
+\subsection{Data analysis}
+
+In this section, we use the dataset \texttt{est2pl} to illustrate 
+the package. The code for loading the library and the data is
+<<>>=
+library("equateIRT")
+data("est2pl")
+@
+
+To perform the equating, it is necessary to reorganize data using
+function \texttt{modIRT}. This function creates an object of class \texttt{modIRT} 
+consisting of a list with length equal to the number of forms where each element
+contains a lists with components
+\begin{description}
+\item[\texttt{coefficients}] item parameter estimates.
+\item[\texttt{var}] covariance matrix of item parameter estimates.
+\item[\texttt{itmp}] number of item parameters of the model. 
+\end{description}
+The names of the forms can be specified in function \texttt{modIRT} 
+using argument \texttt{names}.  If \texttt{names} is not specified,
+function \texttt{modIRT} assigns the names.
+If item parameters are given under the latent trait parameterization,
+use option \texttt{ltparam = TRUE}.
+If guessing parameters of a three-parameter logistic model are given 
+under the logistic parameterization,
+use option \texttt{lparam = TRUE}.
+The default values of both these arguments is \texttt{TRUE},
+so the user does not need to specify them if these parameterizations were used in the estimation
+of the parameters.
+Using these options, the item parameters are returned under the usual IRT
+parameterization as in equation~(\ref{pr}). In this case, the covariance matrix 
+of the item parameters under parameterization of model~(\ref{pr})  is obtained, 
+by using the delta method,
+on the basis of the covariance matrix of item parameters under the parameterizations
+~(\ref{ltpar}) and/or~(\ref{lpar}), supplied by the user.
+If item parameters already conform to the traditional parameterization,
+the options \texttt{ltparam} and \texttt{lparam} should be set to \texttt{FALSE},
+and the function does not perform any transformation.
+Argument \texttt{coef} is used to specify the item parameter estimates. They
+should be given as a list of matrices (one for each form) whose row names
+are the names of the items.
+Argument \texttt{var} can be used to specify the covariance matrix of item parameter estimates and
+it should be a list of matrices. If it is left equal to \texttt{NULL}, standard errors
+of equating coefficients will not be computed.
+Option \texttt{display = TRUE} can be used to print item parameter estimates and
+the corresponding standard errors in order to compare them with those
+provided by the software used to estimate the item parameters.
+The coefficients can be extracted using the generic function \texttt{coef}.
+
+<<>>=
+test <- paste("test", 1:5, sep = "")
+mod2pl <- modIRT(coef = est2pl$coef, var = est2pl$var, names = test, 
+  display = FALSE)
+coef(mod2pl$test1)[1:5]
+@ 
+
+
+The linkage plan can be observed using the function \texttt{linkp}.
+Given a list of item parameter estimates with item labels as row names,
+this function computes the number of common items between all pairs of forms
+and returns a matrix whose elements indicate the number 
+of common items between the forms.  On the diagonal of the matrix 
+there are the number of items of each form.
+<<>>=
+linkp(coef = est2pl$coef)
+@
+The output of the function shows that
+every form is composed of 20 items and presents 10 items in common 
+with adjacent forms. Furthermore, Forms 1 and 5 present 10 common items.
+
+
+Function \texttt{direc} calculates direct equating coefficients between
+two forms with common items. Arguments \texttt{mod1} and \texttt{mod2}
+are objects of class \texttt{modIRT} containing item parameter coefficients 
+and their covariance matrix.
+Argument \texttt{method} indicates the equating method to use and should be one of 
+``\texttt{mean-mean}'', ``\texttt{mean-gmean}'', ``\texttt{mean-sigma}'', 
+``\texttt{Haebara}'' or ``\texttt{Stocking-Lord}''.
+For example, to calculate direct equating coefficients between Form
+1 and Form 5 using the Haebara method for the \texttt{est2pl} dataset 
+the code is
+<<>>=
+l15 <- direc(mod1 = mod2pl[1], mod2 = mod2pl[5], method = "Haebara")
+l15
+@
+The \texttt{direc} function approximates the integrals in equations~(\ref{h})
+and~(\ref{sl}) using a Gauss-Hermite quadrature with 30 points by default.
+The number of quadrature points can be modified using argument \texttt{nq}.
+Alternatively, setting \texttt{quadrature = FALSE} the integrals are replaced
+with a sum over 40 equally spaced values ranging from -4 to 4 with an increment 
+of 0.05 and weights equal to one for all values.
+Argument \texttt{D} can be used to specify the value of the constant
+$D$ in model~(\ref{pr}) used in the estimation of item parameters.
+A \texttt{summary} method for displaying the output of the function is available.
+<<>>=
+summary(l15)
+@
+The package provides also the function \texttt{alldirec} that calculates direct
+equating coefficients between all pairs of forms that present common items.
+Using the mean-mean method, the code for our example is
+<<>>=
+direclist2pl <- alldirec(mods = mod2pl, method = "mean-mean")
+direclist2pl
+@
+The \texttt{summary} function can be used to display all the equatings
+performed 
+<<eval=FALSE>>=
+summary(direclist2pl)
+@
+or just one of them
+<<>>=
+summary(direclist2pl, "test1.test5")
+@
+In order to compute chain equating coefficients, it is necessary to have
+previously computed direct equating coefficients using function \texttt{alldirec}.
+Chain equating coefficients can be computed using function
+\texttt{chainec}. This function requires the specification of the length
+of the chain using argument \texttt{r}. For example,
+to compute all chain equating coefficients of length 4 for the 
+\texttt{est2pl} dataset the code is
+<<>>=
+cec4 <- chainec(r = 4, direclist = direclist2pl)
+cec4
+@
+The summary function displays all the equatings performed.
+<<eval=FALSE>>=
+summary(cec4)
+@
+It is also possible to display only one equating using the following code
+<<>>=
+summary(cec4, "test1.test2.test3.test4")
+@
+Option \texttt{f1} can be used to restrict the equatings 
+to those chains that start from the same form.
+To consider all chain equatings of length 4 that start from
+Form 1 the code is
+<<>>=
+cec4.1 <- chainec(r = 4, direclist = direclist2pl, f1 = "test1")
+@
+Option \texttt{f2} can be used to restrict the equatings 
+to those chains that end with the same form.
+To consider all chain equatings of length 4 that start from
+Form 1 and end with Form 4 the code is
+<<>>=
+cec1234 <- chainec(r = 4, direclist = direclist2pl, f1 = "test1", 
+  f2 = "test4")
+@
+Alternatively, it is possible to specify one or more particular paths 
+using argument \texttt{pths}.
+For example, to compute chain equating coefficients between
+Forms 1 and 4 using path $\{1,5,4\}$ the code is
+<<>>=
+pth1 <- c(paste("test", c(1,5,4), sep = ""))
+pth1 <- data.frame(t(pth1), stringsAsFactors = FALSE)
+cec154 <- chainec(direclist = direclist2pl, pths = pth1)
+summary(cec154)
+@
+Another example is the chain equating of
+Forms 1 and 5 using path $\{1,2,3,4,5\}$ .
+<<>>=
+pth2 <- paste("test", 1:5, sep = "")
+pth2 <- data.frame(t(pth2), stringsAsFactors = FALSE)
+cec12345 <- chainec(direclist = direclist2pl, pths = pth2)
+summary(cec12345)
+@
+When two forms can be linked through different paths,
+the equating coefficients can be averaged using function \texttt{bisectorec},
+that implements the bisector method.
+Options \texttt{weighted = TRUE} and \texttt{unweighted = TRUE} can be
+used to calculate the weighted bisector coefficients and the unweighted bisector
+coefficients. Weights are determined in order to minimize function~(\ref{of}).
+For example, to calculate bisector and weighted bisector coefficients
+to equate Forms 1 and 4 through paths $\{1,2,3,4\}$ and $\{1,5,4\}$,
+and Forms 1 and 5 through paths $\{1,2,3,4,5\}$ and $\{1,5\}$
+the code is
+<<>>=
+ecall <- c(cec1234, cec154, cec12345, direclist2pl["test1.test5"])
+fec <- bisectorec(ecall = ecall, mod = mod2pl, weighted = TRUE, 
+  unweighted = TRUE)
+fec
+@
+The \texttt{summary} function displays the results.
+<<>>=
+summary(fec)
+@
+
+Function \texttt{eqc} can be used to extract a data frame containing
+the equating coefficients.
+For direct equating coefficients the code is
+<<>>=
+eqc(l15)
+@
+while, for a list of direct equating coefficients the code is
+<<>>=
+eqc(direclist2pl)
+@
+It is also possible to select a specific link.
+<<>>=
+eqc(direclist2pl, link = "test1.test5")
+@
+For a list of chain equating coefficients it is possible to display the equating coefficients
+for all paths, or specify a particular link and/or path. 
+The code is as follows
+<<>>=
+eqc(cec4)
+eqc(cec4, path = "test1.test2.test3.test4")
+@
+Also for the output of function bisector, it is possible to extract a data frame containing all the coefficients,
+or select the link and/or the path.
+<<>>=
+eqc(fec)
+eqc(fec, link = "test1.test4", path = "bisector")
+@
+
+Functions \texttt{direc}, \texttt{alldirec} and \texttt{chainec} provide also the scale conversion of
+item parameter estimates. This is included in the data frame \texttt{tab}, that is one of the outputs 
+of the functions. 
+Function \texttt{itm} extracts this data frame.  Some examples for direct and chain equating
+coefficients are given belove.
+<<>>=
+itm(l15)[1:3,]
+itm(direclist2pl, "test1.test5")[1:3,]
+itm(cec12345, "test1.test2.test3.test4.test5")[1:3,]
+@
+The transformation of item parameter estimates can be found under column \texttt{test1.as.test5}.
+
+Since the \texttt{bisectorec} function returns the equating coefficients of 
+a plurality of scale conversions, it does not
+provide the scale conversion of the item parameters.
+For average equating coefficients the user can employ function \texttt{convert},
+that is a specific function to convert item and person parameter, 
+given the equating coefficients.
+The following code extracts the equating coefficients obtained with the bisector method
+to transform from the scale of Form 1 to the scale of Form 4 
+and performs the scale conversion of item parameters of Form 1 and of an hypothetical vector
+of person parameters.
+<<>>=
+eqc14<-eqc(fec, link = "test1.test4", path = "bisector")
+convert(A = eqc14$A, B = eqc14$B, coef = coef(mod2pl$test1), 
+  person.par = seq(-3, 3, 0.5))
+@
+
+Function \texttt{convert} can be also used for direct or chain equating parameters.
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+\section{Conclusion}
+\label{con}
+
+The linkage plans can be rather complex involving many forms, several links, chains
+and the connection of forms through more than one path. 
+This situation necessitates the performance of chain equating
+in order to link forms that do not present common items.
+Furthermore, when two forms can be connected through different paths it can be useful to synthesize
+the conversions obtained into a single one.
+The \pkg{equateIRT} package includes not only the computation of direct equating coefficients 
+but also permits the computation of chain and average equating coefficients.
+Another important and exclusive feature of the \pkg{equateIRT} package is the provision
+of analytical standard errors of equating coefficients.
+Standard errors are an important tool for assessing the accuracy of the equating process
+and can be also used to perform further inferential analysis.
+
+\section*{Acknowledgments}
+
+The author wishes to thank the referees and the Associate Editor for their helpful comments and suggestions that
+greatly improved this work.
+
+
+\bibliography{equateIRT}
+
+\begin{appendix}
+
+\section[Importing data from the ltm package]{Importing data from the \pkg{ltm} package}
+\label{app}
+
+This Appendix shows how to import the estimates obtained with the \pkg{ltm} package
+using the data set \texttt{data2pl}. 
+This data set is a list of length five and includes five simulated data frames 
+generated from a two-parameter logistic model.
+Each data frame contains 5000 dichotomous responses to 20 items.
+Item parameter estimates and covariance matrices included in the data set \texttt{est2pl}
+are obtained from the dataset \texttt{data2pl}.
+
+The code for loading the package \pkg{ltm}, the package \pkg{equateIRT} and the data,
+and estimate a two-parameter logistic model is
+<<>>=
+library("ltm")
+library("equateIRT")
+data("data2pl")
+m1 <- ltm(data2pl[[1]] ~ z1)
+m2 <- ltm(data2pl[[2]] ~ z1)
+m3 <- ltm(data2pl[[3]] ~ z1)
+m4 <- ltm(data2pl[[4]] ~ z1)
+m5 <- ltm(data2pl[[5]] ~ z1)
+@
+Function \texttt{import.ltm} extracts the item parameter estimates and the covariance matrix.
+<<>>=
+estm1 <- import.ltm(m1, display = FALSE)
+estm2 <- import.ltm(m2, display = FALSE)
+estm3 <- import.ltm(m3, display = FALSE)
+estm4 <- import.ltm(m4, display = FALSE)
+estm5 <- import.ltm(m5, display = FALSE)
+estm1$coef[1:3,]
+estm1$var[1:3,1:3]
+@
+The item parameters and the corresponding covariance matrix are given under parameterizations~(\ref{ltpar})
+and~(\ref{lpar}). The function \texttt{modIRT} transforms item parameters in the usual IRT parameterization
+given in equation~(\ref{pr}) and returns item parameter estimates and the covariance matrices in a format
+suitable for running the equating.
+<<>>=
+estc <- list(estm1$coef, estm2$coef, estm3$coef, estm4$coef, estm5$coef)
+estv <- list(estm1$var, estm2$var, estm3$var, estm4$var, estm5$var)
+mod2pl.ltm <- modIRT(coef = estc, var = estv, display = FALSE)
+@
+
+
+\end{appendix}
+
+
+\end{document}
