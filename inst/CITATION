@@ -1,0 +1,20 @@
+bibentry(bibtype = "Article",
+  title        = "{equateIRT}: An {R} Package for IRT Test Equating",
+  author       = person(given = "Michela",
+                        family = "Battauz",
+                        email = "michela.battauz@uniud.it"),
+  journal      = "Journal of Statistical Software",
+  year         = "2015",
+  volume       = "68",
+  number       = "7",
+  pages        = "1--22",
+  doi          = "10.18637/jss.v068.i07",
+
+  header       = "To cite equateIRT in publications use:",
+  textVersion  =
+  paste("Michela Battauz (2015).",
+        "equateIRT: An R Package for IRT Test Equating.",
+        "Journal of Statistical Software, 68(7), 1-22.",
+        "doi:10.18637/jss.v068.i07")
+)
+

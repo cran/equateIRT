@@ -17,8 +17,8 @@
 \tabular{ll}{
 Package: \tab equateIRT\cr
 Type: \tab Package\cr
-Version: \tab 1.2-1\cr
-Date: \tab 2015-11-19\cr
+Version: \tab 1.2-2\cr
+Date: \tab 2015-12-16\cr
 License: \tab GPL (>= 2)\cr
 }
 Direct equating coefficients and their standard errors
@@ -57,7 +57,10 @@ dataset \code{data2pl}, also contained in the package.
 \references{
 	Battauz, M. (2013). IRT Test Equating in Complex Linkage Plans. 
 	\emph{Psychometrika}, \bold{78}, 464--480.
-
+	
+	Battauz, M. (2015). equateIRT: An R Package for IRT Test Equating.
+	\emph{Journal of Statistical Software}, \bold{68}, 1--22.
+	
 	Cai L. (2013). \emph{FlexMIRT version 2: Flexible Multilevel Multidimensional Item Analysis and
 	Test Scoring [Computer Software]}. Chapel Hill, NC: Vector Psychometric Group.
 	
@@ -72,8 +75,8 @@ dataset \code{data2pl}, also contained in the package.
 	functions if you must. In A.A. von Davier (Ed.), \emph{Statistical models for 
 	test equating, scaling, and linking} (pp. 89--107). New York: Springer.
 
-	Kolen, M.J. and Brennan, R.L. (2004). \emph{Test equating, scaling, 
-	and linking: methods and practices}, 2nd ed., New York: Springer.
+	Kolen, M.J. and Brennan, R.L. (2014). \emph{Test equating, scaling, 
+	and linking: methods and practices}, 3rd ed., New York: Springer.
 
 	Ogasawara, H. (2000). Asymptotic standard errors of IRT equating coefficients 
 	using moments. \emph{Economic Review (Otaru University of Commerce)}, 

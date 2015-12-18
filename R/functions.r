@@ -391,27 +391,55 @@ print.summary.eqc <- function(x, ...)
 	else cat("no common items\n")
 }
 
-
-alldirec<-function(mods,method="mean-mean",all=FALSE,quadrature=TRUE,nq=30)
+alldirec<-function(mods,method="mean-mean",all=FALSE,quadrature=TRUE,nq=30,direction="both")
 {
 	options(warn=-1)
 	nt<-length(mods)
 	direclist<-list()
 	k<-1
-	for (i in 1:nt) {
-		for (j in 1:nt) {
-			if (i!=j) {
-			tmp<-direc(mods[i],mods[j],suff1=paste(".",i,sep=""),suff2=paste(".",j,sep=""),method=method,quadrature=quadrature,nq=nq)
-			if (tmp$ni>0 | all) {
-				direclist[[k]]<-tmp
-				names(direclist)[[k]]<-tmp$forms
-				k<-k+1
+	if (direction=="both") {
+		for (i in 1:nt) {
+			for (j in 1:nt) {
+				if (i!=j) {
+					tmp<-direc(mods[i],mods[j],suff1=paste(".",i,sep=""),suff2=paste(".",j,sep=""),method=method,quadrature=quadrature,nq=nq)
+					if (tmp$ni>0 | all) {
+						direclist[[k]]<-tmp
+						names(direclist)[[k]]<-tmp$forms
+						k<-k+1
+					}
 				}
-	}}}
+			}
+		}
+	}
+	if (direction=="back") {
+		for (i in 2:nt) {
+			for (j in 1:(i-1)) {
+				tmp<-direc(mods[i],mods[j],suff1=paste(".",i,sep=""),suff2=paste(".",j,sep=""),method=method,quadrature=quadrature,nq=nq)
+				if (tmp$ni>0 | all) {
+					direclist[[k]]<-tmp
+					names(direclist)[[k]]<-tmp$forms
+					k<-k+1
+				}
+			}
+		}
+	}
+	if (direction=="forward") {
+		for (j in 2:nt) {
+			for (i in 1:(j-1)) {
+				tmp<-direc(mods[i],mods[j],suff1=paste(".",i,sep=""),suff2=paste(".",j,sep=""),method=method,quadrature=quadrature,nq=nq)
+				if (tmp$ni>0 | all) {
+					direclist[[k]]<-tmp
+					names(direclist)[[k]]<-tmp$forms
+					k<-k+1
+				}
+			}
+		}
+	}
 	class(direclist)<-"eqclist"
 	options(warn=0)
 	return(direclist)
 }
+
 
 print.eqclist<-function(x, ...)
 {
@@ -445,6 +473,8 @@ print.summary.eqclist<-function(x, ...)
 }
 
 
+
+
 chainec<-function(r=NULL,direclist,f1=NULL,f2=NULL,pths=NULL)
 {
 	if (is.null(r) & is.null(pths)) stop("argument \"r\" needs to be specified if argument \"pths\" is NULL")
@@ -454,24 +484,27 @@ chainec<-function(r=NULL,direclist,f1=NULL,f2=NULL,pths=NULL)
 		sel<-sapply(direclist,FUN= function(x)(x$ni!=0))
 		nl<-names(direclist)[sel]
 		nll<-strsplit(nl,split=".",fixed=TRUE)
-		l<-data.frame(f1=sapply(nll,FUN=function(x) x[1]),f2=sapply(nll,FUN=function(x) x[2]))
+		l<-data.frame(f1=sapply(nll,FUN=function(x) x[1]),f2=sapply(nll,FUN=function(x) x[2]),stringsAsFactors=FALSE)
 		if (is.null(f1)) pths<-l
 		if (!is.null(f1)) pths<-l[l$f1==f1,]
 		colnames(pths)<-paste(colnames(pths),1,sep=".")
 		if (r>3) {
 			for (k in 1:(r-3)) {
-			pths<-merge(pths,l,by.x=k+1,by.y=1)
-			colnames(pths)<-paste(colnames(pths),k+1,sep=".")
-			pths<-pths[,c(2:(k+1),1,k+2)]
-			pths<-pths[pths[,k]!=pths[,k+2],]
+				pths<-merge(pths,l,by.x=k+1,by.y=1)
+				colnames(pths)<-paste(colnames(pths),k+1,sep=".")
+				pths<-pths[,c(2:(k+1),1,k+2)]
+				pths<-pths[pths[,k]!=pths[,k+2],]
 			}
 		}
-	if (is.null(f2)) pths<-merge(pths,l,by.x=r-1,by.y=1)
-	if (!is.null(f2)) pths<-merge(pths,l[l$f2==f2,],by.x=r-1,by.y=1)
-	pths<-pths[,c(2:(r-1),1,r)]
-	pths<-pths[pths[,r-2]!=pths[,r],] }
+		if (is.null(f2)) pths<-merge(pths,l,by.x=r-1,by.y=1)
+		if (!is.null(f2)) pths<-merge(pths,l[l$f2==f2,],by.x=r-1,by.y=1)
+		pths<-pths[,c(2:(r-1),1,r)]
+		pths<-pths[pths[,r-2]!=pths[,r],] 
+	}
    
 	pths<-pths[pths[,1]!=pths[,r],]
+	if (nrow(pths)==0) stop("There are not paths of length ", r, ".")
+	
 	nomi<-pths[,1]
 	for (k in 2:r) nomi<-paste(nomi,pths[,k],sep=".")
 	out<- vector("list", nrow(pths))
@@ -535,7 +568,6 @@ chainec<-function(r=NULL,direclist,f1=NULL,f2=NULL,pths=NULL)
 			sel<-unique(rownames(varAll))
 			varAB<-t(mat[sel,])%*%varAll[sel,sel]%*%mat[sel,]
 			if(varNULL) varAB<-matrix(NA,2,2)
-			#if (is.null(link$var12))
 			taball<-merge(tab1,tab2,by=0,suffixes=c(.1,.2),all=T)
 			niall<-nrow(taball)/link$itmp
 			taball$value12<-NA
@@ -564,6 +596,7 @@ chainec<-function(r=NULL,direclist,f1=NULL,f2=NULL,pths=NULL)
 	class(out) <- "ceqclist"
 	return(out)
 }
+
 
 print.ceqc<-function(x, ...)
 {

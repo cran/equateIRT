@@ -28,9 +28,13 @@ modIRT(coef, var = NULL, names = NULL, ltparam = TRUE, lparam = TRUE,
 		If NULL, the names of the forms are assigned by 
 		function \code{modIRT}.}
 	\item{ltparam}{logical; if TRUE the latent trait parameterization is used
-		for difficulty parameters. See below for more details.}
+		for difficulty parameters and the \code{modIRT} function performs a 
+		transformation of item parameters to return them in the usual IRT
+		parameterization. Set to FALSE to avoid transformations. See below for more details.}
 	\item{lparam}{logical; if TRUE the logistic parameterization is used
-		for guessing parameters. See below for more details.}
+		for guessing parameters and the \code{modIRT} function performs a 
+		transformation of item parameters to return them in the usual IRT
+		parameterization. Set to FALSE to avoid transformations. See below for more details.}
 	\item{display}{logical; if TRUE coefficients and standard errors are printed.}
 	\item{digits}{integer indicating the number of decimal places to be used
 		if \code{display} is \code{TRUE}.}
@@ -87,6 +91,9 @@ modIRT(coef, var = NULL, names = NULL, ltparam = TRUE, lparam = TRUE,
 	model.}
 }
 \references{
+	Battauz, M. (2015). equateIRT: An R Package for IRT Test Equating.
+	\emph{Journal of Statistical Software}, \bold{68}, 1--22.
+	
 	Bartholomew, D., Knott, M. and Moustaki, I. (2011) 
 	\emph{Latent Variable Models and Factor Analysis: 
 	a Unified Approach}, 3rd ed. Wiley.

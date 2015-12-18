@@ -36,8 +36,11 @@ convert(A, B, coef = NULL, person.par = NULL)
 	\item{person.par}{vector of person parameters transformed}
 }
 \references{
-	Kolen, M.J. and Brennan, R.L. (2004). \emph{Test equating, scaling, 
-	and linking: methods and practices}, 2nd ed., New York: Springer
+	Battauz, M. (2015). equateIRT: An R Package for IRT Test Equating.
+	\emph{Journal of Statistical Software}, \bold{68}, 1--22.
+	
+	Kolen, M.J. and Brennan, R.L. (2014). \emph{Test equating, scaling, 
+	and linking: methods and practices}, 3rd ed., New York: Springer
 }
 \author{
 	Michela Battauz

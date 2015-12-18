@@ -42,6 +42,9 @@ import.flexmirt(fnamep, fnamev = NULL, fnameirt = NULL, display = TRUE, digits =
 	\item{var}{covariance matrix of item parameter estimates.}
 }
 \references{
+	Battauz, M. (2015). equateIRT: An R Package for IRT Test Equating.
+	\emph{Journal of Statistical Software}, \bold{68}, 1--22.
+	
 	Cai L. (2013). \emph{FlexMIRT version 2: Flexible Multilevel Multidimensional Item Analysis and
 	Test Scoring [Computer Software]}. Chapel Hill, NC: Vector Psychometric Group.
 	

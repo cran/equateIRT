@@ -9,7 +9,8 @@
 	IRT methods between all pairs of a list of forms.
 }
 \usage{
-alldirec(mods, method = "mean-mean", all = FALSE, quadrature = TRUE, nq = 30)
+alldirec(mods, method = "mean-mean", all = FALSE, quadrature = TRUE, nq = 30, 
+	direction = "both")
 }
 \arguments{
 	\item{mods}{
@@ -36,6 +37,12 @@ alldirec(mods, method = "mean-mean", all = FALSE, quadrature = TRUE, nq = 30)
 	\item{nq}{number of quadrature points used for the Gauss-Hermite quadrature
 	if \code{quadrature} is TRUE
 	}
+	\item{direction}{a character string specifying the direction used to equate 
+	pair of forms. If "\code{back}" newer forms are equated to older forms,
+	if "\code{forward}" older forms are equated to newer forms, if "\code{both}"
+	(the default) equating is performed in both directions. Form A is considered 
+	to be newer than Form B if it is listed after Form B in \code{mods}.
+	}
 }
 \value{
 	An object of class \code{eqclist} consisting in a list with length 
@@ -44,8 +51,11 @@ alldirec(mods, method = "mean-mean", all = FALSE, quadrature = TRUE, nq = 30)
 	\code{\link{direc}}.
 }
 \references{
-	Kolen, M.J. and Brennan, R.L. (2004). \emph{Test equating, scaling, 
-	and linking: methods and practices}, 2nd ed., New York: Springer
+	Battauz, M. (2015). equateIRT: An R Package for IRT Test Equating.
+	\emph{Journal of Statistical Software}, \bold{68}, 1--22.
+	
+	Kolen, M.J. and Brennan, R.L. (2014). \emph{Test equating, scaling, 
+	and linking: methods and practices}, 3rd ed., New York: Springer
 
 	Ogasawara, H. (2000). Asymptotic standard errors of IRT equating coefficients 
 	using moments. \emph{Economic Review (Otaru University of Commerce)}, 

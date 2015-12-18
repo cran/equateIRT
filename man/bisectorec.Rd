@@ -43,6 +43,9 @@ bisectorec(ecall, mods, weighted = TRUE, unweighted = TRUE)
 	Battauz, M. (2013). IRT Test Equating in Complex Linkage Plans. 
 	\emph{Psychometrika}, \bold{78}, 464--480.
 
+	Battauz, M. (2015). equateIRT: An R Package for IRT Test Equating.
+	\emph{Journal of Statistical Software}, \bold{68}, 1--22.
+	
 	Holland, P.W. and Strawderman, W.E. (2011). How to average equating 
 	functions if you must. In A.A. von Davier (Ed.), \emph{Statistical models for 
 	test equating, scaling, and linking} (pp. 89--107). New York: Springer.

@@ -90,8 +90,11 @@ direc(mod1, mod2, method = "mean-mean", suff1 = ".1", suff2 = ".2",
 	\item{itmp}{number of item parameters of the IRT model.}
 }
 \references{
-	Kolen, M.J. and Brennan, R.L. (2004). \emph{Test equating, scaling, 
-	and linking: methods and practices}, 2nd ed., New York: Springer
+	Battauz, M. (2015). equateIRT: An R Package for IRT Test Equating.
+	\emph{Journal of Statistical Software}, \bold{68}, 1--22.
+	
+	Kolen, M.J. and Brennan, R.L. (2014). \emph{Test equating, scaling, 
+	and linking: methods and practices}, 3nd ed., New York: Springer
 
 	Ogasawara, H. (2000). Asymptotic standard errors of IRT equating coefficients 
 	using moments. \emph{Economic Review (Otaru University of Commerce)}, 
