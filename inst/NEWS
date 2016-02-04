@@ -1,7 +1,4 @@
-﻿Changes in version: equateIRT_1.2-2
+﻿Changes in version: equateIRT_1.2-3
 
-* modified vignette
-* included CITATION
-* included reference: Battauz, M. (2015). equateIRT: An R Package for IRT Test Equating. Journal of Statistical Software, 68, 1–22.
-* added option "direction" in function "alldirec"
-* same changes in .Rd files
+* modified function import.mirt (because of changes in the mirt package)
+

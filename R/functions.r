@@ -1113,6 +1113,8 @@ import.ltm<-function(mod,display=TRUE,digits=4) {
 		colnames(out)[seq(2,ncol(out),by=2)]<-rep("s.e.",ncol(p))
 		out<-round(out,digits)
 		print(out)
+		cat("\nNOTE: Use the modIRT function to transform parameters in the usual IRT parameterization")
+		cat("\n")
 	}
 	return(list(coef=p,var=vm))
 }
@@ -1120,52 +1122,44 @@ import.ltm<-function(mod,display=TRUE,digits=4) {
 
 
 import.mirt<-function(mod,display=TRUE,digits=3) {
-	if (mod@Data$ngroups>1) stop("Cannot handle multiple groups")
-	if (mod@nfact>1) stop("Cannot handle multiple factors")
-	itemtype<-mod@itemtype
+	ngroups<-extract.mirt(mod,what="ngroups")
+	if (ngroups>1) stop("Cannot handle multiple groups")
+	nfact<-extract.mirt(mod,what="nfact")
+	if (nfact>1) stop("Cannot handle multiple factors")
+	itemtype<-extract.mirt(mod,what="itemtype")	
 	if (length(unique(itemtype))>1) stop("Cannot handle mixed item types")
 	itemtype<-itemtype[1]
 	if (itemtype!="Rasch" & itemtype!="2PL" & itemtype!="3PL") stop(paste("Cannot handle the",itemtype,"model"))
-	#ifelse(itemtype=="Rasch",Rasch<-TRUE,Rasch<-FALSE)
-	#if (itemtype=="Rasch") itmp<-1
-	#if (itemtype=="2PL") itmp<-2
-	#if (itemtype=="3PL") itmp<-3
-	constrain<-mod@constrain
-	mpars<-mod@pars
-	ni<-mod@Data$nitems
-	itemnames<-colnames(mod@Data$data)
-	par<-c()
-	for (i in 1:ni) {
-		if (mpars[[i]]@nfact>1) stop("Cannot handle multiple factors")
-		if (mpars[[i]]@ncat>2) stop("Cannot handle multiple response models")
-		if (mpars[[i]]@class!="dich") stop("Cannot handle multiple response models")
-		tmp<-cbind(itemnames[i],names(mpars[[i]]@par),mpars[[i]]@par,mpars[[i]]@est,mpars[[i]]@parnum)
-		par<-rbind(par,tmp)
-		mpars[[i]]@constr
-	}
-	par<-data.frame(par,row.names=NULL,stringsAsFactors=FALSE)
-	colnames(par)<-c("item","name","par","est","parnum")
-	par$par<-as.numeric(par$par)
+	constrain<-extract.mirt(mod,what="constrain")
+	ni<-extract.mirt(mod,what="nitems")
+	itemnames<-extract.mirt(mod,"itemnames")
+	par<-mod2values(mod) 
+	par<-par[par$item%in%itemnames,]
+	if (any(par$class!="dich")) stop("Cannot handle multiple response models")
+	par<-par[,c("item","name","value","est","parnum")]
+
 	par$fixed<-FALSE
-	if (any(par$name=="g" & par$par> -998)) par[par$name=="g",]$fixed<-TRUE
+	if (any(par$name=="g" & par$value> 0)) par[par$name=="g",]$fixed<-TRUE
 	if (any(par$fixed)) itemtype<-"3PL"
 	par<-par[par$est==TRUE | par$fixed==TRUE,]
-	#p<-par$par
-	#if (length(unique(par[par$name=="a1",]$par))==1) itemtype<-"1PL"
-	hess<-mod@information
-	if (all(dim(hess)>c(1,1))) {
-		hess<-hess[!apply(is.na(hess),1,all),]
-		hess<-hess[,!apply(is.na(hess),2,all)]
-		vm<-solve(hess)
-		rnvm<-rownames(vm)
+
+	par$value[par$name=="g"]<-qlogis(par$value[par$name=="g"])
+	
+	par$parnum<-as.character(par$parnum)
+
+	vcov<-extract.mirt(mod,what="vcov")
+	if (all(dim(vcov)>c(1,1))) {
+		vcov<-vcov[!apply(is.na(vcov),1,all),]
+		vcov<-vcov[,!apply(is.na(vcov),2,all)]
+		rnvm<-rownames(vcov)
 		rnvm<-sub(pattern="a1.",x=rnvm,replacement="")
 		rnvm<-sub(pattern="d.",x=rnvm,replacement="")
 		rnvm<-sub(pattern="g.",x=rnvm,replacement="")
 		rnvm<-sub(pattern="u.",x=rnvm,replacement="")
+		vm<-vcov
 		rownames(vm)<-colnames(vm)<-rnvm
 		if (any(par$fixed)) {
 			rnvm<-rownames(vm)
-			#cstr<-constrain[[i]]
 			nf<-sum(par$fixed)
 			rnvm1<-c(rnvm,par$parnum[par$fixed])
 			nrvm<-nrow(vm)
@@ -1186,7 +1180,7 @@ import.mirt<-function(mod,display=TRUE,digits=3) {
 				par[par$parnum%in%cstr,]$parnum<-nc
 			}
 		}
-	vm<-vm[par$parnum,par$parnum]
+		vm<-vm[par$parnum,par$parnum]
 	}
 	else vm<-NULL
 	if (!is.null(vm)) par$SE<-diag(vm)^0.5
@@ -1197,9 +1191,9 @@ import.mirt<-function(mod,display=TRUE,digits=3) {
 	pn<-c(out$parnum.g,out$parnum.d,out$parnum.a1)
 	vm<-vm[pn,pn]
 	rownames(vm)<-colnames(vm)<-NULL
-	if (itemtype=="Rasch") out<-out[,c("par.d","SE.d")]
-	if (itemtype=="2PL") out<-out[,c("par.d","SE.d","par.a1","SE.a1")]
-	if (itemtype=="3PL") out<-out[,c("par.g","SE.g","par.d","SE.d","par.a1","SE.a1")]
+	if (itemtype=="Rasch") out<-out[,c("value.d","SE.d")]
+	if (itemtype=="2PL") out<-out[,c("value.d","SE.d","value.a1","SE.a1")]
+	if (itemtype=="3PL") out<-out[,c("value.g","SE.g","value.d","SE.d","value.a1","SE.a1")]
 	p<-out
 	p$SE.g<-c()
 	p$SE.d<-c()
@@ -1210,9 +1204,13 @@ import.mirt<-function(mod,display=TRUE,digits=3) {
 		if (!is.null(vm)) out<-round(out,digits)
 		if (is.null(vm)) out[,seq(1,ncol(out),by=2)]<-round(out[,seq(1,ncol(out),by=2)],digits)
 		print(out)
+		cat("\nNOTE: Use the modIRT function to transform parameters in the usual IRT parameterization")
+		cat("\n")
 	}
 	return(list(coef=p,var=vm))
 }
+
+
 
 
 

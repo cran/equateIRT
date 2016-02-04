@@ -66,7 +66,6 @@ import.flexmirt(fnamep, fnamev = NULL, fnameirt = NULL, display = TRUE, digits =
 	\code{\link{modIRT}}
 }
 \examples{
-\dontrun{
 
 #====================
 # from package ltm
@@ -78,10 +77,9 @@ est.mod1pl <- import.ltm(mod1pl)
 est.mod1pl
 
 # two-parameter logistic model
-data(data2pl)
-m1 <- ltm(data2pl[[1]] ~ z1)
-estm1 <- import.ltm(m1, display = FALSE)
-estm1
+mod2pl <- ltm(LSAT ~ z1)
+est.mod2pl <- import.ltm(mod2pl)
+est.mod2pl
 
 #====================
 # from package mirt
@@ -91,14 +89,14 @@ library(mirt)
 data(LSAT, package = "ltm")
 val <- mirt(LSAT, 1, SE = TRUE, pars = "values")
 cnstr <- val[val$name == "a1",]$parnum
-mod1pl.m <- mirt(LSAT, 1, SE = TRUE, constrain = list(cnstr))
+mod1pl.m <- mirt(LSAT, 1, SE = TRUE, SE.type = 'BL', constrain = list(cnstr))
 est.mod1pl.m <- import.mirt(mod1pl.m, digits = 4)
 est.mod1pl.m
 
 # two-parameter logistic model
-data(data2pl)
-m1.m <- mirt(data2pl[[1]], 1, SE = TRUE)
-estm1.m <- import.mirt(m1.m, display = FALSE)
-estm1.m
-}
+data(LSAT, package = "ltm")
+mod2pl.m <- mirt(LSAT, 1, SE = TRUE, SE.type = 'BL')
+est.mod2pl.m <- import.mirt(mod2pl.m, display = FALSE)
+est.mod2pl.m
+
 }

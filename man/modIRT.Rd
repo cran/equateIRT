@@ -127,12 +127,11 @@ modrasch <- modIRT(coef = estrasch$coef, var = estrasch$var, names = test,
 	display = FALSE)
 
 # one-parameter logistic model imported from the R package ltm
-\dontrun{
 library(ltm)
 mod1pl <- rasch(LSAT)
 summary(mod1pl)
 est.mod1pl <- import.ltm(mod1pl)
 mod1pl.ltm <- modIRT(coef = list(est.mod1pl$coef), var = list(est.mod1pl$var), digits = 4)
-}
+
 }
 

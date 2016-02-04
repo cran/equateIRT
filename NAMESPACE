@@ -1,7 +1,8 @@
 # Imported functions
 importFrom('statmod', "gauss.quad.prob")
-importFrom('stats', "nlminb", "optim", "reshape", "sd")
+importFrom('stats', "nlminb", "optim", "reshape", "sd", "qlogis")
 importFrom('utils', "read.fwf", "read.table")
+importFrom('mirt', "extract.mirt", "mod2values")
 
 # Exported functions
 export(linkp, modIRT, direc, alldirec, chainec, bisectorec, convert, import.ltm, import.mirt, import.flexmirt, import.irtpro, itm, eqc)
