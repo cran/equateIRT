@@ -5,7 +5,7 @@ importFrom('utils', "read.fwf", "read.table")
 importFrom('mirt', "extract.mirt", "mod2values")
 
 # Exported functions
-export(linkp, modIRT, direc, alldirec, chainec, bisectorec, convert, import.ltm, import.mirt, import.flexmirt, import.irtpro, itm, eqc)
+export(linkp, modIRT, direc, alldirec, chainec, bisectorec, convert, import.ltm, import.mirt, import.flexmirt, import.irtpro, itm, eqc, score)
 
 # S3 methods
 S3method(summary, eqc)
@@ -27,6 +27,7 @@ S3method(itm, eqc)
 S3method(itm, eqclist)
 S3method(itm, ceqc)
 S3method(itm, ceqclist)
+S3method(itm, meqc)
 S3method(eqc, eqc)
 S3method(eqc, eqclist)
 S3method(eqc, ceqc)

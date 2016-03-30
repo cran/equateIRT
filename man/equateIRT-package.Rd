@@ -17,8 +17,8 @@
 \tabular{ll}{
 Package: \tab equateIRT\cr
 Type: \tab Package\cr
-Version: \tab 1.2-3\cr
-Date: \tab 2016-02-03\cr
+Version: \tab 2.0\cr
+Date: \tab 2016-03-30\cr
 License: \tab GPL (>= 2)\cr
 }
 Direct equating coefficients and their standard errors
@@ -40,6 +40,10 @@ given direct equating coefficients between forms directly linked.
 Average equating coefficients with standard errors 
 can be calculated using function \code{bisectorec}, that 
 implements the (weighted) bisector method.
+Once the equating coefficients are obtained, the computation of 
+equated scores can be performed using function \code{score},
+which implements true score equating and observed score equating.
+Standard errors of equated scores are also provided.
 Three simulated datasets are available for illustrative purposes.
 These datasets contain item parameter coefficients and their 
 covariance matrix. In particular, \code{est3pl} concerns a 
@@ -82,9 +86,17 @@ dataset \code{data2pl}, also contained in the package.
 	using moments. \emph{Economic Review (Otaru University of Commerce)}, 
 	\bold{51}, 1--23.
 
-	Ogasawara, H. (2001). Standard Errors of Item Response Theory Equating/Linking
+	Ogasawara, H. (2001a). Item response theory true score equatings and
+	their standard errors. \emph{Journal of Educational and Behavioral Statistics}, 
+	\bold{26}, 31--50.
+
+	Ogasawara, H. (2001b). Standard Errors of Item Response Theory Equating/Linking
 	by Response Function Methods. \emph{Applied Psychological Measurement}, 
 	\bold{25}, 53--67.
+
+	Ogasawara, H. (2003). Asymptotic standard errors of IRT 
+	observed-score equating methods. \emph{Psychometrika}, 
+	\bold{68}, 193--211.
 
 	Rizopoulos, D. (2006). ltm: an R package for latent variable modelling 
 	and item response theory analyses. \emph{Journal of Statistical Software}, 

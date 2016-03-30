@@ -10,7 +10,7 @@
 	given a set of direct and chain equating coefficients.
 }
 \usage{
-bisectorec(ecall, mods, weighted = TRUE, unweighted = TRUE)
+bisectorec(ecall, mods = NULL, weighted = TRUE, unweighted = TRUE)
 }
 \arguments{
 	\item{ecall}{
@@ -21,7 +21,7 @@ bisectorec(ecall, mods, weighted = TRUE, unweighted = TRUE)
 	\item{mods}{
 	an object of class \code{modIRT} containing 
 	item parameter coefficients and their covariance matrix
-	of the forms to be equated.
+	of the forms to be equated. From version 2.0 it can be \code{NULL}
 	}
 	\item{weighted}{
 	logical; if TRUE weighted bisector coefficients are computed.
@@ -64,22 +64,14 @@ data(est3pl)
 test <- paste("test", 1:5, sep = "")
 mod3pl <- modIRT(coef = est3pl$coef, var = est3pl$var, names = test, display = FALSE)
 direclist3pl <- alldirec(mods = mod3pl, method = "Stocking-Lord")
-# compute chain equating coefficients for path 1,2,3,4
-pth1 <- paste("test", 1:4, sep = "")
-pth1 <- data.frame(t(pth1), stringsAsFactors = FALSE)
-chainec1 <- chainec(direclist = direclist3pl, pths = pth1)
-# compute chain equating coefficients for path 1,5,4
-pth2 <- c(paste("test", c(1,5,4), sep = ""))
-pth2 <- data.frame(t(pth2), stringsAsFactors = FALSE)
-chainec2 <- chainec(direclist = direclist3pl, pths = pth2)
 # compute chain equating coefficients for path 1,2,3,4,5
 pth3 <- paste("test", 1:5, sep = "")
 pth3 <- data.frame(t(pth3), stringsAsFactors = FALSE)
 chainec3 <- chainec(direclist = direclist3pl, pths = pth3)
 # create a list of objects of class eqc or ceqc
-ecall <- c(chainec1, chainec2, chainec3, direclist3pl["test1.test5"])
+ecall <- c(chainec3, direclist3pl["test1.test5"])
 # compute bisector and weighted bisector coefficients
-allec <- bisectorec(ecall = ecall, mods = mod3pl, weighted = TRUE, unweighted = TRUE)
+allec <- bisectorec(ecall = ecall, weighted = TRUE, unweighted = TRUE)
 summary(allec)
 
 # two-parameter logistic model
@@ -103,7 +95,7 @@ chainec3 <- chainec(direclist = direclist2pl, pths = pth3)
 # create a list of objects of class eqc or ceqc
 ecall <- c(chainec1, chainec2, chainec3, direclist2pl["test1.test5"])
 # compute bisector and weighted bisector coefficients
-allec <- bisectorec(ecall = ecall, mods = mod2pl, weighted = TRUE, unweighted = TRUE)
+allec <- bisectorec(ecall = ecall, weighted = TRUE, unweighted = TRUE)
 summary(allec)
 
 # Rasch model
@@ -121,13 +113,9 @@ chainec1 <- chainec(direclist = direclistrasch, pths = pth1)
 pth2 <- c(paste("test", c(1,5,4), sep = ""))
 pth2 <- data.frame(t(pth2), stringsAsFactors = FALSE)
 chainec2 <- chainec(direclist = direclistrasch, pths = pth2)
-# compute chain equating coefficients for path 1,2,3,4,5
-pth3 <- paste("test", 1:5, sep = "")
-pth3 <- data.frame(t(pth3), stringsAsFactors = FALSE)
-chainec3 <- chainec(direclist = direclistrasch, pths = pth3)
 # create a list of objects of class eqc or ceqc
-ecall <- c(chainec1, chainec2, chainec3, direclistrasch["test1.test5"])
+ecall <- c(chainec1, chainec2)
 # compute bisector and weighted bisector coefficients
-allec <- bisectorec(ecall = ecall, mods = mod3pl, weighted = TRUE, unweighted = TRUE)
+allec <- bisectorec(ecall = ecall, weighted = TRUE, unweighted = TRUE)
 summary(allec)
 }

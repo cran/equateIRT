@@ -61,6 +61,6 @@ chainec3 <- chainec(direclist = direclist3pl, pths = pth3)
 # create a list of objects of class eqc or ceqc
 ecall <- c(chainec1, chainec2, chainec3, direclist3pl["test1.test5"])
 # compute bisector and weighted bisector coefficients
-allec <- bisectorec(ecall = ecall, mods = mod3pl, weighted = TRUE, unweighted = TRUE)
+allec <- bisectorec(ecall = ecall, weighted = TRUE, unweighted = TRUE)
 summary(allec)
 }

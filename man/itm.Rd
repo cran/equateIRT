@@ -4,6 +4,7 @@
 \alias{itm.eqclist}
 \alias{itm.ceqc}
 \alias{itm.ceqclist}
+\alias{itm.meqc}
 \title{
 	Extract Item Parameters
 }
@@ -22,13 +23,18 @@ itm(x, \dots)
 \method{itm}{ceqc}(x, \dots)
 
 \method{itm}{ceqclist}(x, path, \dots)
+
+\method{itm}{meqc}(x, link, bistype = NULL, \dots)
 }
 \arguments{
 	\item{x}{object of the class \code{eqc} returned by function \code{\link{direc}} 
 		or of the class \code{eqclist} returned by function \code{\link{alldirec}} 
-		or of the class \code{ceqc} and \code{ceqclist} returned by function \code{\link{chainec}}.}
+		or of the class \code{ceqc} and \code{ceqclist} returned by function \code{\link{chainec}}
+		or of the class \code{meqc} return by function \code{\link{bisectorec}}.}
 	\item{link}{a character string with the names of the two forms being linked separated by a dot (e.g. "\code{test1.test3}").}
 	\item{path}{a character string with the names of the forms that constitute the path separated by a dot (e.g. "\code{test1.test2.test3}").}
+	\item{bistype}{bisector type. It should be \code{weighted} or \code{unweighted}. 
+		It could be \code{NULL} if only one type was computed by function \code{\link{bisectorec}}.}
 	\item{\dots}{further arguments passed to or from other methods.}
 }
 \value{
@@ -42,7 +48,7 @@ itm(x, \dots)
 	Michela Battauz
 }
 \seealso{
-	\code{\link{convert}}, \code{\link{alldirec}}, \code{\link{chainec}}, \code{\link{direc}}
+	\code{\link{convert}}, \code{\link{alldirec}}, \code{\link{bisectorec}}, \code{\link{chainec}}, \code{\link{direc}}
 }
 \examples{
 # two-parameter logistic model
@@ -55,9 +61,22 @@ l12 <- direc(mod1 = mod2pl[1], mod2 = mod2pl[2], method = "Haebara")
 direclist2pl <- alldirec(mods = mod2pl, method = "Haebara")
 # compute all chain equating coefficients of length 3
 chainec3 <- chainec(r = 3, direclist = direclist2pl)
+# compute chain equating coefficients for path 1,2,3,4
+pth1 <- paste("test", 1:4, sep = "")
+pth1 <- data.frame(t(pth1), stringsAsFactors = FALSE)
+chainec1 <- chainec(direclist = direclist2pl, pths = pth1)
+# compute chain equating coefficients for path 1,5,4
+pth2 <- c(paste("test", c(1,5,4), sep = ""))
+pth2 <- data.frame(t(pth2), stringsAsFactors = FALSE)
+chainec2 <- chainec(direclist = direclist2pl, pths = pth2)
+# create a list of objects of class ceqc
+ecall <- c(chainec1, chainec2)
+# compute bisector and weighted bisector coefficients
+allec <- bisectorec(ecall = ecall, weighted = TRUE, unweighted = TRUE)
 
 # extract item parameters
 itm(l12)
-itm(direclist2pl,link="test1.test2")
-itm(chainec3,path="test1.test2.test3")
+itm(direclist2pl, link = "test1.test2")
+itm(chainec3, path = "test1.test2.test3")
+itm(allec, bistype = "weighted")
 }

@@ -65,16 +65,16 @@ chainec2 <- chainec(direclist = direclist2pl, pths = pth2)
 # create a list of objects of class ceqc
 ecall <- c(chainec1, chainec2)
 # compute bisector and weighted bisector coefficients
-allec <- bisectorec(ecall = ecall, mods = mod2pl, weighted = TRUE, unweighted = TRUE)
+allec <- bisectorec(ecall = ecall, weighted = TRUE, unweighted = TRUE)
 
 # extract equating coefficients
 eqc(l12)
 eqc(direclist2pl)
-eqc(direclist2pl,link="test1.test2")
+eqc(direclist2pl, link = "test1.test2")
 eqc(chainec3)
-eqc(chainec3,link="test1.test3")
+eqc(chainec3, link = "test1.test3")
 eqc(allec)
-eqc(allec,path="bisector")
+eqc(allec, path = "bisector")
 }
 
 

@@ -8,12 +8,17 @@
 \alias{BisW}
 \alias{VarExt}
 \alias{path2link}
-
+\alias{fr}
+\alias{truescore}
+\alias{partialtruescore}
+\alias{fr_cond}
+\alias{DPx}
+\alias{Fp}
 
 
 \title{Internal Functions of Package equateIRT}
 \description{
-  Internal Functions of Package equateIRT
+  Internal Functions of Package equateIRT.
 }
 \details{
   These are not to be called by the user.

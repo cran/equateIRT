@@ -1,4 +1,10 @@
-﻿Changes in version: equateIRT_1.2-3
+﻿Changes in version: equateIRT_2.0
 
-* modified function import.mirt (because of changes in the mirt package)
+* added function score which implements true score equating and observed score equating
+* in function direc added varFull and suffixes in output
+* in function chainec added varFull and suffixes in output
+* in function bisectorec modified output
+* in function bisectorec deleted argument mods
+* function itm implemented also for bisectorec
+* same changes in .Rd files
 
