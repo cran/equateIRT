@@ -1,16 +1,16 @@
-f198bdfee29bcfad64156abfade32bda *DESCRIPTION
+eea061dd6997ffe237b8b22d917c8c0c *DESCRIPTION
 3817565b0af56d411313ecf3081322f8 *NAMESPACE
-f88bc82384cfc8cac816bf2f0df1cec5 *R/functions.r
-28fb4e2586bd91d601525c476dd89826 *build/vignette.rds
+f12045a499d9c11084a67625884abd99 *R/functions.r
+e2d6cda6a03a300f4b1b1baea1f1ada0 *build/vignette.rds
 da4fadbe9fa9f481560faa629030ddd9 *data/data2pl.rda
 ddb31b4e8144bdcca5cd6c3b712c8ad7 *data/est2pl.rda
 55ae5f9ecbcccb14ac72130cd1c223b9 *data/est3pl.rda
 99e51e69216e0412931fa38dfcbdaebd *data/estrasch.rda
 0623a1b2f09a460cf6aa6dcda7a332fd *inst/CITATION
-3baa64c7c85b07ed07b1ca4f78f1b055 *inst/NEWS
+acdde0d709107d1dad5de0fc58192b98 *inst/NEWS
 ee5e889f48a72489066a0784eca216bf *inst/doc/equateIRT.R
 bbd2fbfc62427326cec31d775bd6cce8 *inst/doc/equateIRT.Rnw
-0bc1acfdc2acf93638b4a177805fdba5 *inst/doc/equateIRT.pdf
+6c9f3dd639088ac8e0ae059b503b993b *inst/doc/equateIRT.pdf
 cc6e85ec6bf0cb6bd65b9611ec4776d6 *man/alldirec.Rd
 13d0a4841ca6f83c6bb9f95fbf25adfc *man/bisectorec.Rd
 75f900fe058d2017383a7508c533812a *man/chainec.Rd
@@ -19,7 +19,7 @@ e7f98977c3b298c2e7fe160265ab5b9b *man/data2pl.Rd
 3eaa14be5796a8bee186d57c70b3a191 *man/direc.Rd
 a2bdd14ea888c0342f2dd0b1300241b0 *man/eqc.Rd
 136c0faf1a271536151b02eac801021d *man/equateIRT-internal.Rd
-9279785bb082164caea3b874b2eb8edf *man/equateIRT-package.Rd
+ac4eacb413463b8027dd1016cba5340c *man/equateIRT-package.Rd
 74502ccad8d01a38532cf2a885df6571 *man/est2pl.Rd
 8f9af830dc2dafb364f53cb2a4d817ce *man/est3pl.Rd
 1a94a3d5c3c8be740e53db553bfb3335 *man/estrasch.Rd
@@ -33,5 +33,5 @@ d5f8ee9a059149fe44e4cc818250ceb8 *man/linkp.Rd
 434dcb80501de92a69789bf2647b8422 *man/summary.eqc.Rd
 752abd870346b376fb340c9440062291 *man/summary.eqclist.Rd
 b89d1984074b219e5279bdc2fb71ffe0 *man/summary.meqc.Rd
-bbd2fbfc62427326cec31d775bd6cce8 *vignettes/equateIRT.Rnw
+bd47ea8bc89251dbd1a0f3677e84bdac *vignettes/equateIRT.Rnw
 f6fdc028d036ad374d3c287ad30b29ce *vignettes/equateIRT.bib

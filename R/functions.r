@@ -12,8 +12,8 @@ linkp<-function(coef)
 
 modIRT<-function(coef,var=NULL,names=NULL,ltparam=TRUE,lparam=TRUE,display=TRUE,digits=2)
 {
-	coef<-lapply(coef,FUN=function(x) x<-as.matrix(x[,colSums(x==1)!=nrow(x)]))
-	coef<-lapply(coef,FUN=function(x) x<-as.matrix(x[,colSums(x==0)!=nrow(x)]))
+	coef<-lapply(coef,FUN=function(x) x<-subset(x,select=colSums(x==1)!=nrow(x))) #changed in version 2.1
+	coef<-lapply(coef,FUN=function(x) x<-subset(x,select=colSums(x==0)!=nrow(x))) #changed in version 2.1
 	itmp<-sapply(coef,ncol)
 	if (length(unique(itmp))!=1) stop("Mixed model types not allowed.")
 	itmp<-itmp[1]
@@ -550,8 +550,11 @@ chainec<-function(r=NULL,direclist,f1=NULL,f2=NULL,pths=NULL)
 					A<-link$A*A  #A1...k=Ak-1k*A1...k-1
 					B<-link$B+link$A*B #B1...k=Bkk-1+Akk-1*B1...k-1
 					
-					if (!is.null(link$var12)) varAll<-blockdiag(varAll,link$var12)
+
+					#if (!is.null(link$var12)) varAll<-blockdiag(varAll,link$var12)
 					if (is.null(link$var12)) varNULL<-TRUE
+					if (!is.null(link$varFull) & k==1) varAll<-blockdiag(varAll,link$varFull[[1]]) #changed in version 2.1
+					if (!is.null(link$varFull)) varAll<-blockdiag(varAll,link$varFull[[2]]) #changed in version 2.1
 					if (!is.null(link$varFull) & k==1) varFull[[k]]<-(link$varFull[[1]])
 					if (!is.null(link$varFull)) varFull[[k+1]]<-(link$varFull[[2]])
 					if (k==1) suffixes<-c(suffixes,link$suffixes[1])
@@ -580,7 +583,7 @@ chainec<-function(r=NULL,direclist,f1=NULL,f2=NULL,pths=NULL)
 			colnames(mat)<-c("A","B")
 			rownames(mat)<-nom
 			mat<-as.matrix(mat)
-			sel<-unique(rownames(varAll))
+			sel<-nom  #changed in version 2.1
 			varAB<-t(mat[sel,])%*%varAll[sel,sel]%*%mat[sel,]
 			if(varNULL) varAB<-matrix(NA,2,2)
 			taball<-merge(tab1,tab2,by=0,suffixes=c(.1,.2),all=T)
@@ -683,7 +686,7 @@ print.summary.ceqclist<-function(x, ...)
 
 bisectorec<-function(ecall,mods=NULL,weighted=TRUE,unweighted=TRUE)
 {
-	if (!is.null(mods)) cat("Note: from version 2.0 argument mods can be left unspecified.")
+	if (!is.null(mods)) cat("Note: from version 2.0 argument mods can be left unspecified.\n")
 	if (length(table(sapply(ecall,FUN=function(x) x$method)))!=1) stop("ecall contains different methods.")
 	itmp<-sapply(ecall,FUN=function(x) x$itmp)
 	if (length(table(itmp))>1) stop("Mixed models not allowed. Number of item parameters differs.")
@@ -803,14 +806,18 @@ bisco<-function(coall,varFull,partall)
 	#out<-data.frame(link=names(mA),A=mA,B=mB,seA=NA,seB=NA,corAB=NA,path="bisector",weights=NA)
 	out1<-list()
 	if (!is.null(varFull)) {
-		coall$partAA<-((1-coall$A^2/(1+coall$A^2))*coall$w*coall$W+
-						coall$mA*coall$W*coall$weights*coall$A*(1+coall$A^2)^(-1.5))/
-						coall$W^2
-		coall$partBA<- -(coall$A*coall$B/(1+coall$A^2)*coall$w*coall$W+
-						coall$mB*coall$W*coall$weights*coall$A*(1+coall$A^2)^(-1.5))/
-						coall$W^2
+		# coall$partAA<-((1-coall$A^2/(1+coall$A^2))*coall$w*coall$W+
+						# coall$mA*coall$W*coall$weights*coall$A*(1+coall$A^2)^(-1.5))/
+						# coall$W^2
+		# coall$partBA<- (-coall$A*coall$B/(1+coall$A^2)*coall$w*coall$W+
+						# coall$mB*coall$W*coall$weights*coall$A*(1+coall$A^2)^(-1.5))/
+						# coall$W^2
+		coall$partAA<-(1-coall$A^2/(1+coall$A^2))*coall$w/coall$W+  #changed in version 2.1
+						coall$mA*coall$w/coall$W*coall$A/(1+coall$A^2)
+		coall$partBA<- -coall$A*coall$B/(1+coall$A^2)*coall$w/coall$W+  #changed in version 2.1
+						coall$mB*coall$w/coall$W*coall$A/(1+coall$A^2)
 		coall$partBB<- coall$w/coall$W
-
+		
 		links<-unique(coall$link)
 		for (i in 1:length(links)){
 			coi<-coall[coall$link==links[i],]

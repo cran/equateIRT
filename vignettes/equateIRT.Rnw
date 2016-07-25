@@ -771,8 +771,7 @@ $\{1,2,3,4\}$ and $\{1,5,4\}$, and Forms~1 and 5 through paths
 $\{1,2,3,4,5\}$ and $\{1,5\}$ the code is
 <<>>=
 ecall <- c(cec1234, cec154, cec12345, direclist2pl["test1.test5"])
-fec <- bisectorec(ecall = ecall, mod = mod2pl, weighted = TRUE, 
-unweighted = TRUE)
+fec <- bisectorec(ecall = ecall, weighted = TRUE, unweighted = TRUE)
 fec
 @
 The \code{summary} function displays the results.
