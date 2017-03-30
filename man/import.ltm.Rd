@@ -89,13 +89,13 @@ library(mirt)
 data(LSAT, package = "ltm")
 val <- mirt(LSAT, 1, SE = TRUE, pars = "values")
 cnstr <- val[val$name == "a1",]$parnum
-mod1pl.m <- mirt(LSAT, 1, SE = TRUE, SE.type = 'BL', constrain = list(cnstr))
+mod1pl.m <- mirt(LSAT, 1, SE = TRUE, SE.type = 'Richardson', constrain = list(cnstr))
 est.mod1pl.m <- import.mirt(mod1pl.m, digits = 4)
 est.mod1pl.m
 
 # two-parameter logistic model
 data(LSAT, package = "ltm")
-mod2pl.m <- mirt(LSAT, 1, SE = TRUE, SE.type = 'BL')
+mod2pl.m <- mirt(LSAT, 1, SE = TRUE, SE.type = 'Richardson')
 est.mod2pl.m <- import.mirt(mod2pl.m, display = FALSE)
 est.mod2pl.m
 

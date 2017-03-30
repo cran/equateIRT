@@ -1241,7 +1241,9 @@ import.mirt<-function(mod,display=TRUE,digits=3) {
 	
 	par$parnum<-as.character(par$parnum)
 
-	vcov<-extract.mirt(mod,what="vcov")
+	vcov<-try(extract.mirt(mod,what="vcov"))
+	if(inherits(vcov,"try-error")) warning(vcov)
+
 	if (all(dim(vcov)>c(1,1))) {
 		vcov<-vcov[!apply(is.na(vcov),1,all),]
 		vcov<-vcov[,!apply(is.na(vcov),2,all)]
