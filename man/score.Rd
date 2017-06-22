@@ -74,7 +74,7 @@ data(est2pl)
 test<-paste("test", 1:5, sep = "")
 mod2pl <- modIRT(coef = est2pl$coef, var = est2pl$var, names = test, display = FALSE)
 # direct equating coefficients between forms 1 and 2 using the Haebara method
-l12 <- direc(mod1 = mod2pl[1], mod2 = mod2pl[2], method = "Haebara")
+l12 <- direc(mods = mod2pl, which = c(1,2), method = "Haebara")
 # scoring using direct equating coefficients and the true score equating method
 score(l12)
 # scoring using direct equating coefficients and the observed score equating method
@@ -89,11 +89,11 @@ score(direclist2pl, link = "test1.test2")
 
 # compute chain equating coefficients for path 1,2,3,4
 pth1 <- paste("test", 1:4, sep = "")
-pth1 <- data.frame(t(pth1), stringsAsFactors = FALSE)
+# pth1 <- data.frame(t(pth1), stringsAsFactors = FALSE) no more necessary
 chainec1 <- chainec(direclist = direclist2pl, pths = pth1)
 # compute chain equating coefficients for path 1,5,4
-pth2 <- c(paste("test", c(1,5,4), sep = ""))
-pth2 <- data.frame(t(pth2), stringsAsFactors = FALSE)
+pth2 <- paste("test", c(1,5,4), sep = "")
+# pth2 <- data.frame(t(pth2), stringsAsFactors = FALSE) no more necessary
 chainec2 <- chainec(direclist = direclist2pl, pths = pth2)
 # scoring using chain equating coefficients and the true score equating method for score 12
 score(chainec1, path = "test1.test2.test3.test4", scores = 12)

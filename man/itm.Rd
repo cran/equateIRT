@@ -56,18 +56,18 @@ data(est2pl)
 test<-paste("test", 1:5, sep = "")
 mod2pl <- modIRT(coef = est2pl$coef, var = est2pl$var, names = test, display = FALSE)
 # direct equating coefficients between forms 1 and 2 using the Haebara method
-l12 <- direc(mod1 = mod2pl[1], mod2 = mod2pl[2], method = "Haebara")
+l12 <- direc(mods = mod2pl, which = c(1,2), method = "Haebara")
 # all direct equating coefficients using the Haebara method
 direclist2pl <- alldirec(mods = mod2pl, method = "Haebara")
 # compute all chain equating coefficients of length 3
 chainec3 <- chainec(r = 3, direclist = direclist2pl)
 # compute chain equating coefficients for path 1,2,3,4
 pth1 <- paste("test", 1:4, sep = "")
-pth1 <- data.frame(t(pth1), stringsAsFactors = FALSE)
+# pth1 <- data.frame(t(pth1), stringsAsFactors = FALSE) no more necessary
 chainec1 <- chainec(direclist = direclist2pl, pths = pth1)
 # compute chain equating coefficients for path 1,5,4
 pth2 <- c(paste("test", c(1,5,4), sep = ""))
-pth2 <- data.frame(t(pth2), stringsAsFactors = FALSE)
+# pth2 <- data.frame(t(pth2), stringsAsFactors = FALSE) no more necessary
 chainec2 <- chainec(direclist = direclist2pl, pths = pth2)
 # create a list of objects of class ceqc
 ecall <- c(chainec1, chainec2)

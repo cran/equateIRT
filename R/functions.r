@@ -12,8 +12,8 @@ linkp<-function(coef)
 
 modIRT<-function(coef,var=NULL,names=NULL,ltparam=TRUE,lparam=TRUE,display=TRUE,digits=2)
 {
-	coef<-lapply(coef,FUN=function(x) x<-subset(x,select=colSums(x==1)!=nrow(x))) #changed in version 2.1
-	coef<-lapply(coef,FUN=function(x) x<-subset(x,select=colSums(x==0)!=nrow(x))) #changed in version 2.1
+	coef<-lapply(coef,FUN=function(x) x<-subset(x,select=colSums(x==1)!=nrow(x)))
+	coef<-lapply(coef,FUN=function(x) x<-subset(x,select=colSums(x==0)!=nrow(x)))
 	itmp<-sapply(coef,ncol)
 	if (length(unique(itmp))!=1) stop("Mixed model types not allowed.")
 	itmp<-itmp[1]
@@ -108,9 +108,20 @@ obj<-function(eqc,P2,ab,a1,b1,c1,met,itmp,wt,D=D){
 }
 
 
-direc<-function(mod1,mod2,method="mean-mean",suff1=".1",suff2=".2",D=1,quadrature=TRUE,nq=30)
+direc<-function(mods,which=NULL,mod1,mod2,method="mean-mean",suff1=".1",suff2=".2",D=1,quadrature=TRUE,nq=30)
 {
 	if (method!="mean-mean" & method!="mean-sigma" & method!="mean-gmean" & method!="Haebara" & method!="Stocking-Lord") warning("Method not implemented.")
+	if (!missing(mod1)) {  # new in version 2.0-3
+		warning("Argument mod1 is deprecated; please use mods and which instead.", call. = FALSE)  # new in version 2.0-3
+	}  # new in version 2.0-3
+	if (!missing(mod2)) {  # new in version 2.0-3
+		warning("Argument mod2 is deprecated; please use mods and which instead.", call. = FALSE)  # new in version 2.0-3
+	}  # new in version 2.0-3
+	if (!missing(mods)) {  # new in version 2.0-3	
+		mod1<-mods[which[1]]  # new in version 2.0-3
+		mod2<-mods[which[2]]  # new in version 2.0-3
+	}  # new in version 2.0-3
+	
 	name1<-names(mod1)
 	name2<-names(mod2)
 	forms<-paste(name1,name2,sep=".")
@@ -410,7 +421,7 @@ alldirec<-function(mods,method="mean-mean",all=FALSE,quadrature=TRUE,nq=30,direc
 		for (i in 1:nt) {
 			for (j in 1:nt) {
 				if (i!=j) {
-					tmp<-direc(mods[i],mods[j],suff1=paste(".",i,sep=""),suff2=paste(".",j,sep=""),method=method,quadrature=quadrature,nq=nq)
+					tmp<-direc(mods, which=c(i,j),suff1=paste(".",i,sep=""),suff2=paste(".",j,sep=""),method=method,quadrature=quadrature,nq=nq)
 					if (tmp$ni>0 | all) {
 						direclist[[k]]<-tmp
 						names(direclist)[[k]]<-tmp$forms
@@ -423,7 +434,7 @@ alldirec<-function(mods,method="mean-mean",all=FALSE,quadrature=TRUE,nq=30,direc
 	if (direction=="back") {
 		for (i in 2:nt) {
 			for (j in 1:(i-1)) {
-				tmp<-direc(mods[i],mods[j],suff1=paste(".",i,sep=""),suff2=paste(".",j,sep=""),method=method,quadrature=quadrature,nq=nq)
+				tmp<-direc(mods, which=c(i,j),suff1=paste(".",i,sep=""),suff2=paste(".",j,sep=""),method=method,quadrature=quadrature,nq=nq)
 				if (tmp$ni>0 | all) {
 					direclist[[k]]<-tmp
 					names(direclist)[[k]]<-tmp$forms
@@ -435,7 +446,7 @@ alldirec<-function(mods,method="mean-mean",all=FALSE,quadrature=TRUE,nq=30,direc
 	if (direction=="forward") {
 		for (j in 2:nt) {
 			for (i in 1:(j-1)) {
-				tmp<-direc(mods[i],mods[j],suff1=paste(".",i,sep=""),suff2=paste(".",j,sep=""),method=method,quadrature=quadrature,nq=nq)
+				tmp<-direc(mods, which=c(i,j),suff1=paste(".",i,sep=""),suff2=paste(".",j,sep=""),method=method,quadrature=quadrature,nq=nq)
 				if (tmp$ni>0 | all) {
 					direclist[[k]]<-tmp
 					names(direclist)[[k]]<-tmp$forms
@@ -487,6 +498,10 @@ print.summary.eqclist<-function(x, ...)
 chainec<-function(r=NULL,direclist,f1=NULL,f2=NULL,pths=NULL)
 {
 	if (is.null(r) & is.null(pths)) stop("argument \"r\" needs to be specified if argument \"pths\" is NULL.")
+	if (!is.null(pths)) {  # new in version 2.0-3
+		if (!is.data.frame(pths) & is.vector(pths)) pths <- data.frame(t(pths), stringsAsFactors = FALSE)  # new in version 2.0-3
+		if (!is.data.frame(pths) & is.matrix(pths)) pths <- data.frame(pths, stringsAsFactors = FALSE)  # new in version 2.0-3
+	}  # new in version 2.0-3
 	if (is.null(r) & !is.null(pths)) r<-ncol(pths)
 	if (r<3) stop("r should be at least 3.")
 	if (is.null(pths)) {

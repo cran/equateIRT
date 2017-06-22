@@ -1,5 +1,4 @@
-﻿Changes in version: equateIRT_2.0-2
+Changes in version: equateIRT_2.0-3
 
-* included tutorial as vignette
-* in the example of function import.mirt, changed method for the computation of standard errors.
+* minor changes in functions direc and chainec.
  

@@ -10,15 +10,23 @@
 	IRT methods.
 }
 \usage{
-direc(mod1, mod2, method = "mean-mean", suff1 = ".1", suff2 = ".2",
+direc(mods, which, mod1, mod2, method = "mean-mean", suff1 = ".1", suff2 = ".2",
    D = 1, quadrature = TRUE, nq = 30)
 }
 \arguments{
-	\item{mod1}{an object of the class \code{modIRT} containing 
+	\item{mods}{
+	an object of the class \code{modIRT} containing 
+	item parameter coefficients and their covariance matrix
+	of the forms to be equated.
+	}
+	\item{which}{which forms to equate. Can be specified by name or number.}
+	\item{mod1}{deprecated; please use mods instead. 
+	An object of the class \code{modIRT} containing 
 	item parameter coefficients and their covariance matrix
 	of the first form.
 	}
-	\item{mod2}{an object of the class \code{modIRT} containing 
+	\item{mod2}{deprecated; please use mods instead.
+	An object of the class \code{modIRT} containing 
 	item parameter coefficients and their covariance matrix
 	of the second form.
 	}
@@ -116,7 +124,7 @@ direc(mod1, mod2, method = "mean-mean", suff1 = ".1", suff2 = ".2",
 data(est3pl)
 test <- paste("test", 1:5, sep = "")
 mod3pl <- modIRT(coef = est3pl$coef, var = est3pl$var, names = test, display = FALSE)
-l12 <- direc(mod1 = mod3pl[1], mod2 = mod3pl[2], method = "Stocking-Lord")
+l12 <- direc(mods = mod3pl, which = c("test1", "test2"), method = "Stocking-Lord")
 summary(l12)
 
 # two-parameter logistic model
@@ -124,7 +132,7 @@ summary(l12)
 data(est2pl)
 test <- paste("test", 1:5, sep = "")
 mod2pl <- modIRT(coef = est2pl$coef, var = est2pl$var, names = test, display = FALSE)
-l15 <- direc(mod1 = mod2pl[1], mod2 = mod2pl[5], method = "Haebara")
+l15 <- direc(mods = mod2pl, which = c(1,5), method = "Haebara")
 summary(l15)
 
 # Rasch model
@@ -133,7 +141,7 @@ data(estrasch)
 test <- paste("test", 1:5, sep = "")
 modrasch <- modIRT(coef = estrasch$coef, var = estrasch$var, names = test, 
 	display = FALSE)
-l54 <- direc(mod1 = modrasch[5], mod2 = modrasch[4], method = "mean-mean")
+l54 <- direc(mods = modrasch, which = c(5,4), method = "mean-mean")
 summary(l54)
 }
 

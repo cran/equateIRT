@@ -39,7 +39,7 @@ set.seed(6)
 gplot(lplan, displaylabels = TRUE,  vertex.sides = 4, vertex.cex = 5, vertex.rot =45,  usearrows = FALSE, label.pos = 5, label.cex = 1, vertex.col = 0)
 
 ## ------------------------------------------------------------------------
-l12 <- direc(mod1 = mod2pl[1], mod2 = mod2pl[2], method = "mean-mean")
+l12 <- direc(mods = mod2pl, which = c(1,2), method = "mean-mean")
 l12
 summary(l12)
 
@@ -67,8 +67,7 @@ cec14
 summary(cec14)
 
 ## ------------------------------------------------------------------------
-pth <- c(paste("test", c(1,5,4), sep = ""))
-pth <- data.frame(t(pth), stringsAsFactors = FALSE)
+pth <- paste("test", c(1,5,4), sep = "")
 chainec154 <- chainec(direclist = direclist2pl, pths = pth)
 summary(chainec154)
 
@@ -82,7 +81,7 @@ summary(fec)
  eqc(fec)
 
 ## ------------------------------------------------------------------------
-itm(fec,bistype="weighted")
+itm(fec, bistype = "weighted")
 
 ## ------------------------------------------------------------------------
 score(fec, bistype = "weighted")
@@ -91,8 +90,8 @@ score(fec, bistype = "weighted")
 score(fec, method = "OSE", bistype = "weighted")
 
 ## ------------------------------------------------------------------------
-score(chainec154,scores=17)
-score(cec4, path="test1.test2.test3.test4", scores = 17)
-score(fec, bistype = "unweighted", scores=17)
-score(fec, bistype = "weighted", scores=17)
+score(chainec154, scores = 17)
+score(cec4, path = "test1.test2.test3.test4", scores = 17)
+score(fec, bistype = "unweighted", scores = 17)
+score(fec, bistype = "weighted", scores = 17)
 

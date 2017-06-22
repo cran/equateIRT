@@ -318,7 +318,7 @@ Linkage plan
 <div id="direct-equating-coefficients" class="section level1">
 <h1><span class="header-section-number">3</span> Direct equating coefficients</h1>
 <p>Estimation of direct equating coefficients between Forms 1 and 2 using the mean-mean method</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">l12 &lt;-<span class="st"> </span><span class="kw">direc</span>(<span class="dt">mod1 =</span> mod2pl[<span class="dv">1</span>], <span class="dt">mod2 =</span> mod2pl[<span class="dv">2</span>], <span class="dt">method =</span> <span class="st">&quot;mean-mean&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">l12 &lt;-<span class="st"> </span><span class="kw">direc</span>(<span class="dt">mods =</span> mod2pl, <span class="dt">which =</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), <span class="dt">method =</span> <span class="st">&quot;mean-mean&quot;</span>)
 l12</code></pre></div>
 <pre><code>## Direct equating coefficients 
 ## Method: mean-mean 
@@ -403,8 +403,7 @@ cec14</code></pre></div>
 ## A  1.25323 0.046518
 ## B -0.49789 0.038505</code></pre>
 <p>Estimation of chain equating coefficient for path {1, 5, 4}</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pth &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">paste</span>(<span class="st">&quot;test&quot;</span>, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">5</span>,<span class="dv">4</span>), <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>))
-pth &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="kw">t</span>(pth), <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pth &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="st">&quot;test&quot;</span>, <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">5</span>,<span class="dv">4</span>), <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)
 chainec154 &lt;-<span class="st"> </span><span class="kw">chainec</span>(<span class="dt">direclist =</span> direclist2pl, <span class="dt">pths =</span> pth)
 <span class="kw">summary</span>(chainec154)</code></pre></div>
 <pre><code>## Path: test1.test5.test4 
@@ -448,7 +447,7 @@ fec</code></pre></div>
 ## 3 test1.test4                bisector 1.204801 -0.4476611
 ## 4 test1.test4       weighted bisector 1.188853 -0.4311214</code></pre>
 <p>Extract item parameters of two forms being equated in the original scale and item parameters of the first form converted to the scale of the second form.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">itm</span>(fec,<span class="dt">bistype=</span><span class="st">&quot;weighted&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">itm</span>(fec, <span class="dt">bistype =</span> <span class="st">&quot;weighted&quot;</span>)</code></pre></div>
 <pre><code>##          Item       test1       test4 test1.as.test4
 ## 1   Dffclt.I1  0.05774085          NA    -0.36247602
 ## 2  Dffclt.I10  0.65469024          NA     0.34720876
@@ -582,16 +581,16 @@ fec</code></pre></div>
 ## 20    19    19.13886811 0.04575589
 ## 21    20    20.09377896 0.02876039</code></pre>
 <p>A comparison of equated scores obtained with 2 different chains, bisector and weighted bisector methods.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">score</span>(chainec154,<span class="dt">scores=</span><span class="dv">17</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">score</span>(chainec154, <span class="dt">scores =</span> <span class="dv">17</span>)</code></pre></div>
 <pre><code>##     theta test4 test1.as.test4     StdErr
 ## 1 1.74087    17       17.24468 0.09997669</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">score</span>(cec4, <span class="dt">path=</span><span class="st">&quot;test1.test2.test3.test4&quot;</span>, <span class="dt">scores =</span> <span class="dv">17</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">score</span>(cec4, <span class="dt">path =</span> <span class="st">&quot;test1.test2.test3.test4&quot;</span>, <span class="dt">scores =</span> <span class="dv">17</span>)</code></pre></div>
 <pre><code>##     theta test4 test1.as.test4    StdErr
 ## 1 1.74087    17       17.06646 0.1618316</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">score</span>(fec, <span class="dt">bistype =</span> <span class="st">&quot;unweighted&quot;</span>, <span class="dt">scores=</span><span class="dv">17</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">score</span>(fec, <span class="dt">bistype =</span> <span class="st">&quot;unweighted&quot;</span>, <span class="dt">scores =</span> <span class="dv">17</span>)</code></pre></div>
 <pre><code>##     theta test4 test1.as.test4     StdErr
 ## 1 1.74087    17       17.15531 0.08280613</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">score</span>(fec, <span class="dt">bistype =</span> <span class="st">&quot;weighted&quot;</span>, <span class="dt">scores=</span><span class="dv">17</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">score</span>(fec, <span class="dt">bistype =</span> <span class="st">&quot;weighted&quot;</span>, <span class="dt">scores =</span> <span class="dv">17</span>)</code></pre></div>
 <pre><code>##     theta test4 test1.as.test4     StdErr
 ## 1 1.74087    17       17.18562 0.07365858</code></pre>
 </div>

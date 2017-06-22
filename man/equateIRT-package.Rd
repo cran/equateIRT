@@ -17,8 +17,8 @@
 \tabular{ll}{
 Package: \tab equateIRT\cr
 Type: \tab Package\cr
-Version: \tab 2.0-2\cr
-Date: \tab 2017-03-30\cr
+Version: \tab 2.0-3\cr
+Date: \tab 2017-06-13\cr
 License: \tab GPL (>= 2)\cr
 }
 Direct equating coefficients and their standard errors

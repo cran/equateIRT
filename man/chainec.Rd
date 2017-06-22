@@ -28,7 +28,8 @@ chainec(r = NULL, direclist, f1 = NULL, f2 = NULL, pths = NULL)
 		the name of the last form of the chain.
 	}
 	  \item{pths}{
-		data frame containing the path used for equating. The number of columns 
+		vector, matrix or data frame containing the path used for equating. 
+		The number of columns 
 		is equal to r and the number of rows is equal to the equatings that
 		have to be performed.
 		If \code{NULL} all the chain equating coefficients of length \code{r} 
@@ -108,8 +109,8 @@ test<-paste("test", 1:5, sep = "")
 mod2pl <- modIRT(coef = est2pl$coef, var = est2pl$var, names = test, display = FALSE)
 direclist2pl <- alldirec(mods = mod2pl, method = "Haebara")
 # compute chain equating coefficients of a given path
-pth <- c(paste("test", c(1,5,4), sep = ""))
-pth <- data.frame(t(pth), stringsAsFactors = FALSE)
+pth <- paste("test", c(1,5,4), sep = "")
+# pth <- data.frame(t(pth), stringsAsFactors = FALSE) # no more necessary
 chainec154 <- chainec(direclist = direclist2pl, pths = pth)
 summary(chainec154)
 
@@ -123,9 +124,9 @@ modrasch <- modIRT(coef = estrasch$coef, var = estrasch$var, names = test,
 direclistrasch <- alldirec(mods = modrasch, method = "mean-mean", all = TRUE)
 # compute chain equating coefficients of two given paths
 pth1 <- paste("test", 1:3, sep = "")
-pth1 <- data.frame(t(pth1), stringsAsFactors = FALSE)
-pth2 <- c(paste("test", c(1,5,4), sep = ""))
-pth2 <- data.frame(t(pth2), stringsAsFactors = FALSE)
+# pth1 <- data.frame(t(pth1), stringsAsFactors = FALSE) no more necessary
+pth2 <- paste("test", c(1,5,4), sep = "")
+# pth2 <- data.frame(t(pth2), stringsAsFactors = FALSE) no more necessary
 pths <- rbind(pth1, pth2)
 chainec1 <- chainec(direclist = direclistrasch, pths = pths)
 summary(chainec1)

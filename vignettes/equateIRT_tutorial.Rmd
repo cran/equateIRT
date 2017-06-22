@@ -92,7 +92,7 @@ Estimation of direct equating coefficients between Forms 1 and 2 using
 the mean-mean method
 
 ```{r}
-l12 <- direc(mod1 = mod2pl[1], mod2 = mod2pl[2], method = "mean-mean")
+l12 <- direc(mods = mod2pl, which = c(1,2), method = "mean-mean")
 l12
 summary(l12)
 ```
@@ -142,8 +142,7 @@ summary(cec14)
 Estimation of chain equating coefficient for path {1, 5, 4}
 
 ```{r}
-pth <- c(paste("test", c(1,5,4), sep = ""))
-pth <- data.frame(t(pth), stringsAsFactors = FALSE)
+pth <- paste("test", c(1,5,4), sep = "")
 chainec154 <- chainec(direclist = direclist2pl, pths = pth)
 summary(chainec154)
 ```
@@ -169,7 +168,7 @@ Extract item parameters of two forms being equated in the original scale
 and item parameters of the first form converted to the scale of the second form.
 
 ```{r}
-itm(fec,bistype="weighted")
+itm(fec, bistype = "weighted")
 ```
 
 # Equated scores
@@ -190,10 +189,10 @@ A comparison of equated scores obtained with 2 different chains,
 bisector and weighted bisector methods.
 
 ```{r}
-score(chainec154,scores=17)
-score(cec4, path="test1.test2.test3.test4", scores = 17)
-score(fec, bistype = "unweighted", scores=17)
-score(fec, bistype = "weighted", scores=17)
+score(chainec154, scores = 17)
+score(cec4, path = "test1.test2.test3.test4", scores = 17)
+score(fec, bistype = "unweighted", scores = 17)
+score(fec, bistype = "weighted", scores = 17)
 ```
 
 
