@@ -63,11 +63,9 @@ direclist2pl <- alldirec(mods = mod2pl, method = "Haebara")
 chainec3 <- chainec(r = 3, direclist = direclist2pl)
 # compute chain equating coefficients for path 1,2,3,4
 pth1 <- paste("test", 1:4, sep = "")
-# pth1 <- data.frame(t(pth1), stringsAsFactors = FALSE) no more necessary
 chainec1 <- chainec(direclist = direclist2pl, pths = pth1)
 # compute chain equating coefficients for path 1,5,4
 pth2 <- c(paste("test", c(1,5,4), sep = ""))
-# pth2 <- data.frame(t(pth2), stringsAsFactors = FALSE) no more necessary
 chainec2 <- chainec(direclist = direclist2pl, pths = pth2)
 # create a list of objects of class ceqc
 ecall <- c(chainec1, chainec2)

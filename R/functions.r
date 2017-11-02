@@ -1421,18 +1421,90 @@ eqc.meqc<-function(x,link=NULL,path=NULL, ...)
 	return(out)
 }
 
+score <- function(obj, ...) UseMethod("score")
 
-score<-function(obj, link=NULL, path=NULL, method="TSE", D=1, scores=NULL, se=TRUE, bistype=NULL, nq=30, w=0.5, theta=NULL, weights=NULL)
+score.eqc<-function(obj, method="TSE", D=1, scores=NULL, se=TRUE, nq=30, w=0.5, theta=NULL, weights=NULL, ...)
 {
-	if (class(obj)=="ceqclist" & is.null(path) & length(obj)==1) path<-obj[[1]]$forms
-	if (class(obj)=="ceqclist" & is.null(path)) stop("Specify path.")
-	if (class(obj)=="eqclist" & is.null(link)) stop("Specify link.")
-	if (class(obj)=="meqc" & is.null(bistype) & is.null(obj$wbis) & !is.null(obj$bis)) bistype<-"unweighted"
-	if (class(obj)=="meqc" & is.null(bistype) & !is.null(obj$wbis) & !is.null(obj$bis)) bistype<-"weighted"
-	if (class(obj)=="meqc" & is.null(link) & length(unique(obj$coef$link))==1) link<-unique(obj$coef$link)
-	if (class(obj)=="meqc" & is.null(link)) stop("Specify link.")
 	if (!is.null(scores)) if (any(round(scores)!=scores)) stop("Scores should be integer values.")
-	itmpar<-itm(obj,link=link,path=path,bistype=bistype)
+
+	obj1<-obj
+	itmpar<-itm(obj)
+
+	itm_prepare<-score_prepare(itmpar,suff1=obj1$suff[1],suff2=obj1$suff[length(obj1$suff)])
+
+	out<-score_compute(method=method,itm_prepare=itm_prepare,D=D,varFull=obj1$varFull,partial=obj1$partial,varAB=obj1$varAB,itmp=obj1$itmp,A=obj1$A,B=obj1$B,scores=scores,se=se,nq=nq,w=w,theta=theta,weights=weights,names=colnames(itmpar)[3:4])
+	return(out)
+}
+
+score.eqclist<-function(obj, link=NULL, method="TSE", D=1, scores=NULL, se=TRUE, nq=30, w=0.5, theta=NULL, weights=NULL, ...)
+{
+	if (!is.null(scores)) if (any(round(scores)!=scores)) stop("Scores should be integer values.")
+
+	if (is.null(link)) stop("Specify link.")
+	obj1<-obj[[link]]
+	itmpar<-itm(obj,link=link)
+
+	itm_prepare<-score_prepare(itmpar,suff1=obj1$suff[1],suff2=obj1$suff[length(obj1$suff)])
+
+	out<-score_compute(method=method,itm_prepare=itm_prepare,D=D,varFull=obj1$varFull,partial=obj1$partial,varAB=obj1$varAB,itmp=obj1$itmp,A=obj1$A,B=obj1$B,scores=scores,se=se,nq=nq,w=w,theta=theta,weights=weights,names=colnames(itmpar)[3:4])
+	return(out)
+}
+
+
+score.ceqc<-function(obj, method="TSE", D=1, scores=NULL, se=TRUE, nq=30, w=0.5, theta=NULL, weights=NULL, ...)
+{
+	if (!is.null(scores)) if (any(round(scores)!=scores)) stop("Scores should be integer values.")
+
+	obj1<-obj
+	itmpar<-itm(obj)
+
+	itm_prepare<-score_prepare(itmpar,suff1=obj1$suff[1],suff2=obj1$suff[length(obj1$suff)])
+
+	out<-score_compute(method=method,itm_prepare=itm_prepare,D=D,varFull=obj1$varFull,partial=obj1$partial,varAB=obj1$varAB,itmp=obj1$itmp,A=obj1$A,B=obj1$B,scores=scores,se=se,nq=nq,w=w,theta=theta,weights=weights,names=colnames(itmpar)[3:4])
+	return(out)
+}
+
+score.ceqclist<-function(obj, path=NULL, method="TSE", D=1, scores=NULL, se=TRUE, nq=30, w=0.5, theta=NULL, weights=NULL, ...)
+{
+	if (!is.null(scores)) if (any(round(scores)!=scores)) stop("Scores should be integer values.")
+
+	if (is.null(path) & length(obj)==1) path<-obj[[1]]$forms
+	if (is.null(path)) stop("Specify path.")
+	obj1<-obj[[path]]
+	itmpar<-itm(obj,path=path)
+
+	itm_prepare<-score_prepare(itmpar,suff1=obj1$suff[1],suff2=obj1$suff[length(obj1$suff)])
+
+	out<-score_compute(method=method,itm_prepare=itm_prepare,D=D,varFull=obj1$varFull,partial=obj1$partial,varAB=obj1$varAB,itmp=obj1$itmp,A=obj1$A,B=obj1$B,scores=scores,se=se,nq=nq,w=w,theta=theta,weights=weights,names=colnames(itmpar)[3:4])
+	return(out)
+}
+
+score.meqc<-function(obj, link=NULL, method="TSE", D=1, scores=NULL, se=TRUE, bistype=NULL, nq=30, w=0.5, theta=NULL, weights=NULL, ...)
+{
+	if (!is.null(scores)) if (any(round(scores)!=scores)) stop("Scores should be integer values.")
+
+	if (is.null(bistype) & is.null(obj$wbis) & !is.null(obj$bis)) bistype<-"unweighted"
+	if (is.null(bistype) & !is.null(obj$wbis) & !is.null(obj$bis)) bistype<-"weighted"
+	if (is.null(link) & length(unique(obj$coef$link))==1) link<-unique(obj$coef$link)
+	if (is.null(link)) stop("Specify link.")
+	if (is.null(bistype)) {
+		if (!is.null(obj$wbis[[link]])) obj1<-obj$wbis[[link]] else obj1<-obj$bis[[link]]
+	}
+	if (!is.null(bistype)) {
+		if (bistype=="weighted") obj1<-obj$wbis[[link]]
+		if (bistype=="unweighted") obj1<-obj$bis[[link]]
+	}
+	itmpar<-itm(obj,link=link,bistype=bistype)
+
+	itm_prepare<-score_prepare(itmpar,suff1=obj1$suff[1],suff2=obj1$suff[length(obj1$suff)])
+
+	out<-score_compute(method=method,itm_prepare=itm_prepare,D=D,varFull=obj1$varFull,partial=obj1$partial,varAB=obj1$varAB,itmp=obj1$itmp,A=obj1$A,B=obj1$B,scores=scores,se=se,nq=nq,w=w,theta=theta,weights=weights,names=colnames(itmpar)[3:4])
+	return(out)
+}
+
+
+score_prepare<-function(itmpar,suff1,suff2)
+{
 	Item<-itmpar$Item
 	# conversion from Y to X
 	diffY<-itmpar[,2][substr(Item,1,6)=="Dffclt"]
@@ -1447,25 +1519,12 @@ score<-function(obj, link=NULL, path=NULL, method="TSE", D=1, scores=NULL, se=TR
 	discrY2X<-itmpar[,4][substr(Item,1,6)=="Dscrmn"]
 	guessY2X<-itmpar[,4][substr(Item,1,6)=="Gussng"]
 
-	if (class(obj)=="eqc") obj1<-obj
-	if (class(obj)=="ceqc") obj1<-obj
-	if (class(obj)=="ceqclist") obj1<-obj[[path]]
-	if (class(obj)=="eqclist") obj1<-obj[[link]]
-	if (class(obj)=="meqc") {
-		if (is.null(bistype)) {
-			if (!is.null(obj$wbis[[link]])) obj1<-obj$wbis[[link]] else obj1<-obj$bis[[link]]
-		}
-		if (!is.null(bistype)) {
-			if (bistype=="weighted") obj1<-obj$wbis[[link]]
-			if (bistype=="unweighted") obj1<-obj$bis[[link]]
-		}
-	}
-	names(diffY)<-paste(Item[substr(Item,1,6)=="Dffclt"],obj1$suff[1],sep="")
-	if (length(discrY)>0) names(discrY)<-paste(Item[substr(Item,1,6)=="Dscrmn"],obj1$suff[1],sep="")
-	if (length(guessY)>0) names(guessY)<-paste(Item[substr(Item,1,6)=="Gussng"],obj1$suff[1],sep="")
-	names(diffX)<-paste(Item[substr(Item,1,6)=="Dffclt"],obj1$suff[length(obj1$suff)],sep="")
-	if (length(discrX)>0) names(discrX)<-paste(Item[substr(Item,1,6)=="Dscrmn"],obj1$suff[length(obj1$suff)],sep="")
-	if (length(guessX)>0) names(guessX)<-paste(Item[substr(Item,1,6)=="Gussng"],obj1$suff[length(obj1$suff)],sep="")
+	names(diffY)<-paste(Item[substr(Item,1,6)=="Dffclt"],suff1,sep="")
+	if (length(discrY)>0) names(discrY)<-paste(Item[substr(Item,1,6)=="Dscrmn"],suff1,sep="")
+	if (length(guessY)>0) names(guessY)<-paste(Item[substr(Item,1,6)=="Gussng"],suff1,sep="")
+	names(diffX)<-paste(Item[substr(Item,1,6)=="Dffclt"],suff2,sep="")
+	if (length(discrX)>0) names(discrX)<-paste(Item[substr(Item,1,6)=="Dscrmn"],suff2,sep="")
+	if (length(guessX)>0) names(guessX)<-paste(Item[substr(Item,1,6)=="Gussng"],suff2,sep="")
 	
 	diffY<-diffY[!is.na(diffY)]
 	discrY<-discrY[!is.na(discrY)]
@@ -1487,6 +1546,26 @@ score<-function(obj, link=NULL, path=NULL, method="TSE", D=1, scores=NULL, se=TR
 	if (length(discrY2X)==0) discrY2X<-rep(1,rY)
 	if (length(guessY2X)==0) guessY2X<-rep(0,rY)
 	
+	return(list(diffX=diffX,discrX=discrX,guessX=guessX,diffY=diffY,discrY=discrY,guessY=guessY,diffY2X=diffY2X,discrY2X=discrY2X,guessY2X=guessY2X))
+}
+
+
+
+score_compute<-function(method,itm_prepare,D,varFull,partial,varAB,itmp,A,B,scores,se,nq,w,theta,weights,names)
+{
+	diffX<-itm_prepare$diffX
+	discrX<-itm_prepare$discrX
+	guessX<-itm_prepare$guessX
+	diffY<-itm_prepare$diffY
+	discrY<-itm_prepare$discrY
+	guessY<-itm_prepare$guessY
+	diffY2X<-itm_prepare$diffY2X
+	discrY2X<-itm_prepare$discrY2X
+	guessY2X<-itm_prepare$guessY2X
+	
+	rX<-length(diffX)
+	rY<-length(diffY)
+	
 	if (method=="TSE") {
 		scoresall<-0:(rX)
 		if (!is.null(scores)) scores<-sort(scores)
@@ -1494,7 +1573,7 @@ score<-function(obj, link=NULL, path=NULL, method="TSE", D=1, scores=NULL, se=TR
 		outbound<-scores[!scores%in%scoresall]
 		if (any(!scores%in%scoresall)) cat("The following scores are out of range:", outbound, "\n")
 		scores<-scores[scores%in%scoresall]
-		smin<-truescore(person.par=-100,diff=diffX,discr=discrX,guess=guessX,Item=Item,D=D)
+		smin<-truescore(person.par=-100,diff=diffX,discr=discrX,guess=guessX,D=D)
 		undermin<-scores[scores<smin]
 		if (any(scores<smin)) cat("The following scores are not attainable:", undermin, "\n")
 		scores<-scores[scores>=smin]
@@ -1504,22 +1583,21 @@ score<-function(obj, link=NULL, path=NULL, method="TSE", D=1, scores=NULL, se=TR
 		
 		cond<-TRUE
 		while (cond) {
-			theta2<-theta1-(scores-truescore(person.par=theta1,diff=diffX,discr=discrX,guess=guessX,Item=Item,D=D))/
-				partialtruescore(person.par=theta1,diff=diffX,discr=discrX,guess=guessX,Item=Item,D=D)
+			theta2<-theta1-(scores-truescore(person.par=theta1,diff=diffX,discr=discrX,guess=guessX,D=D))/
+				partialtruescore(person.par=theta1,diff=diffX,discr=discrX,guess=guessX,D=D)
 			theta2[theta2==Inf]<-2
 			theta2[theta2==-Inf]<- -2
 			cond<-max(abs(theta2-theta1))>0.000001
 			theta1<-theta2
 		}
 		theta<-theta2
-		ts<-truescore(person.par=theta,diff=diffY2X,discr=discrY2X,guess=guessY2X,Item=Item,D=D)
+		ts<-truescore(person.par=theta,diff=diffY2X,discr=discrY2X,guess=guessY2X,D=D)
 		out<-data.frame(theta,scores,ts)
-		colnames(out)<-c("theta",colnames(itmpar)[3:4])
+		colnames(out)<-c("theta",names)
 		rownames(out)<-NULL
 		
 		if (se) {
 			# computation of standar errors (Ogasawara, JEBS, 2001)
-			varFull<-obj1$varFull
 			if (is.null(varFull)) stop("The asymptotic covariance matrix of item parameters is necessary to compute standard errors. Set se=FALSE.")
 			acovalpha<-varFull[[1]]
 			for (j in 2:length(varFull)) {
@@ -1527,12 +1605,12 @@ score<-function(obj, link=NULL, path=NULL, method="TSE", D=1, scores=NULL, se=TR
 			}
 			dAB_dalpha<-matrix(0,nrow(acovalpha),2)
 			rownames(dAB_dalpha)<-rownames(acovalpha)
-			sel<-rownames(dAB_dalpha)%in%rownames(obj1$partial)
-			dAB_dalpha[sel,]<-obj1$partial[rownames(dAB_dalpha)[sel],]
-			acovAB<-obj1$varAB
+			sel<-rownames(dAB_dalpha)%in%rownames(partial)
+			dAB_dalpha[sel,]<-partial[rownames(dAB_dalpha)[sel],]
+			acovAB<-varAB
+			rownames(acovAB)<-colnames(acovAB)<-c("A","B")
 			acovABalpha<-t(dAB_dalpha)%*%acovalpha
 			acovbeta<-rbind(cbind(acovalpha,t(acovABalpha)),cbind(acovABalpha,acovAB))
-			
 			K<-length(theta)
 			se<-rep(NA,length(theta))
 			for (k in 1:K) {
@@ -1543,16 +1621,16 @@ score<-function(obj, link=NULL, path=NULL, method="TSE", D=1, scores=NULL, se=TR
 				deta_dAB<-matrix(0,2,1)
 				for (i in 1:rY) {
 					PYg<-irtp1(ab=theta[k],diff=diffY2X[i],discr=discrY2X[i],guess=guessY2X[i],D=D)
-					deta_dtheta<-deta_dtheta+(1-PYg)*(PYg-guessY[i])*D*discrY[i]/(obj1$A*(1-guessY[i]))
-					deta_dalphaY_a[i,1]<- (1-PYg)/(1-guessY[i])*(PYg-guessY[i])*D*(theta[k]-obj1$A*diffY[i]-obj1$B)/obj1$A
+					deta_dtheta<-deta_dtheta+(1-PYg)*(PYg-guessY[i])*D*discrY[i]/(A*(1-guessY[i]))
+					deta_dalphaY_a[i,1]<- (1-PYg)/(1-guessY[i])*(PYg-guessY[i])*D*(theta[k]-A*diffY[i]-B)/A
 					deta_dalphaY_b[i,1]<- (1-PYg)/(1-guessY[i])*(PYg-guessY[i])*D*(-discrY[i])
 					deta_dalphaY_c[i,1]<- (1-PYg)/(1-guessY[i])
-					deta_dAB[1,1]<- deta_dAB[1,1]-(1-PYg)*(PYg-guessY[i])*D*discrY[i]/(1-guessY[i])*(theta[k]-obj1$B)/obj1$A^2
-					deta_dAB[2,1]<- deta_dAB[2,1]-(1-PYg)*(PYg-guessY[i])*D*discrY[i]/(1-guessY[i])/obj1$A
+					deta_dAB[1,1]<- deta_dAB[1,1]-(1-PYg)*(PYg-guessY[i])*D*discrY[i]/(1-guessY[i])*(theta[k]-B)/A^2
+					deta_dAB[2,1]<- deta_dAB[2,1]-(1-PYg)*(PYg-guessY[i])*D*discrY[i]/(1-guessY[i])/A
 				}
-				if (obj1$itmp==3) deta_dalphaY<-rbind(deta_dalphaY_b,deta_dalphaY_a,deta_dalphaY_c)
-				if (obj1$itmp==2) deta_dalphaY<-rbind(deta_dalphaY_b,deta_dalphaY_a)
-				if (obj1$itmp==1) deta_dalphaY<-deta_dalphaY_b
+				if (itmp==3) deta_dalphaY<-rbind(deta_dalphaY_b,deta_dalphaY_a,deta_dalphaY_c)
+				if (itmp==2) deta_dalphaY<-rbind(deta_dalphaY_b,deta_dalphaY_a)
+				if (itmp==1) deta_dalphaY<-deta_dalphaY_b
 				rownames(deta_dalphaY)<-c(names(diffY),names(discrY),names(guessY))
 				rownames(deta_dAB)<-c("A","B")
 
@@ -1570,13 +1648,13 @@ score<-function(obj, link=NULL, path=NULL, method="TSE", D=1, scores=NULL, se=TR
 				dtheta_dalphaX_a<-dtheta_dalphaX_a/denom
 				dtheta_dalphaX_b<-dtheta_dalphaX_b/denom
 				dtheta_dalphaX_c<-dtheta_dalphaX_c/denom
-				if (obj1$itmp==3) dtheta_dalphaX<-rbind(dtheta_dalphaX_b,dtheta_dalphaX_a,dtheta_dalphaX_c)
-				if (obj1$itmp==2) dtheta_dalphaX<-rbind(dtheta_dalphaX_b,dtheta_dalphaX_a)
-				if (obj1$itmp==1) dtheta_dalphaX<-dtheta_dalphaX_b
+				if (itmp==3) dtheta_dalphaX<-rbind(dtheta_dalphaX_b,dtheta_dalphaX_a,dtheta_dalphaX_c)
+				if (itmp==2) dtheta_dalphaX<-rbind(dtheta_dalphaX_b,dtheta_dalphaX_a)
+				if (itmp==1) dtheta_dalphaX<-dtheta_dalphaX_b
 				deta_dalphaX<-deta_dtheta*dtheta_dalphaX
-				if (obj1$itmp==3) rownames(deta_dalphaX)<-c(names(diffX),names(discrX),names(guessX))
-				if (obj1$itmp==2) rownames(deta_dalphaX)<-c(names(diffX),names(discrX))
-				if (obj1$itmp==1) rownames(deta_dalphaX)<-names(diffX)
+				if (itmp==3) rownames(deta_dalphaX)<-c(names(diffX),names(discrX),names(guessX))
+				if (itmp==2) rownames(deta_dalphaX)<-c(names(diffX),names(discrX))
+				if (itmp==1) rownames(deta_dalphaX)<-names(diffX)
 				deta_dbeta<-rbind(deta_dalphaY,deta_dalphaX,deta_dAB)
 				if(any(!rownames(deta_dbeta)[1:(nrow(deta_dbeta)-2)]%in%rownames(acovbeta))) stop("Names mismatch.")
 				deta_dbeta1<-matrix(0,nrow(acovbeta),1)
@@ -1606,6 +1684,8 @@ score<-function(obj, link=NULL, path=NULL, method="TSE", D=1, scores=NULL, se=TR
 		for (i in 1:rY) prY1[,i]<-irtp1(ab=theta,diff=diffY2X[i],discr=discrY2X[i],guess=guessY2X[i],D=D)
 		f1X_theta<-matrix(NA,lt,rX+1)
 		f1Y_theta<-matrix(NA,lt,rY+1)
+		#rX<<-rX
+		#prX1<<-prX1
 		for (i in 1:length(theta)) f1X_theta[i,]<-fr(r=rX,pr=prX1[i,])
 		for (i in 1:length(theta)) f1Y_theta[i,]<-fr(r=rY,pr=prY1[i,])
 		mweightX<-matrix(rep(weights,rX+1),ncol=rX+1)
@@ -1616,8 +1696,8 @@ score<-function(obj, link=NULL, path=NULL, method="TSE", D=1, scores=NULL, se=TR
 		# pop 2
 		prX2<-matrix(NA,lt,rX)
 		prY2<-matrix(NA,lt,rY)
-		for (i in 1:rX) prX2[,i]<-irtp1(ab=theta*obj1$A+obj1$B,diff=diffX[i],discr=discrX[i],guess=guessX[i],D=D)
-		for (i in 1:rY) prY2[,i]<-irtp1(ab=theta*obj1$A+obj1$B,diff=diffY2X[i],discr=discrY2X[i],guess=guessY2X[i],D=D) #sarebbe lo stesso usare theta non trasformato e item parameter non trasformati
+		for (i in 1:rX) prX2[,i]<-irtp1(ab=theta*A+B,diff=diffX[i],discr=discrX[i],guess=guessX[i],D=D)
+		for (i in 1:rY) prY2[,i]<-irtp1(ab=theta*A+B,diff=diffY2X[i],discr=discrY2X[i],guess=guessY2X[i],D=D) #sarebbe lo stesso usare theta non trasformato e item parameter non trasformati
 		rX<-ncol(prX2)
 		rY<-ncol(prY2)
 		f2X_theta<-matrix(NA,lt,rX+1)
@@ -1660,12 +1740,11 @@ score<-function(obj, link=NULL, path=NULL, method="TSE", D=1, scores=NULL, se=TR
 		xx<-0:rX
 		
 		out<-data.frame(xx,eY)
-		colnames(out)<-c(colnames(itmpar)[3:4])
+		colnames(out)<-names
 		if (is.null(scores)) scores<-xx
 
 		# computation of standar errors (Ogasawara, Psychometrika, 2003)
 		if (se) {
-			varFull<-obj1$varFull
 			if (is.null(varFull)) stop("The asymptotic covariance matrix of item parameters is necessary to compute standard errors. Set se=FALSE.")
 			acovalpha<-varFull[[1]]
 			for (j in 2:length(varFull)) {
@@ -1673,9 +1752,10 @@ score<-function(obj, link=NULL, path=NULL, method="TSE", D=1, scores=NULL, se=TR
 			}
 			dAB_dalpha<-matrix(0,nrow(acovalpha),2)
 			rownames(dAB_dalpha)<-rownames(acovalpha)
-			sel<-rownames(dAB_dalpha)%in%rownames(obj1$partial)
-			dAB_dalpha[sel,]<-obj1$partial[rownames(dAB_dalpha)[sel],]
-			acovAB<-obj1$varAB
+			sel<-rownames(dAB_dalpha)%in%rownames(partial)
+			dAB_dalpha[sel,]<-partial[rownames(dAB_dalpha)[sel],]
+			acovAB<-varAB
+			rownames(acovAB)<-colnames(acovAB)<-c("A","B")
 			acovABalpha<-t(dAB_dalpha)%*%acovalpha
 			acovbeta<-rbind(cbind(acovalpha,t(acovABalpha)),cbind(acovABalpha,acovAB))
 		
@@ -1710,7 +1790,7 @@ score<-function(obj, link=NULL, path=NULL, method="TSE", D=1, scores=NULL, se=TR
 				Db1X[[j]]<-db1X
 				Dc1X[[j]]<-dc1X
 				
-				da2X<-(prX2[,j]-guessX[j])*(1-prX2[,j])*D*(obj1$A*theta+obj1$B-diffX[j])/(1-guessX[j])
+				da2X<-(prX2[,j]-guessX[j])*(1-prX2[,j])*D*(A*theta+B-diffX[j])/(1-guessX[j])
 				db2X<-(prX2[,j]-guessX[j])*(1-prX2[,j])*D*(-discrX[j])/(1-guessX[j])
 				dc2X<-(1-prX2[,j])/(1-guessX[j])
 				da2X<-matrix(rep(da2X,rX+1),ncol=rX+1)
@@ -1744,7 +1824,7 @@ score<-function(obj, link=NULL, path=NULL, method="TSE", D=1, scores=NULL, se=TR
 				for (i in 1:length(theta)) f2Y_theta_zero[i,]<-fr_cond(r=rY,pr=prY2[i,],which=j,value=0)
 				f2Y_theta_diff<-f2Y_theta_uno-f2Y_theta_zero
 				
-				da1Y<-(prY1[,j]-guessY[j])*(1-prY1[,j])*D*((theta-obj1$B)/obj1$A-diffY[j])/(1-guessY[j])
+				da1Y<-(prY1[,j]-guessY[j])*(1-prY1[,j])*D*((theta-B)/A-diffY[j])/(1-guessY[j])
 				db1Y<-(prY1[,j]-guessY[j])*(1-prY1[,j])*D*(-discrY[j])/(1-guessY[j])
 				dc1Y<-(1-prY1[,j])/(1-guessY[j])
 				da1Y<-matrix(rep(da1Y,rY+1),ncol=rY+1)
@@ -1753,8 +1833,8 @@ score<-function(obj, link=NULL, path=NULL, method="TSE", D=1, scores=NULL, se=TR
 				da1Y<-da1Y*f1Y_theta_diff
 				db1Y<-db1Y*f1Y_theta_diff
 				dc1Y<-dc1Y*f1Y_theta_diff
-				dA1Y<-(prY1[,j]-guessY[j])*(1-prY1[,j])*D*(discrY[j]/obj1$A^2*(obj1$B-theta))/(1-guessY[j])
-				dB1Y<-(prY1[,j]-guessY[j])*(1-prY1[,j])*D*(-discrY[j]/obj1$A)/(1-guessY[j])
+				dA1Y<-(prY1[,j]-guessY[j])*(1-prY1[,j])*D*(discrY[j]/A^2*(B-theta))/(1-guessY[j])
+				dB1Y<-(prY1[,j]-guessY[j])*(1-prY1[,j])*D*(-discrY[j]/A)/(1-guessY[j])
 				dA1Y<-matrix(rep(dA1Y,rY+1),ncol=rY+1)
 				dB1Y<-matrix(rep(dB1Y,rY+1),ncol=rY+1)
 				dA1Y<-dA1Y*f1Y_theta_diff
@@ -1804,11 +1884,11 @@ score<-function(obj, link=NULL, path=NULL, method="TSE", D=1, scores=NULL, se=TR
 			se<-rep(NA,rX+1)
 			for (k in 1:(rX+1)) {
 				yp<-out[k,2]
-				if (obj1$itmp==3) Der<-c(-DPyc[k,],-DPyb[k,],-DPya[k,],DPxc[k,],DPxb[k,],DPxa[k,],DPxA[k]-DPyA[k],DPxB[k]-DPyB[k])
-				if (obj1$itmp==2) Der<-c(-DPyb[k,],-DPya[k,],DPxb[k,],DPxa[k,],DPxA[k]-DPyA[k],DPxB[k]-DPyB[k])
-				if (obj1$itmp==1) Der<-c(-DPyb[k,],DPxb[k,],DPxB[k]-DPyB[k])
+				if (itmp==3) Der<-c(-DPyc[k,],-DPyb[k,],-DPya[k,],DPxc[k,],DPxb[k,],DPxa[k,],DPxA[k]-DPyA[k],DPxB[k]-DPyB[k])
+				if (itmp==2) Der<-c(-DPyb[k,],-DPya[k,],DPxb[k,],DPxa[k,],DPxA[k]-DPyA[k],DPxB[k]-DPyB[k])
+				if (itmp==1) Der<-c(-DPyb[k,],DPxb[k,],DPxB[k]-DPyB[k])
 				Der<-Der/fY[round(yp)+1] # +1 because it starts from zero
-				if (obj1$itmp==1) names(Der)[length(Der)]<-"B"
+				if (itmp==1) names(Der)[length(Der)]<-"B"
 				else names(Der)[(length(Der)-1):length(Der)]<-c("A","B")
 				if(any(!names(Der)%in%rownames(acovbeta))) stop("Names mismatch.")
 				Der1<-matrix(0,nrow(acovbeta),1)
@@ -1824,6 +1904,25 @@ score<-function(obj, link=NULL, path=NULL, method="TSE", D=1, scores=NULL, se=TR
 	}
 	return(out)
 }
+
+
+
+# recursion formula 
+fr<-function(r,pr)
+{
+	if (r==0) stop("r should be at least 1.")
+	if (r==1) out<-c(1-pr[r],pr[r])
+	else {
+		frm1<-fr(r-1,pr=pr) # vector with dimension r
+		p1<-frm1[1]*(1-pr[r])
+		if (r==2) p2<-frm1[2]*(1-pr[r])+frm1[1]*pr[r]
+		else p2<-frm1[2:r]*(1-pr[r])+frm1[1:(r-1)]*pr[r]
+		p3<-frm1[r]*pr[r]
+		out<-c(p1,p2,p3)
+	}
+	return(out)
+}
+
 
 # recursion formula 
 fr<-function(r,pr)
@@ -1842,7 +1941,7 @@ fr<-function(r,pr)
 }
 
 # compute true score
-truescore<-function(person.par,diff,discr,guess,Item,D)
+truescore<-function(person.par,diff,discr,guess,D)
 {
 	out<-rep(0,length(person.par))
 	ni<-length(diff)
@@ -1852,7 +1951,7 @@ truescore<-function(person.par,diff,discr,guess,Item,D)
 	return(out)
 }
 
-partialtruescore<-function(person.par,diff,discr,guess,Item,D)
+partialtruescore<-function(person.par,diff,discr,guess,D)
 {
 	out<-rep(0,length(person.par))
 	ni<-length(diff)

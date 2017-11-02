@@ -1,5 +1,10 @@
 \name{score}
 \alias{score}
+\alias{score.eqc}
+\alias{score.eqclist}
+\alias{score.ceqc}
+\alias{score.ceqclist}
+\alias{score.meqc}
 
 \title{
 	Scoring
@@ -8,9 +13,22 @@
 	Relates number-correct scores on two forms.
 }
 \usage{
-score(obj, link = NULL, path = NULL, method = "TSE", D = 1,
-      scores = NULL, se = TRUE, bistype = NULL, nq = 30, w = 0.5, 
-      theta = NULL, weights = NULL)
+score(obj, \dots)
+
+\method{score}{eqc}(obj, method = "TSE", D = 1, scores = NULL, se = TRUE, nq = 30, 
+  w = 0.5, theta = NULL, weights = NULL, \dots)
+
+\method{score}{eqclist}(obj, link = NULL, method = "TSE", D = 1, scores = NULL, se = TRUE, nq = 30, 
+  w = 0.5, theta = NULL, weights = NULL, \dots)
+
+\method{score}{ceqc}(obj, method = "TSE", D = 1, scores = NULL, se = TRUE, nq = 30, 
+  w = 0.5, theta = NULL, weights = NULL, \dots)
+
+\method{score}{ceqclist}(obj, path = NULL, method = "TSE", D = 1, scores = NULL, se = TRUE, nq = 30, 
+  w = 0.5, theta = NULL, weights = NULL, \dots)
+
+\method{score}{meqc}(obj, link = NULL, method = "TSE", D = 1, scores = NULL, se = TRUE, 
+  bistype = NULL, nq = 30, w = 0.5, theta = NULL, weights = NULL, \dots)
 }
 \arguments{
 	\item{obj}{output object from functions \code{\link{direc}}, 
@@ -35,6 +53,7 @@ score(obj, link = NULL, path = NULL, method = "TSE", D = 1,
 	\item{w}{synthetic weight for population 1. It should be a number between 0 and 1.}
 	\item{theta}{vector of ability values used to approximate integrals with observed score equating.}
 	\item{weights}{vector of weights used to approximate integrals with observed score equating.}
+	\item{\dots}{further arguments passed to or from other methods.}
 }
 \details{
 	In this function common items are internal, i.e. they are used for scoring the test.
@@ -89,11 +108,9 @@ score(direclist2pl, link = "test1.test2")
 
 # compute chain equating coefficients for path 1,2,3,4
 pth1 <- paste("test", 1:4, sep = "")
-# pth1 <- data.frame(t(pth1), stringsAsFactors = FALSE) no more necessary
 chainec1 <- chainec(direclist = direclist2pl, pths = pth1)
 # compute chain equating coefficients for path 1,5,4
 pth2 <- paste("test", c(1,5,4), sep = "")
-# pth2 <- data.frame(t(pth2), stringsAsFactors = FALSE) no more necessary
 chainec2 <- chainec(direclist = direclist2pl, pths = pth2)
 # scoring using chain equating coefficients and the true score equating method for score 12
 score(chainec1, path = "test1.test2.test3.test4", scores = 12)

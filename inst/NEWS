@@ -1,4 +1,4 @@
-Changes in version: equateIRT_2.0-3
+Changes in version: equateIRT_2.0-4
 
-* minor changes in functions direc and chainec.
+* function score converted to a generic function
  

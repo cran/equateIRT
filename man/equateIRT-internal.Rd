@@ -14,6 +14,9 @@
 \alias{fr_cond}
 \alias{DPx}
 \alias{Fp}
+\alias{score_prepare}
+\alias{score_compute}
+
 
 
 \title{Internal Functions of Package equateIRT}

@@ -3,8 +3,7 @@
 \alias{equateIRT}
 \docType{package}
 \title{
-	Direct, Chain and Average Equating Coefficients with Standard Errors
-	Using IRT Methods.
+	IRT Equating Methods
 }
 \description{
 	This package computes direct, chain and average (bisector) equating coefficients 
@@ -17,9 +16,9 @@
 \tabular{ll}{
 Package: \tab equateIRT\cr
 Type: \tab Package\cr
-Version: \tab 2.0-3\cr
-Date: \tab 2017-06-13\cr
-License: \tab GPL (>= 2)\cr
+Version: \tab 2.0-4\cr
+Date: \tab 2017-10-31\cr
+License: \tab GPL-3\cr
 }
 Direct equating coefficients and their standard errors
 between forms presenting common items  

@@ -110,7 +110,6 @@ mod2pl <- modIRT(coef = est2pl$coef, var = est2pl$var, names = test, display = F
 direclist2pl <- alldirec(mods = mod2pl, method = "Haebara")
 # compute chain equating coefficients of a given path
 pth <- paste("test", c(1,5,4), sep = "")
-# pth <- data.frame(t(pth), stringsAsFactors = FALSE) # no more necessary
 chainec154 <- chainec(direclist = direclist2pl, pths = pth)
 summary(chainec154)
 
@@ -124,9 +123,7 @@ modrasch <- modIRT(coef = estrasch$coef, var = estrasch$var, names = test,
 direclistrasch <- alldirec(mods = modrasch, method = "mean-mean", all = TRUE)
 # compute chain equating coefficients of two given paths
 pth1 <- paste("test", 1:3, sep = "")
-# pth1 <- data.frame(t(pth1), stringsAsFactors = FALSE) no more necessary
 pth2 <- paste("test", c(1,5,4), sep = "")
-# pth2 <- data.frame(t(pth2), stringsAsFactors = FALSE) no more necessary
 pths <- rbind(pth1, pth2)
 chainec1 <- chainec(direclist = direclistrasch, pths = pths)
 summary(chainec1)

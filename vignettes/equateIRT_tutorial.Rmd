@@ -89,7 +89,10 @@ gplot(lplan, displaylabels = TRUE,  vertex.sides = 4, vertex.cex = 5, vertex.rot
 # Direct equating coefficients
  
 Estimation of direct equating coefficients between Forms 1 and 2 using
-the mean-mean method
+the mean-mean method.
+
+__NOTE: Item parameters are converted to the scale of Form 2.__
+
 
 ```{r}
 l12 <- direc(mods = mod2pl, which = c(1,2), method = "mean-mean")
@@ -146,6 +149,8 @@ pth <- paste("test", c(1,5,4), sep = "")
 chainec154 <- chainec(direclist = direclist2pl, pths = pth)
 summary(chainec154)
 ```
+
+__NOTE: Item parameters are converted to the scale of Form 4.__
 
 # Average equating coefficients
 
