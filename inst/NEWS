@@ -1,4 +1,4 @@
-Changes in version: equateIRT_2.0-4
+Changes in version: equateIRT_2.0-5
 
-* function score converted to a generic function
+* function import.mirt prints a message when the hessian matrix is singular
  
