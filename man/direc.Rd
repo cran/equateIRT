@@ -11,7 +11,7 @@
 }
 \usage{
 direc(mods, which, mod1, mod2, method = "mean-mean", suff1 = ".1", suff2 = ".2",
-   D = 1, quadrature = TRUE, nq = 30)
+   D = 1, quadrature = TRUE, nq = 30, items.select = NULL)
 }
 \arguments{
 	\item{mods}{
@@ -51,6 +51,8 @@ direc(mods, which, mod1, mod2, method = "mean-mean", suff1 = ".1", suff2 = ".2",
 	\item{nq}{number of quadrature points used for the Gauss-Hermite quadrature
 	if \code{quadrature} is TRUE.
 	}
+	\item{items.select}{optional character vector including the names of
+	the items to use for equating.}
 }
 \details{
 	Equating coefficients perform the conversion from the scale of the 
@@ -85,14 +87,19 @@ direc(mods, which, mod1, mod2, method = "mean-mean", suff1 = ".1", suff2 = ".2",
 	and item parameters of the first form converted 
 	in the scale of the second form (e.g. \code{test1.as.test2}).}
 	\item{var12}{covariance matrix of item parameters of the first 
-		and the second form.}
+		and the second form (only items used for equating).}
+	\item{varFull}{list of covariance matrices of the item parameters
+	  (one matrix for each form)}
 	\item{partial}{partial derivatives of equating coefficients A and B
 		with respect to item parameters.}
 	\item{A}{equating coefficient A.}
 	\item{B}{equating coefficient B.}
 	\item{varAB}{covariance matrix of the equating coefficients.}
-	\item{commonitem}{list of length 1 containing the names of common item parameters.}
+	\item{commonitem}{list of length 2 containing the names of common item parameters
+	  and the names of the common items selected for equating.}
+	\item{suffixes}{suffixes used to identify the forms.}
 	\item{ni}{number of common items.}
+	\item{nis}{number of common items selected for equating.}
 	\item{forms}{names of equated forms.}
 	\item{method}{the equating method used.}
 	\item{itmp}{number of item parameters of the IRT model.}

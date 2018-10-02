@@ -1,11 +1,12 @@
 # Imported functions
 importFrom('statmod', "gauss.quad.prob")
-importFrom('stats', "nlminb", "optim", "reshape", "sd", "qlogis")
+importFrom('stats', "nlminb", "optim", "reshape", "sd", "qlogis", "plogis", "pchisq", "symnum")
 importFrom('utils', "read.fwf", "read.table")
 importFrom('mirt', "extract.mirt", "mod2values")
 
 # Exported functions
-export(linkp, modIRT, direc, alldirec, chainec, bisectorec, convert, import.ltm, import.mirt, import.flexmirt, import.irtpro, itm, eqc, score)
+export(linkp, modIRT, direc, alldirec, chainec, bisectorec, convert, import.ltm, 
+  import.mirt, import.flexmirt, import.irtpro, itm, eqc, score, dif.test)
 
 # S3 methods
 S3method(summary, eqc)
@@ -23,6 +24,7 @@ S3method(print, eqclist)
 S3method(print, ceqc)
 S3method(print, ceqclist)
 S3method(print, meqc)
+S3method(print, dift)
 S3method(itm, eqc)
 S3method(itm, eqclist)
 S3method(itm, ceqc)

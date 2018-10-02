@@ -16,8 +16,8 @@
 \alias{Fp}
 \alias{score_prepare}
 \alias{score_compute}
-
-
+\alias{dif.test.compute}
+\alias{trasf.compute}
 
 \title{Internal Functions of Package equateIRT}
 \description{

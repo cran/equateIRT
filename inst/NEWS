@@ -1,4 +1,4 @@
-Changes in version: equateIRT_2.0-5
+Changes in version: equateIRT_2.1
 
-* function import.mirt prints a message when the hessian matrix is singular
+* added function dif.test
  

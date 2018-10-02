@@ -11,13 +11,15 @@
 	The IRT models included are the three-parameter logistic model,
 	the two-parameter logistic model, the one-parameter logistic model and the
 	Rasch model.
+	Test scoring can be performed by true score equating and observed score equating methods.
+	DIF detection can be performed using a Wald-type test.
 }
 \details{
 \tabular{ll}{
 Package: \tab equateIRT\cr
 Type: \tab Package\cr
-Version: \tab 2.0-5\cr
-Date: \tab 2018-06-08\cr
+Version: \tab 2.1.0\cr
+Date: \tab 2018-09-28\cr
 License: \tab GPL-3\cr
 }
 Direct equating coefficients and their standard errors
@@ -51,6 +53,8 @@ two-parameter logistic model, and \code{estrasch} refers to
 a Rasch model.
 The estimates included in \code{est2pl} are obtained from the
 dataset \code{data2pl}, also contained in the package.
+Function \code{dif.test} performs a Wald-type test for the 
+detection of DIF (Battauz, 2018).
 }
 \author{
 	Michela Battauz
@@ -63,6 +67,9 @@ dataset \code{data2pl}, also contained in the package.
 	
 	Battauz, M. (2015). equateIRT: An R Package for IRT Test Equating.
 	\emph{Journal of Statistical Software}, \bold{68}, 1--22.
+	
+	Battauz, M. (2018). On Wald tests for differential item functioning detection.
+	\emph{Statistical Methods and Applications}.
 	
 	Cai L. (2013). \emph{FlexMIRT version 2: Flexible Multilevel Multidimensional Item Analysis and
 	Test Scoring [Computer Software]}. Chapel Hill, NC: Vector Psychometric Group.

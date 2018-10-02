@@ -19,7 +19,7 @@ modIRT(coef, var = NULL, names = NULL, ltparam = TRUE, lparam = TRUE,
 		item parameter estimates. Guessing, difficulty and discrimination 
 		parameters should strictly be given in this order and they are 
 		contained in different columns of the matrix.
-		The name of the	rows of each matrix should be the name of the item.}
+		The names of the	rows of each matrix should be the names of the items.}
 	\item{var}{list of matrices (one for each form) containing the 
 		covariance matrix of item parameter estimates. They should be
 		given in the same order of coefficients.}
@@ -86,8 +86,8 @@ modIRT(coef, var = NULL, names = NULL, ltparam = TRUE, lparam = TRUE,
 	\item{coefficients}{item parameter estimates.}
 	\item{var}{covariance matrix of item parameter estimates.}
 	\item{itmp}{number of item parameters of the IRT model. This is 1 for the 
-	Rasch model, 2 for the one-parameter logistic model, 2 for the
-	two-parameter logistic model and 3 for the three-parameter logistic
+	Rasch model, 2 for the one-parameter logistic model with constant discriminations, 
+	2 for the	two-parameter logistic model and 3 for the three-parameter logistic
 	model.}
 }
 \references{
