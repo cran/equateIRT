@@ -557,15 +557,15 @@ trasf.compute<-function(alleq,coef,var,itmp){
 
   varref<-var[ref][[1]]
   coefref<-coef[ref][[1]]
-  ni<-nrow(coefref)
+  niref<-nrow(coefref)
   itmsnames<-rownames(coefref)
   if (itmp==1) {
     rownames(varref)<-colnames(varref)<-paste("beta1",itmsnames,ref,sep=".")
     colnames(coefref)[1]<-"beta1"
     coefref<-subset(coefref,select="beta1")
     beta1<-coefref[,1]
-    der_abc_cbeta12_ref<-matrix(0,ni,ni)
-    diag(der_abc_cbeta12_ref[1:ni,1:ni])<- -1
+    der_abc_cbeta12_ref<-matrix(0,niref,niref)
+    diag(der_abc_cbeta12_ref[1:niref,1:niref])<- -1
     colnames(der_abc_cbeta12_ref)<-paste("beta1",itmsnames,ref,sep=".")
     rownames(der_abc_cbeta12_ref)<-paste("Dffclt",itmsnames,ref,sep=".")
   }
@@ -574,10 +574,10 @@ trasf.compute<-function(alleq,coef,var,itmp){
     colnames(coefref)<-c("beta1","beta2")
     beta1<-coefref[,1]
     beta2<-coefref[,2]
-    der_abc_cbeta12_ref<-matrix(0,2*ni,2*ni)
-    diag(der_abc_cbeta12_ref[1:ni,1:ni])<- -1/beta2
-    diag(der_abc_cbeta12_ref[1:ni,(ni+1):(2*ni)])<- beta1/beta2^2
-    diag(der_abc_cbeta12_ref[(ni+1):(2*ni),(ni+1):(2*ni)])<-1
+    der_abc_cbeta12_ref<-matrix(0,2*niref,2*niref)
+    diag(der_abc_cbeta12_ref[1:niref,1:niref])<- -1/beta2
+    diag(der_abc_cbeta12_ref[1:niref,(niref+1):(2*niref)])<- beta1/beta2^2
+    diag(der_abc_cbeta12_ref[(niref+1):(2*niref),(niref+1):(2*niref)])<-1
     colnames(der_abc_cbeta12_ref)<-c(paste("beta1",itmsnames,ref,sep="."),paste("beta2",itmsnames,ref,sep="."))
     rownames(der_abc_cbeta12_ref)<-c(paste("Dffclt",itmsnames,ref,sep="."),paste("Dscrmn",itmsnames,ref,sep="."))
   }
@@ -587,21 +587,26 @@ trasf.compute<-function(alleq,coef,var,itmp){
     c0<-coefref[,1]
     beta1<-coefref[,2]
     beta2<-coefref[,3]
-    der_abc_cbeta12_ref<-matrix(0,3*ni,3*ni)
-    diag(der_abc_cbeta12_ref[1:ni,(ni+1):(2*ni)])<- -1/beta2
-    diag(der_abc_cbeta12_ref[1:ni,(2*ni+1):(3*ni)])<- beta1/beta2^2
-    diag(der_abc_cbeta12_ref[(ni+1):(2*ni),(2*ni+1):(3*ni)])<-1
-    diag(der_abc_cbeta12_ref[(2*ni+1):(3*ni),1:ni])<-plogis(c0)*(1-plogis(c0))
+    der_abc_cbeta12_ref<-matrix(0,3*niref,3*niref)
+    diag(der_abc_cbeta12_ref[1:niref,(niref+1):(2*niref)])<- -1/beta2
+    diag(der_abc_cbeta12_ref[1:niref,(2*niref+1):(3*niref)])<- beta1/beta2^2
+    diag(der_abc_cbeta12_ref[(niref+1):(2*niref),(2*niref+1):(3*niref)])<-1
+    diag(der_abc_cbeta12_ref[(2*niref+1):(3*niref),1:niref])<-plogis(c0)*(1-plogis(c0))
     colnames(der_abc_cbeta12_ref)<-c(paste("c0",itmsnames,ref,sep="."),paste("beta1",itmsnames,ref,sep="."),paste("beta2",itmsnames,ref,sep="."))
     rownames(der_abc_cbeta12_ref)<-c(paste("Dffclt",itmsnames,ref,sep="."),paste("Dscrmn",itmsnames,ref,sep="."),paste("Gussng",itmsnames,ref,sep="."))
   }
+  allitmsnames<-c()
+  for (i in 1:ng)
+  {
+    itmsnames<-rownames(coef[[i]])
+    if (itmp==1) namestmp<-paste("beta1",itmsnames,i,sep=".")
+    if (itmp==2) namestmp<-c(paste("beta1",itmsnames,i,sep="."),paste("beta2",itmsnames,i,sep="."))
+    if (itmp==3) namestmp<-c(paste("c0",itmsnames,i,sep="."),paste("beta1",itmsnames,i,sep="."),paste("beta2",itmsnames,i,sep="."))
+    allitmsnames<-c(allitmsnames,namestmp)
+  }
   coef_trasf<-list()
-  var_trasf<-matrix(NA,ni*itmp*ng,ni*itmp*ng)
-  if (itmp==1) namestmp<-expand.grid(itmsnames,"beta1",1:ng)
-  if (itmp==2) namestmp<-expand.grid(itmsnames,c("beta1","beta2"),1:ng)
-  if (itmp==3) namestmp<-expand.grid(itmsnames,c("c0","beta1","beta2"),1:ng)
-  namesvar<-apply(namestmp[,c(2,1,3)],1,paste,collapse=".")
-  rownames(var_trasf)<-colnames(var_trasf)<-namesvar
+  var_trasf<-matrix(NA,length(allitmsnames),length(allitmsnames))
+  rownames(var_trasf)<-colnames(var_trasf)<-allitmsnames
   for (i in foc) {
     eqi<-alleq[[i]]
     mat<-eqi$partial
@@ -637,7 +642,7 @@ trasf.compute<-function(alleq,coef,var,itmp){
       
       der1<-cbind(diag(1,ni),-1)
       rownames(der1)<-paste("beta1",itmsnames,i,sep=".")
-      der2<-rbind(cbind(diag(1,ni),matrix(0,ni,ni)),der_AB_cbeta12)
+      der2<-rbind(cbind(diag(1,ni),matrix(0,niref,niref)),der_AB_cbeta12)
     }
     if (itmp==2) {
       beta1<-coefi[,1]
@@ -669,9 +674,7 @@ trasf.compute<-function(alleq,coef,var,itmp){
       der1<-rbind(cbind(diag(1,ni),diag(-B/A,ni),(beta2*B/A^2),(-beta2/A)),
                   cbind(matrix(0,ni,ni),diag(1/A,ni),(-beta2/A^2),rep(0,ni)))
       rownames(der1)<-c(paste("beta1",itmsnames,i,sep="."),paste("beta2",itmsnames,i,sep="."))
-      der2<-rbind(cbind(diag(1,ni),matrix(0,ni,3*ni)),
-                  cbind(matrix(0,ni,ni), diag(1,ni),matrix(0,ni,2*ni)),
-                  der_AB_cbeta12)
+      der2<-rbind(cbind(diag(1,2*ni),matrix(0,2*ni,2*niref)),der_AB_cbeta12)
     }
     if (itmp==3) {
       c0<-coefi[,1]
@@ -706,16 +709,13 @@ trasf.compute<-function(alleq,coef,var,itmp){
                   cbind(matrix(0,ni,ni),diag(1,ni),diag(-B/A,ni),(beta2*B/A^2),(-beta2/A)),
                   cbind(matrix(0,ni,2*ni),diag(1/A,ni),(-beta2/A^2),rep(0,ni)))
       rownames(der1)<-c(paste("c0",itmsnames,i,sep="."),paste("beta1",itmsnames,i,sep="."),paste("beta2",itmsnames,i,sep="."))
-      der2<-rbind(cbind(diag(1,ni),matrix(0,ni,5*ni)),
-                  cbind(matrix(0,ni,ni),diag(1,ni),matrix(0,ni,ni*4)),
-                  cbind(matrix(0,ni,2*ni), diag(1,ni),matrix(0,ni,3*ni)),
-                  der_AB_cbeta12)
+      der2<-rbind(cbind(diag(1,3*ni),matrix(0,3*ni,3*niref)),der_AB_cbeta12)
     }
     der<-der1%*%der2
     var_foc_ref<-blockdiag(vari,varref)[colnames(der),colnames(der)]
     var_trasf_foc<-der%*%var_foc_ref%*%t(der)
     var_trasf[rownames(var_trasf_foc),colnames(var_trasf_foc)]<-var_trasf_foc
-    der_ref_foc<-der[,(ncol(der)/2+1):ncol(der)]
+    der_ref_foc<-der[,rownames(varref)]
     var_trasf_focref<-der_ref_foc%*%varref #covariance of item parameters transformed of focal group and item parameters of reference group 
     var_trasf[rownames(var_trasf_focref),colnames(var_trasf_focref)]<-var_trasf_focref
     if (itmp==1) selref<-paste("beta1",itmsnames,ref,sep=".")
@@ -900,139 +900,139 @@ print.summary.eqclist<-function(x, ...)
 
 chainec<-function(r=NULL,direclist,f1=NULL,f2=NULL,pths=NULL)
 {
-	if (is.null(r) & is.null(pths)) stop("argument \"r\" needs to be specified if argument \"pths\" is NULL.")
-	if (!is.null(pths)) {  # new in version 2.0-3
-		if (!is.data.frame(pths) & is.vector(pths)) pths <- data.frame(t(pths), stringsAsFactors = FALSE)  # new in version 2.0-3
-		if (!is.data.frame(pths) & is.matrix(pths)) pths <- data.frame(pths, stringsAsFactors = FALSE)  # new in version 2.0-3
-	}  # new in version 2.0-3
-	if (is.null(r) & !is.null(pths)) r<-ncol(pths)
-	if (r<3) stop("r should be at least 3.")
-	if (is.null(pths)) {
-		sel<-sapply(direclist,FUN= function(x)(x$ni!=0))
-		nl<-names(direclist)[sel]
-		nll<-strsplit(nl,split=".",fixed=TRUE)
-		l<-data.frame(f1=sapply(nll,FUN=function(x) x[1]),f2=sapply(nll,FUN=function(x) x[2]),stringsAsFactors=FALSE)
-		if (is.null(f1)) pths<-l
-		if (!is.null(f1)) pths<-l[l$f1==f1,]
-		colnames(pths)<-paste(colnames(pths),1,sep=".")
-		if (r>3) {
-			for (k in 1:(r-3)) {
-				pths<-merge(pths,l,by.x=k+1,by.y=1)
-				colnames(pths)<-paste(colnames(pths),k+1,sep=".")
-				pths<-pths[,c(2:(k+1),1,k+2)]
-				pths<-pths[pths[,k]!=pths[,k+2],]
-			}
-		}
-		if (is.null(f2)) pths<-merge(pths,l,by.x=r-1,by.y=1)
-		if (!is.null(f2)) pths<-merge(pths,l[l$f2==f2,],by.x=r-1,by.y=1)
-		pths<-pths[,c(2:(r-1),1,r)]
-		pths<-pths[pths[,r-2]!=pths[,r],] 
-	}
-   
-	pths<-pths[pths[,1]!=pths[,r],]
-	if (nrow(pths)==0) stop("There are not paths of length ", r, ".")
-	
-	nomi<-pths[,1]
-	for (k in 2:r) nomi<-paste(nomi,pths[,k],sep=".")
-	out<- vector("list", nrow(pths))
-	for (j in 1:nrow(pths)) {
-		name1<-as.character(pths[j,1])
-		name2<-as.character(pths[j,r])
-		ni<-c()
-		A<-1
-		B<-0
-		partialA<-c()
-		partialB<-c()
-		varAll<-matrix(0,0,0)
-		varFull<-list()
-		suffixes<-c()
-		comuni<-list()
-		missing<-FALSE
-		varNULL<-FALSE
-		for (k in 1:(r-1)) {
-			nome<-paste(pths[j,k],pths[j,k+1],sep=".")
-			link<-direclist[[nome]]
-			if (k==1)   tab1<-link$tab1
-			if (k==r-1) tab2<-link$tab2
-			if (!is.null(link)) {
-				ni<-c(ni,link$ni)
-				if (link$ni!=0) {
-					partialAk<-A*link$partial[,1] 
-					partialA<-partialA*link$A
-					partialA<-c(partialA,partialAk)
-
-					partialBk<-B*link$partial[,1]+link$partial[,2] 
-					partialB<-partialB*link$A
-					partialB<-c(partialB,partialBk)
-
-					A<-link$A*A  #A1...k=Ak-1k*A1...k-1
-					B<-link$B+link$A*B #B1...k=Bkk-1+Akk-1*B1...k-1
-					
-
-					#if (!is.null(link$var12)) varAll<-blockdiag(varAll,link$var12)
-					if (is.null(link$var12)) varNULL<-TRUE
-					if (!is.null(link$varFull) & k==1) varAll<-blockdiag(varAll,link$varFull[[1]]) #changed in version 2.1
-					if (!is.null(link$varFull)) varAll<-blockdiag(varAll,link$varFull[[2]]) #changed in version 2.1
-					if (!is.null(link$varFull) & k==1) varFull[[k]]<-(link$varFull[[1]])
-					if (!is.null(link$varFull)) varFull[[k+1]]<-(link$varFull[[2]])
-					if (k==1) suffixes<-c(suffixes,link$suffixes[1])
-					suffixes<-c(suffixes,link$suffixes[2])
-					comuni[[k]]<-link$commonitem[[1]]
-				}
-				else {
-					warning("forms ",nome," have no common items\n")
-					missing<-TRUE
-				}
-			}
-			if (is.null(link)) {
-				warning("link of forms ",nome," is missing\n")
-				missing<-TRUE
-				ni<-c(ni,0)
-			}
-		}
-
-		if (!missing) {
-			partialA<-tapply(partialA,names(partialA),sum)
-			partialB<-tapply(partialB,names(partialB),sum)
-
-			mat<-merge(partialA,partialB,by=0)
-			nom<-mat$Row.names
-			mat<-mat[,-1]
-			colnames(mat)<-c("A","B")
-			rownames(mat)<-nom
-			mat<-as.matrix(mat)
-			sel<-nom  #changed in version 2.1
-			varAB<-t(mat[sel,])%*%varAll[sel,sel]%*%mat[sel,]
-			if(varNULL) varAB<-matrix(NA,2,2)
-			taball<-merge(tab1,tab2,by=0,suffixes=c(.1,.2),all=T)
-			niall<-nrow(taball)/link$itmp
-			taball$value12<-NA
-			taball$value12[1:niall]<-A*taball$value1[1:niall]+B
-			if (link$itmp>1) taball$value12[(niall+1):(2*niall)]<-taball$value1[(niall+1):(2*niall)]/A
-			if (link$itmp==3) taball$value12[(2*niall+1):(3*niall)]<-taball$value1[(2*niall+1):(3*niall)]
-			colnames(taball)<-c("Item",name1,name2,paste(name1,name2,sep=".as."))
-			out[[j]]$tab1<-tab1
-			out[[j]]$tab2<-tab2
-			out[[j]]$tab<-taball
-			out[[j]]$varAll<-varAll
-			out[[j]]$varFull<-varFull
-			out[[j]]$partial<-mat[sel,]
-			out[[j]]$A<-A
-			out[[j]]$B<-B
-			out[[j]]$varAB<-varAB
-			out[[j]]$commonitem<-comuni
-			out[[j]]$suffixes<-suffixes
-		}
-		out[[j]]$ni<-ni
-		out[[j]]$forms<-nomi[j]
-		if (!is.null(link)) out[[j]]$method<-link$method
-		if (!is.null(link)) out[[j]]$itmp<-link$itmp
-		else out[[j]]$method<-""
-		class(out[[j]])<-"ceqc"
-	} 
-	names(out)<-nomi
-	class(out) <- "ceqclist"
-	return(out)
+  if (is.null(r) & is.null(pths)) stop("argument \"r\" needs to be specified if argument \"pths\" is NULL.")
+  if (!is.null(pths)) {  # new in version 2.0-3
+    if (!is.data.frame(pths) & is.vector(pths)) pths <- data.frame(t(pths), stringsAsFactors = FALSE)  # new in version 2.0-3
+    if (!is.data.frame(pths) & is.matrix(pths)) pths <- data.frame(pths, stringsAsFactors = FALSE)  # new in version 2.0-3
+  }  # new in version 2.0-3
+  if (is.null(r) & !is.null(pths)) r<-ncol(pths)
+  if (r<3) stop("r should be at least 3.")
+  if (is.null(pths)) {
+    sel<-sapply(direclist,FUN= function(x)(x$ni!=0))
+    nl<-names(direclist)[sel]
+    nll<-strsplit(nl,split=".",fixed=TRUE)
+    l<-data.frame(f1=sapply(nll,FUN=function(x) x[1]),f2=sapply(nll,FUN=function(x) x[2]),stringsAsFactors=FALSE)
+    if (is.null(f1)) pths<-l
+    if (!is.null(f1)) pths<-l[l$f1==f1,]
+    colnames(pths)<-paste(colnames(pths),1,sep=".")
+    if (r>3) {
+      for (k in 1:(r-3)) {
+        pths<-merge(pths,l,by.x=k+1,by.y=1)
+        colnames(pths)<-paste(colnames(pths),k+1,sep=".")
+        pths<-pths[,c(2:(k+1),1,k+2)]
+        pths<-pths[pths[,k]!=pths[,k+2],]
+      }
+    }
+    if (is.null(f2)) pths<-merge(pths,l,by.x=r-1,by.y=1)
+    if (!is.null(f2)) pths<-merge(pths,l[l$f2==f2,],by.x=r-1,by.y=1)
+    pths<-pths[,c(2:(r-1),1,r)]
+    pths<-pths[pths[,r-2]!=pths[,r],] 
+    pths<-pths[pths[,1]!=pths[,r],]
+  }
+  
+  if (nrow(pths)==0) stop("There are not paths of length ", r, ".")
+  
+  nomi<-pths[,1]
+  for (k in 2:r) nomi<-paste(nomi,pths[,k],sep=".")
+  out<- vector("list", nrow(pths))
+  for (j in 1:nrow(pths)) {
+    name1<-as.character(pths[j,1])
+    name2<-as.character(pths[j,r])
+    ni<-c()
+    A<-1
+    B<-0
+    partialA<-c()
+    partialB<-c()
+    varAll<-matrix(0,0,0)
+    varFull<-list()
+    suffixes<-c()
+    comuni<-list()
+    missing<-FALSE
+    varNULL<-FALSE
+    for (k in 1:(r-1)) {
+      nome<-paste(pths[j,k],pths[j,k+1],sep=".")
+      link<-direclist[[nome]]
+      if (k==1)   tab1<-link$tab1
+      if (k==r-1) tab2<-link$tab2
+      if (!is.null(link)) {
+        ni<-c(ni,link$ni)
+        if (link$ni!=0) {
+          partialAk<-A*link$partial[,1] 
+          partialA<-partialA*link$A
+          partialA<-c(partialA,partialAk)
+          
+          partialBk<-B*link$partial[,1]+link$partial[,2] 
+          partialB<-partialB*link$A
+          partialB<-c(partialB,partialBk)
+          
+          A<-link$A*A  #A1...k=Ak-1k*A1...k-1
+          B<-link$B+link$A*B #B1...k=Bkk-1+Akk-1*B1...k-1
+          
+          
+          #if (!is.null(link$var12)) varAll<-blockdiag(varAll,link$var12)
+          if (is.null(link$var12)) varNULL<-TRUE
+          if (!is.null(link$varFull) & k==1) varAll<-blockdiag(varAll,link$varFull[[1]]) #changed in version 2.1
+          if (!is.null(link$varFull)) varAll<-blockdiag(varAll,link$varFull[[2]]) #changed in version 2.1
+          if (!is.null(link$varFull) & k==1) varFull[[k]]<-(link$varFull[[1]])
+          if (!is.null(link$varFull)) varFull[[k+1]]<-(link$varFull[[2]])
+          if (k==1) suffixes<-c(suffixes,link$suffixes[1])
+          suffixes<-c(suffixes,link$suffixes[2])
+          comuni[[k]]<-link$commonitem[[1]]
+        }
+        else {
+          warning("forms ",nome," have no common items\n")
+          missing<-TRUE
+        }
+      }
+      if (is.null(link)) {
+        warning("link of forms ",nome," is missing\n")
+        missing<-TRUE
+        ni<-c(ni,0)
+      }
+    }
+    
+    if (!missing) {
+      partialA<-tapply(partialA,names(partialA),sum)
+      partialB<-tapply(partialB,names(partialB),sum)
+      
+      mat<-merge(partialA,partialB,by=0)
+      nom<-mat$Row.names
+      mat<-mat[,-1]
+      colnames(mat)<-c("A","B")
+      rownames(mat)<-nom
+      mat<-as.matrix(mat)
+      sel<-nom  #changed in version 2.1
+      varAB<-t(mat[sel,])%*%varAll[sel,sel]%*%mat[sel,]
+      if(varNULL) varAB<-matrix(NA,2,2)
+      taball<-merge(tab1,tab2,by=0,suffixes=c(.1,.2),all=T)
+      niall<-nrow(taball)/link$itmp
+      taball$value12<-NA
+      taball$value12[1:niall]<-A*taball$value1[1:niall]+B
+      if (link$itmp>1) taball$value12[(niall+1):(2*niall)]<-taball$value1[(niall+1):(2*niall)]/A
+      if (link$itmp==3) taball$value12[(2*niall+1):(3*niall)]<-taball$value1[(2*niall+1):(3*niall)]
+      colnames(taball)<-c("Item",name1,name2,paste(name1,name2,sep=".as."))
+      out[[j]]$tab1<-tab1
+      out[[j]]$tab2<-tab2
+      out[[j]]$tab<-taball
+      out[[j]]$varAll<-varAll
+      out[[j]]$varFull<-varFull
+      out[[j]]$partial<-mat[sel,]
+      out[[j]]$A<-A
+      out[[j]]$B<-B
+      out[[j]]$varAB<-varAB
+      out[[j]]$commonitem<-comuni
+      out[[j]]$suffixes<-suffixes
+    }
+    out[[j]]$ni<-ni
+    out[[j]]$forms<-nomi[j]
+    if (!is.null(link)) out[[j]]$method<-link$method
+    if (!is.null(link)) out[[j]]$itmp<-link$itmp
+    else out[[j]]$method<-""
+    class(out[[j]])<-"ceqc"
+  } 
+  names(out)<-nomi
+  class(out) <- "ceqclist"
+  return(out)
 }
 
 
@@ -2393,4 +2393,109 @@ Fp<-function(xp,fX)
 	return(res)
 }
 
+
+
+
+# functions that performs scale drift test:
+
+id.test<-function(chain)
+{
+  if (class(chain)!="ceqclist") stop("This function requires an output of the chainec function.")
+  out<-vector("list",length(chain))
+  for (i in 1:length(chain))
+  {
+    forms<-strsplit(chain[[i]]$forms,".",fixed = TRUE)[[1]]
+    if (forms[[1]]!=forms[[length(forms)]]) stop("The first and the last form of the chain should be equal.")
+    AB<-c(chain[[i]]$A,chain[[i]]$B)
+    vAB<-chain[[i]]$varAB
+    diff<-AB-c(1,0)
+    statistic<-t(diff)%*%solve(vAB)%*%diff
+    p.value<-pchisq(statistic,2,lower.tail=FALSE)
+    out[[i]]<-list(path=chain[[i]]$forms,AB=AB,statistic=statistic,df=2,p.value=p.value)
+  }
+  class(out)<-"idtest"
+  return(out)
+}
+
+print.idtest<-function(x, ...)
+{
+  cat("\n        Identity test \n\n")
+  for (i in 1:length(x)) {
+    cat("path: ", x[[i]]$path, "\n")
+    cat("statistic = ",x[[i]]$statistic,", ","df = ",x[[i]]$df,", ","p-value = ",x[[i]]$p.value,"\n\n",sep="")
+    
+  }
+}
+
+
+sd.test<-function(ecall)
+{
+  if (length(table(sapply(ecall,FUN=function(x) x$method)))!=1) stop("ecall contains different methods.")
+  itmp<-sapply(ecall,FUN=function(x) x$itmp)
+  if (length(table(itmp))>1) stop("Mixed models not allowed. Number of item parameters differs.")
+  varNULL<-FALSE
+  if (any(sapply(ecall,FUN=function(x) is.na(x$varAB)))) varNULL<-TRUE
+  if (varNULL) stop("Scale drift test requires the covariance matrix.")
+  part<-lapply(ecall,FUN=function(x) data.frame(A=x$partial[,1],
+                                                B=x$partial[,2],stringsAsFactors = FALSE))
+  for (i in 1:length(part)) {
+    part[[i]]$path<-names(part)[i]
+    part[[i]]$par<-rownames(part[[i]])
+  }
+  partall<-part[[1]]
+  for (i in 2:length(part))  partall<-rbind(partall,part[[i]])
+  partall$link<-path2link(partall$path)
+  coall<-data.frame(t(sapply(ecall,FUN=function(x) x[c("A","B")])))
+  for (i in 1:2) coall[,i]<-unlist(coall[,i])
+  coall$path<-rownames(coall)
+  coall$link<-path2link(coall$path)
+  
+  links<-sort(unique(coall$link))
+  varFull<-lapply(ecall,FUN=function(x) x$varFull)
+  suffixes<-lapply(ecall,FUN=function(x) x$suffixes)
+  out<-vector("list",length(links))
+  for (i in 1:length(links)){
+    coi<-coall[coall$link==links[i],]
+    parti<-partall[partall$link==links[i],]
+    #sel<-paste(parti$par,parti$path,sep="_")
+    linkvf<-path2link(names(varFull))
+    varFull1<-varFull[linkvf==links[i]]
+    varAll<-matrix(0,0,0)
+    for (k in 1:length(varFull1)) {
+      for (j in 1:length(varFull1[[k]])) {
+        v1<-varFull1[[k]][[j]]
+        if (!all(rownames(v1)%in%rownames(varAll))) varAll<-blockdiag(varAll,v1)
+      }
+    }
+    p<-nrow(coi)-1
+    C<-cbind(1,-diag(1,p,p))
+    C<-blockdiag(C,C)
+    AB<-matrix(c(coi$A,coi$B),ncol=1)
+    namesAB<-c(paste("A",rownames(coi),sep="."),paste("B",rownames(coi),sep="."))
+    rownames(AB)<-namesAB
+    partim<-reshape(parti[,1:4],direction="wide",timevar="path",idvar="par")
+    rownames(partim)<-partim$par
+    partim[is.na(partim)]<-0
+    partim<-as.matrix(partim[,-1])
+    partim<-partim[,namesAB]
+    sel<-rownames(partim)
+    Sigma<-t(partim)%*%varAll[sel,sel]%*%partim
+    statistic<-t(AB)%*%t(C)%*%solve(C%*%Sigma%*%t(C))%*%C%*%AB
+    p.value<-pchisq(statistic[1],df=nrow(C),lower.tail=FALSE)
+    out[[i]]<-list(link=links[i],paths=coi$path,AB=coi,statistic=statistic,df=nrow(C),p.value=p.value)
+  }
+  class(out)<-"sdtest"
+  return(out)
+}
+
+
+print.sdtest<-function(x, ...)
+{
+  cat("\n        Scale drift test \n\n")
+  for (i in 1:length(x)) {
+    cat("link: ", x[[i]]$link, "\n")
+    cat("statistic = ",x[[i]]$statistic,", ","df = ",x[[i]]$df,", ","p-value = ",x[[i]]$p.value,"\n\n",sep="")
+    
+  }
+}
 

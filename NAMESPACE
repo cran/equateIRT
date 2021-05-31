@@ -6,7 +6,7 @@ importFrom('mirt', "extract.mirt", "mod2values")
 
 # Exported functions
 export(linkp, modIRT, direc, alldirec, chainec, bisectorec, convert, import.ltm, 
-  import.mirt, import.flexmirt, import.irtpro, itm, eqc, score, dif.test)
+  import.mirt, import.flexmirt, import.irtpro, itm, eqc, score, dif.test,id.test,sd.test)
 
 # S3 methods
 S3method(summary, eqc)
@@ -25,6 +25,8 @@ S3method(print, ceqc)
 S3method(print, ceqclist)
 S3method(print, meqc)
 S3method(print, dift)
+S3method(print, idtest)
+S3method(print, sdtest)
 S3method(itm, eqc)
 S3method(itm, eqclist)
 S3method(itm, ceqc)

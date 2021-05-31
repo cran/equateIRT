@@ -18,8 +18,8 @@
 \tabular{ll}{
 Package: \tab equateIRT\cr
 Type: \tab Package\cr
-Version: \tab 2.1.0\cr
-Date: \tab 2018-09-28\cr
+Version: \tab 2.2.0\cr
+Date: \tab 2021-05-27\cr
 License: \tab GPL-3\cr
 }
 Direct equating coefficients and their standard errors

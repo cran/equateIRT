@@ -1,4 +1,4 @@
-Changes in version: equateIRT_2.1
+Changes in version: equateIRT_2.2.0
 
-* added function dif.test
+* added functions sd.test and id.test
  

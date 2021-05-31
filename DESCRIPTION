@@ -3,7 +3,7 @@ Type: Package
 Title: IRT Equating Methods
 Imports: statmod, stats, utils, mirt
 Suggests: knitr, ltm, rmarkdown, sna
-Version: 2.1.0
+Version: 2.2.0
 Author: Michela Battauz
 Maintainer: Michela Battauz <michela.battauz@uniud.it>
 Description: Computation of direct, chain and average (bisector) equating coefficients with 
@@ -16,6 +16,6 @@ Description: Computation of direct, chain and average (bisector) equating coeffi
 License: GPL-3
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2018-10-02 12:13:42 UTC; pc
+Packaged: 2021-05-31 10:28:44 UTC; pc
 Repository: CRAN
-Date/Publication: 2018-10-02 18:30:05 UTC
+Date/Publication: 2021-05-31 11:00:02 UTC
