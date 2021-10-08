@@ -1,4 +1,4 @@
-Changes in version: equateIRT_2.2.0
+Changes in version: equateIRT_2.2.1
 
-* added functions sd.test and id.test
+* bug fixed in function chainec
  

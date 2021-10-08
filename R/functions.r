@@ -1002,7 +1002,7 @@ chainec<-function(r=NULL,direclist,f1=NULL,f2=NULL,pths=NULL)
       rownames(mat)<-nom
       mat<-as.matrix(mat)
       sel<-nom  #changed in version 2.1
-      varAB<-t(mat[sel,])%*%varAll[sel,sel]%*%mat[sel,]
+      if(!varNULL) varAB<-t(mat[sel,])%*%varAll[sel,sel]%*%mat[sel,]
       if(varNULL) varAB<-matrix(NA,2,2)
       taball<-merge(tab1,tab2,by=0,suffixes=c(.1,.2),all=T)
       niall<-nrow(taball)/link$itmp
