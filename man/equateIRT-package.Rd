@@ -18,8 +18,8 @@
 \tabular{ll}{
 Package: \tab equateIRT\cr
 Type: \tab Package\cr
-Version: \tab 2.2.1\cr
-Date: \tab 2021-10-07\cr
+Version: \tab 2.3.0\cr
+Date: \tab 2022-08-08\cr
 License: \tab GPL-3\cr
 }
 Direct equating coefficients and their standard errors
@@ -55,6 +55,11 @@ The estimates included in \code{est2pl} are obtained from the
 dataset \code{data2pl}, also contained in the package.
 Function \code{dif.test} performs a Wald-type test for the 
 detection of DIF (Battauz, 2018).
+The stability of the equating transformations can be assessed using
+function \code{sd.test}, which tests if the equating coefficients
+that link the same two forms are equal, and function \code{id.test},
+which tests if the equating coefficients that link a form to itself
+through a chain of forms return the identity equating.
 }
 \author{
 	Michela Battauz
@@ -68,8 +73,11 @@ detection of DIF (Battauz, 2018).
 	Battauz, M. (2015). equateIRT: An R Package for IRT Test Equating.
 	\emph{Journal of Statistical Software}, \bold{68}, 1--22.
 	
-	Battauz, M. (2018). On Wald tests for differential item functioning detection.
-	\emph{Statistical Methods and Applications}.
+	Battauz, M. (2019). On Wald tests for differential item functioning detection.
+	\emph{Statistical Methods and Applications}. \bold{28}, 103--118.
+	
+	Battauz, M. (2022). Testing for differences in chain equating. 
+	\emph{Statistica Neerlandica}, 1--12.
 	
 	Cai L. (2013). \emph{FlexMIRT version 2: Flexible Multilevel Multidimensional Item Analysis and
 	Test Scoring [Computer Software]}. Chapel Hill, NC: Vector Psychometric Group.

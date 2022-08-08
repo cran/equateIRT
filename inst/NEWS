@@ -1,4 +1,6 @@
-Changes in version: equateIRT_2.2.1
+Changes in version: equateIRT_2.3.0
 
-* bug fixed in function chainec
+* the methods provided by functions sd.test and id.test are published, added reference.
+* updated vignette
+
  

@@ -25,6 +25,10 @@ id.test(chain)
 	\item{df}{}
 	\item{p.value}{}
 }
+\references{
+	Battauz, M. (2022). Testing for differences in chain equating. 
+	\emph{Statistica Neerlandica}, 1-12.
+}
 \author{
 	Michela Battauz
 }

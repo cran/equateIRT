@@ -113,8 +113,8 @@ dif.test(coef, var, names = NULL, reference = NULL, method = "mean-mean",
 	\item{niter}{number of iterations.}
 }
 \references{
-	Battauz, M. (2018). On Wald tests for differential item functioning detection.
-	\emph{Statistical Methods and Applications}.
+	Battauz, M. (2019). On Wald tests for differential item functioning detection.
+	\emph{Statistical Methods and Applications}. \bold{28}, 103-118.
 	
 	Candell,  G.L., Drasgow, F. (1988). An iterative procedure for linking 
 	metrics and assessing item bias in item response theory. 
@@ -127,18 +127,18 @@ dif.test(coef, var, names = NULL, reference = NULL, method = "mean-mean",
 # load the data
 data(dataDIF)
 head(dataDIF)
-# estimate a 2PL model for each group using the R package ltm
-library(ltm)
+# estimate a 2PL model for each group using the R package mirt
+library(mirt)
 data1 <- dataDIF[dataDIF$group == 1, 1:20]
 data2 <- dataDIF[dataDIF$group == 2, 1:20]
 data3 <- dataDIF[dataDIF$group == 3, 1:20]
-mod1 <- ltm(data1 ~ z1)
-mod2 <- ltm(data2 ~ z1)
-mod3 <- ltm(data3 ~ z1)
+mod1 <- mirt(data1, SE = TRUE)
+mod2 <- mirt(data2, SE = TRUE)
+mod3 <- mirt(data3, SE = TRUE)
 # extract the coefficients and the covariance matrix
-est1 <- import.ltm(mod1, display = FALSE)
-est2 <- import.ltm(mod2, display = FALSE)
-est3 <- import.ltm(mod3, display = FALSE)
+est1 <- import.mirt(mod1, display = FALSE)
+est2 <- import.mirt(mod2, display = FALSE)
+est3 <- import.mirt(mod3, display = FALSE)
 
 # perform the test for DIF on two groups
 res_diftest2 <- dif.test(coef = list(est1$coef, est2$coef),

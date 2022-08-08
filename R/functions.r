@@ -1583,13 +1583,13 @@ import.irtpro<-function(fnamep,fnamev=NULL,fnameirt=NULL,display=TRUE,digits=2) 
 
 
 import.ltm<-function(mod,display=TRUE,digits=4) {
-	if (class(mod)=="grm") stop("Cannot handle multiple response models.")
-	if (class(mod)=="gpcm") stop("Cannot handle multiple response models.")
-	if (class(mod)=="ltm") if (mod$ltst$factors>1) stop("Cannot handle multiple factors.")
-	if (class(mod)=="ltm") if (ncol(mod$coef)>2) stop("Cannot handle not IRT models.")
+	if (isa(mod,"grm")) stop("Cannot handle multiple response models.")
+	if (isa(mod,"gpcm")) stop("Cannot handle multiple response models.")
+	if (isa(mod,"ltm")) if (mod$ltst$factors>1) stop("Cannot handle multiple factors.")
+	if (isa(mod,"ltm")) if (ncol(mod$coef)>2) stop("Cannot handle not IRT models.")
 	p<-mod$coef
 	vm<-solve(mod$hessian)
-	if (!is.null(mod$constraint) & class(mod)=="rasch") {
+	if (!is.null(mod$constraint) & isa(mod,"rasch")) {
 		if (!all(p[,ncol(p)]==1)) {
 			cstr<-mod$constraint
 			nf<-nrow(cstr)
@@ -1600,7 +1600,7 @@ import.ltm<-function(mod,display=TRUE,digits=4) {
 			vm<-vm1
 		}
 	}
-	if (!is.null(mod$constraint) & (class(mod)=="ltm" | class(mod)=="tpm")) {
+	if (!is.null(mod$constraint) & (isa(mod,"ltm") | isa(mod,"tpm"))) {
 		cstr<-mod$constraint
 		nf<-nrow(cstr)
 		fixed<-cstr[,1]+(cstr[,2]-1)*nrow(p)
@@ -2400,7 +2400,7 @@ Fp<-function(xp,fX)
 
 id.test<-function(chain)
 {
-  if (class(chain)!="ceqclist") stop("This function requires an output of the chainec function.")
+  if (!isa(chain,"ceqclist")) stop("This function requires an output of the chainec function.")
   out<-vector("list",length(chain))
   for (i in 1:length(chain))
   {
