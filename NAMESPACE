@@ -1,7 +1,7 @@
 # Imported functions
 importFrom('statmod', "gauss.quad.prob")
 importFrom('stats', "nlminb", "optim", "reshape", "sd", "qlogis", "plogis", "pchisq", "symnum")
-importFrom('utils', "read.fwf", "read.table")
+importFrom('utils', "read.fwf", "read.table", "head", "tail")
 importFrom('mirt', "extract.mirt", "mod2values")
 
 # Exported functions

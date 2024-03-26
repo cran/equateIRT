@@ -16,19 +16,20 @@
 score(obj, \dots)
 
 \method{score}{eqc}(obj, method = "TSE", D = 1, scores = NULL, se = TRUE, nq = 30, 
-  w = 0.5, theta = NULL, weights = NULL, \dots)
+  w = 0.5, theta = NULL, weights = NULL, anchor.type = "internal", \dots)
 
 \method{score}{eqclist}(obj, link = NULL, method = "TSE", D = 1, scores = NULL, se = TRUE, nq = 30, 
-  w = 0.5, theta = NULL, weights = NULL, \dots)
+  w = 0.5, theta = NULL, weights = NULL, anchor.type = "internal", \dots)
 
 \method{score}{ceqc}(obj, method = "TSE", D = 1, scores = NULL, se = TRUE, nq = 30, 
-  w = 0.5, theta = NULL, weights = NULL, \dots)
+  w = 0.5, theta = NULL, weights = NULL, anchor.type = "internal", \dots)
 
 \method{score}{ceqclist}(obj, path = NULL, method = "TSE", D = 1, scores = NULL, se = TRUE, nq = 30, 
-  w = 0.5, theta = NULL, weights = NULL, \dots)
+  w = 0.5, theta = NULL, weights = NULL, anchor.type = "internal", \dots)
 
 \method{score}{meqc}(obj, link = NULL, method = "TSE", D = 1, scores = NULL, se = TRUE, 
-  bistype = NULL, nq = 30, w = 0.5, theta = NULL, weights = NULL, \dots)
+  bistype = NULL, nq = 30, w = 0.5, theta = NULL, weights = NULL, 
+  anchor.type = "internal", \dots)
 }
 \arguments{
 	\item{obj}{output object from functions \code{\link{direc}}, 
@@ -53,10 +54,17 @@ score(obj, \dots)
 	\item{w}{synthetic weight for population 1. It should be a number between 0 and 1.}
 	\item{theta}{vector of ability values used to approximate integrals with observed score equating.}
 	\item{weights}{vector of weights used to approximate integrals with observed score equating.}
+	\item{anchor.type}{The anchor type, which can be "\code{internal}" or "\code{external}".
+	External anchors are not implemented for bisector equating coefficients. See details.}
 	\item{\dots}{further arguments passed to or from other methods.}
 }
 \details{
-	In this function common items are internal, i.e. they are used for scoring the test.
+	If \code{anchor.type} is \code{internal}, the common items are used for 
+	computing the scores; if it is \code{external}, the common items are used
+	for computing the equating coefficients but not for computing the scores.
+	External anchors are not implemented for bisector equating coefficients 
+	because it is possible that all items are used as achors in one of the paths
+	considered.
 
 	This function computes standard error of equated scores with the observed score equating method
 	using \eqn{(\alpha_X',\alpha_{V1}',A,B)'} for the description of \eqn{\beta_{X2,x}(At_m+B)}, and
@@ -100,6 +108,10 @@ score(l12)
 score(l12, method = "OSE")
 # specify only scores from 10 to 15
 score(l12, method = "OSE", scores = 10:15)
+# external anchors and true score equating method
+score(l12, anchor.type = "external")
+# external anchors and observed score equating method
+score(l12, method = "OSE", anchor.type = "external")
 
 # all direct equating coefficients using the Haebara method
 direclist2pl <- alldirec(mods = mod2pl, method = "Haebara")
@@ -115,6 +127,11 @@ chainec2 <- chainec(direclist = direclist2pl, pths = pth2)
 # scoring using chain equating coefficients and the true score equating method for score 12
 score(chainec1, path = "test1.test2.test3.test4", scores = 12)
 score(chainec2, path = "test1.test5.test4", scores = 12)
+# scoring using chain equating coefficients, true score equating and external anchors
+score(chainec1, path = "test1.test2.test3.test4", anchor.type = "external")
+# scoring using chain equating coefficients, observed score equating and external anchors
+score(chainec1, path = "test1.test2.test3.test4", method = "OSE", anchor.type = "external")
+
 
 # create a list of objects of class ceqc
 ecall <- c(chainec1, chainec2)

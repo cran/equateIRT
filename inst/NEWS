@@ -1,6 +1,5 @@
-Changes in version: equateIRT_2.3.0
+Changes in version: equateIRT_2.4.0
 
-* the methods provided by functions sd.test and id.test are published, added reference.
-* updated vignette
+* added scoring with external anchors
 
  

@@ -2,7 +2,7 @@
 library("equateIRT")
 data("data2pl", package = "equateIRT")
 
-## ---- message=FALSE, results='hide'-------------------------------------------
+## ----message=FALSE, results='hide'--------------------------------------------
 library("mirt")
 m1 <- mirt(data2pl[[1]], SE = TRUE)
 m2 <- mirt(data2pl[[2]], SE = TRUE)
@@ -32,7 +32,7 @@ coef(mod2pl$test1)[1:5]
 lplan<-linkp(coef = estc)
 lplan
 
-## ---- message=FALSE, fig.cap="Linkage plan",fig.width=3.5,fig.height=3--------
+## ----message=FALSE, fig.cap="Linkage plan",fig.width=3.5,fig.height=3---------
 library(sna)
 par(mar=c(0, 0, 0, 0))
 set.seed(6)
@@ -98,7 +98,7 @@ score(fec, bistype = "weighted", scores = 17)
 ## -----------------------------------------------------------------------------
 data(dataDIF)
 
-## ---- message=FALSE, results='hide'-------------------------------------------
+## ----message=FALSE, results='hide'--------------------------------------------
 library(mirt)
 data1 <- dataDIF[dataDIF$group == 1, 1:20]
 data2 <- dataDIF[dataDIF$group == 2, 1:20]
