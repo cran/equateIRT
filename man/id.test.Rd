@@ -32,7 +32,13 @@ id.test(chain)
 \author{
 	Michela Battauz
 }
+\seealso{
+	\code{\link{chainec}}
+}
 \examples{
+# the following code uses item parameter estimates previously obtained
+# for other examples see documentation in function chainec
+
 # three-parameter logistic model
 # direct equating coefficients using the "Haebara" method
 data(est3pl)

@@ -38,9 +38,12 @@
 	Michela Battauz
 }
 \seealso{
-	\code{\link{alldirec}}, \code{\link{summary.eqc}}
+	\code{\link{alldirec}}, \code{\link{modIRT}}, \code{\link{summary.eqc}}
 }
 \examples{
+# the following code uses item parameter estimates previously obtained
+# for examples that start from item response data see function modIRT
+
 # Rasch model
 # direct equating coefficients using the "mean-mean" method
 data(estrasch)

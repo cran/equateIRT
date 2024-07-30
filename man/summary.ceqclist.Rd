@@ -38,9 +38,12 @@
 	Michela Battauz
 }
 \seealso{
-	\code{\link{chainec}}, \code{\link{summary.eqc}}
+	\code{\link{chainec}}, \code{\link{modIRT}}, \code{\link{summary.eqc}}
 }
 \examples{
+# the following code uses item parameter estimates previously obtained
+# for examples that start from item response data see function modIRT
+
 # two-parameter logistic model
 # direct equating coefficients using the "Haebara" method
 data(est2pl)

@@ -11,25 +11,13 @@ m4 <- mirt(data2pl[[4]], SE = TRUE)
 m5 <- mirt(data2pl[[5]], SE = TRUE)
 
 ## -----------------------------------------------------------------------------
-estm1 <- import.mirt(m1, display = FALSE)
-estm2 <- import.mirt(m2, display = FALSE)
-estm3 <- import.mirt(m3, display = FALSE)
-estm4 <- import.mirt(m4, display = FALSE)
-estm5 <- import.mirt(m5, display = FALSE)
-estm1$coef[1:3, ]
-estm1$var[1:3, 1:3]
-
-## -----------------------------------------------------------------------------
-estc <- list(estm1$coef, estm2$coef, estm3$coef, estm4$coef, estm5$coef)
-estv <- list(estm1$var, estm2$var, estm3$var, estm4$var, estm5$var)
+mlist<- list(m1, m2, m3, m4, m5)
 test <- paste("test", 1:5, sep = "")
-
-## -----------------------------------------------------------------------------
-mod2pl <- modIRT(coef = estc, var = estv, names = test, display = FALSE)
+mod2pl <- modIRT(est.mods = mlist, names = test, display = FALSE)
 coef(mod2pl$test1)[1:5]
 
 ## -----------------------------------------------------------------------------
-lplan<-linkp(coef = estc)
+lplan<-linkp(mods = mod2pl)
 lplan
 
 ## ----message=FALSE, fig.cap="Linkage plan",fig.width=3.5,fig.height=3---------
@@ -56,7 +44,6 @@ summary(direclist2pl, link="test1.test2")
 ## -----------------------------------------------------------------------------
 cec4 <- chainec(r = 4, direclist = direclist2pl)
 cec4
-summary(cec4, path="test1.test2.test3.test4")
 
 ## -----------------------------------------------------------------------------
 summary(cec4, path="test1.test2.test3.test4")
@@ -108,23 +95,16 @@ mod2 <- mirt(data2, SE = TRUE)
 mod3 <- mirt(data3, SE = TRUE)
 
 ## -----------------------------------------------------------------------------
-est1 <- import.mirt(mod1, display = FALSE)
-est2 <- import.mirt(mod2, display = FALSE)
-est3 <- import.mirt(mod3, display = FALSE)
-
-## -----------------------------------------------------------------------------
-res_diftest2 <- dif.test(coef = list(est1$coef, est2$coef), var = list(est1$var, est2$var))
+res_diftest2 <- dif.test(est.mods = list(mod1, mod2))
 res_diftest2
 
 ## -----------------------------------------------------------------------------
-res_diftest3 <- dif.test(coef = list(est1$coef, est2$coef, est3$coef), 
-                         var = list(est1$var, est2$var, est3$var))
+res_diftest3 <- dif.test(est.mods = list(mod1, mod2, mod3))
 res_diftest3
 
 ## -----------------------------------------------------------------------------
-res_diftest3 <- dif.test(coef = list(est1$coef, est2$coef, est3$coef), 
-                         var = list(est1$var, est2$var, est3$var), 
-                         reference = 2, method = "Haebara", purification = TRUE)
+res_diftest3 <- dif.test(est.mods = list(mod1, mod2, mod3), reference = 2, 
+                         method = "Haebara", purification = TRUE)
 res_diftest3
 
 ## -----------------------------------------------------------------------------

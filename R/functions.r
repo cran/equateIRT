@@ -1,18 +1,44 @@
 
-linkp <- function(coef)
+linkp <- function(mods=NULL, coef=NULL)
 {
-	l <- length(coef)
+	if (inherits(mods,"modIRT"))
+	  coef<-lapply(mods,function(x) as.matrix(x$coef))
+  l <- length(coef)
 	out <- matrix(NA, l, l)
 	for(i in 1:l)
 		for (j in 1:l)
 			out[i, j] <- sum(rownames(coef[[i]])%in%rownames(coef[[j]]))
+	if (inherits(mods,"modIRT")) out<-out/mods[[1]]$itmp
 	return(out)
 }
 
 
-modIRT <- function(coef, var = NULL, names = NULL, ltparam = TRUE, lparam = TRUE, display = TRUE, digits = 2)
+modIRT <- function(est.mods = NULL, coef = NULL, var = NULL, names = NULL, ltparam = TRUE, lparam = TRUE, display = TRUE, digits = 2)
 {
-	coef <- lapply(coef, FUN = function(x) x <- subset(x, select = colSums(x == 1)!= nrow(x)))
+	if (!is.null(est.mods))
+	{
+	  ltparam <- TRUE
+	  lparam <- TRUE
+	  m1<-est.mods[[1]]
+	  cl<-class(m1)
+	  if (cl=="ltm")
+	  {
+      imports<-lapply(est.mods,import.ltm,display=FALSE)
+      coef<-lapply(imports,function(x) x$coef)
+      var<-lapply(imports,function(x) x$var)
+	  }
+	  else 
+	  {
+	    if (attributes(cl)$package=="mirt")
+	    {
+	      imports<-lapply(est.mods,import.mirt,display=FALSE)
+	      coef<-lapply(imports,function(x) x$coef)
+	      var<-lapply(imports,function(x) x$var)
+	    }
+	    else stop("est.mods should be a list including the models estimated with packages ltm or mirt")
+	  }
+	}
+  coef <- lapply(coef, FUN = function(x) x <- subset(x, select = colSums(x == 1)!= nrow(x)))
 	coef <- lapply(coef, FUN = function(x) x <- subset(x, select = colSums(x == 0)!= nrow(x)))
 	itmp <- sapply(coef, ncol)
 	if (length(unique(itmp))!= 1) stop("Mixed model types not allowed.")
@@ -454,13 +480,41 @@ dif.test.compute <- function(DIFtype, alleq, coef_trasf, var_trasf)
 }
 
 
-dif.test <- function(coef, var, names = NULL, reference = NULL, method = "mean-mean", 
-     quadrature = TRUE, nq = 30, DIFtype = NULL, purification = FALSE, 
-     signif.level = 0.05, trace = FALSE, maxiter = 30, anchor = NULL)
+dif.test <- function(est.mods = NULL, coef = NULL, var = NULL, names = NULL, 
+                     reference = NULL, method = "mean-mean", 
+                     quadrature = TRUE, nq = 30, DIFtype = NULL, purification = FALSE, 
+                     signif.level = 0.05, trace = FALSE, maxiter = 30, anchor = NULL)
 {
- for (i in 1:length(var)) if(all(is.na(var[[i]]))) stop("Variance matrix contains NAs. \n")
- 
- mods <- modIRT(coef = coef, var = var, names = names, display = FALSE)
+  if (!is.null(est.mods))
+  {
+    ltparam <- TRUE
+    lparam <- TRUE
+    m1<-est.mods[[1]]
+    cl<-class(m1)
+    if (cl=="ltm")
+    {
+      imports<-lapply(est.mods,import.ltm,display=FALSE)
+      coef<-lapply(imports,function(x) x$coef)
+      var<-lapply(imports,function(x) x$var)
+    }
+    else 
+    {
+      if (attributes(cl)$package=="mirt")
+      {
+        imports<-lapply(est.mods,import.mirt,display=FALSE)
+        coef<-lapply(imports,function(x) x$coef)
+        var<-lapply(imports,function(x) x$var)
+      }
+      else stop("est.mods should be a list including the models estimated with packages ltm or mirt")
+    }
+    for (i in 1:length(var)) if(all(is.na(var[[i]]))) stop("Variance matrix contains NAs. \n")
+    mods <- modIRT(est.mods, display = FALSE)
+  }
+  else
+  {
+    for (i in 1:length(var)) if(all(is.na(var[[i]]))) stop("Variance matrix contains NAs. \n")
+    mods <- modIRT(coef = coef, var = var, names = names, display = FALSE)
+  }
  itmp <- mods[[1]]$itmp
  
  if (is.null(DIFtype)) DIFtype <- switch(itmp, "1" = "beta1", "2" = "beta12", "3" = "beta123")

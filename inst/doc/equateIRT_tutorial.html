@@ -1610,34 +1610,17 @@ package mirt</p>
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>m3 <span class="ot">&lt;-</span> <span class="fu">mirt</span>(data2pl[[<span class="dv">3</span>]], <span class="at">SE =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>m4 <span class="ot">&lt;-</span> <span class="fu">mirt</span>(data2pl[[<span class="dv">4</span>]], <span class="at">SE =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>m5 <span class="ot">&lt;-</span> <span class="fu">mirt</span>(data2pl[[<span class="dv">5</span>]], <span class="at">SE =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
-<p>Extract the item parameter estimates and the covariance matrices</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>estm1 <span class="ot">&lt;-</span> <span class="fu">import.mirt</span>(m1, <span class="at">display =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>estm2 <span class="ot">&lt;-</span> <span class="fu">import.mirt</span>(m2, <span class="at">display =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>estm3 <span class="ot">&lt;-</span> <span class="fu">import.mirt</span>(m3, <span class="at">display =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>estm4 <span class="ot">&lt;-</span> <span class="fu">import.mirt</span>(m4, <span class="at">display =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>estm5 <span class="ot">&lt;-</span> <span class="fu">import.mirt</span>(m5, <span class="at">display =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>estm1<span class="sc">$</span>coef[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, ]</span></code></pre></div>
-<pre><code>##        value.d value.a1
-## I1 -0.06265505 1.076092
-## I2 -0.03147833 1.123453
-## I3 -0.07992642 1.091380</code></pre>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>estm1<span class="sc">$</span>var[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span></code></pre></div>
-<pre><code>##              [,1]         [,2]         [,3]
-## [1,] 0.0012271350 0.0002449221 0.0002378241
-## [2,] 0.0002449221 0.0012622821 0.0002484510
-## [3,] 0.0002378241 0.0002484510 0.0012394799</code></pre>
-<p>Create a list of coefficients and covariance matrices</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>estc <span class="ot">&lt;-</span> <span class="fu">list</span>(estm1<span class="sc">$</span>coef, estm2<span class="sc">$</span>coef, estm3<span class="sc">$</span>coef, estm4<span class="sc">$</span>coef, estm5<span class="sc">$</span>coef)</span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>estv <span class="ot">&lt;-</span> <span class="fu">list</span>(estm1<span class="sc">$</span>var, estm2<span class="sc">$</span>var, estm3<span class="sc">$</span>var, estm4<span class="sc">$</span>var, estm5<span class="sc">$</span>var)</span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>test <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">&quot;test&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span></code></pre></div>
-<p>Create an object of class <code>modIRT</code></p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>mod2pl <span class="ot">&lt;-</span> <span class="fu">modIRT</span>(<span class="at">coef =</span> estc, <span class="at">var =</span> estv, <span class="at">names =</span> test, <span class="at">display =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">coef</span>(mod2pl<span class="sc">$</span>test1)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code></pre></div>
+<p>Create an object of class <code>modIRT</code> (since package versione
+2.5.0 it is possible to skip the import.mirt function)</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>mlist<span class="ot">&lt;-</span> <span class="fu">list</span>(m1, m2, m3, m4, m5)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>test <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">&quot;test&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>mod2pl <span class="ot">&lt;-</span> <span class="fu">modIRT</span>(<span class="at">est.mods =</span> mlist, <span class="at">names =</span> test, <span class="at">display =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="fu">coef</span>(mod2pl<span class="sc">$</span>test1)[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code></pre></div>
 <pre><code>##    Dffclt.I1    Dffclt.I2    Dffclt.I3    Dffclt.I4    Dffclt.I5 
 ##  0.058224616  0.028019255  0.073234265  0.415936521 -0.006686047</code></pre>
 <p>The linkage plan</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>lplan<span class="ot">&lt;-</span><span class="fu">linkp</span>(<span class="at">coef =</span> estc)</span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>lplan</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>lplan<span class="ot">&lt;-</span><span class="fu">linkp</span>(<span class="at">mods =</span> mod2pl)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>lplan</span></code></pre></div>
 <pre><code>##      [,1] [,2] [,3] [,4] [,5]
 ## [1,]   20   10    0    0   10
 ## [2,]   10   20   10    0    0
@@ -1645,10 +1628,10 @@ package mirt</p>
 ## [4,]    0    0   10   20   10
 ## [5,]   10    0    0   10   20</code></pre>
 <p>A graphic of the linkage plan with package <code>sna</code></p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">library</span>(sna)</span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar=</span><span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>))</span>
-<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">6</span>)</span>
-<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="fu">gplot</span>(lplan, <span class="at">displaylabels =</span> <span class="cn">TRUE</span>,  <span class="at">vertex.sides =</span> <span class="dv">4</span>, <span class="at">vertex.cex =</span> <span class="dv">5</span>, <span class="at">vertex.rot =</span><span class="dv">45</span>,  <span class="at">usearrows =</span> <span class="cn">FALSE</span>, <span class="at">label.pos =</span> <span class="dv">5</span>, <span class="at">label.cex =</span> <span class="dv">1</span>, <span class="at">vertex.col =</span> <span class="dv">0</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">library</span>(sna)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar=</span><span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>))</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">6</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="fu">gplot</span>(lplan, <span class="at">displaylabels =</span> <span class="cn">TRUE</span>,  <span class="at">vertex.sides =</span> <span class="dv">4</span>, <span class="at">vertex.cex =</span> <span class="dv">5</span>, <span class="at">vertex.rot =</span><span class="dv">45</span>,  <span class="at">usearrows =</span> <span class="cn">FALSE</span>, <span class="at">label.pos =</span> <span class="dv">5</span>, <span class="at">label.cex =</span> <span class="dv">1</span>, <span class="at">vertex.col =</span> <span class="dv">0</span>)</span></code></pre></div>
 <div class="figure">
 <img src="data:image/png;base64,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" alt="Linkage plan" width="336" />
 <p class="caption">
@@ -1663,12 +1646,12 @@ coefficients</h1>
 using the mean-mean method.</p>
 <p><strong>NOTE: Item parameters are converted to the scale of Form
 2.</strong></p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>l12 <span class="ot">&lt;-</span> <span class="fu">direc</span>(<span class="at">mods =</span> mod2pl, <span class="at">which =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), <span class="at">method =</span> <span class="st">&quot;mean-mean&quot;</span>)</span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>l12</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>l12 <span class="ot">&lt;-</span> <span class="fu">direc</span>(<span class="at">mods =</span> mod2pl, <span class="at">which =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>), <span class="at">method =</span> <span class="st">&quot;mean-mean&quot;</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>l12</span></code></pre></div>
 <pre><code>## Direct equating coefficients 
 ## Method: mean-mean 
 ## Link: test1.test2</code></pre>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="fu">summary</span>(l12)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">summary</span>(l12)</span></code></pre></div>
 <pre><code>## Link: test1.test2 
 ## Method: mean-mean 
 ## Equating coefficients:
@@ -1677,8 +1660,8 @@ using the mean-mean method.</p>
 ## B -0.14242 0.028106</code></pre>
 <p>Estimation of all direct equating coefficients between forms with
 common items using the mean-mean method</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>direclist2pl <span class="ot">&lt;-</span> <span class="fu">alldirec</span>(<span class="at">mods =</span> mod2pl, <span class="at">method =</span> <span class="st">&quot;mean-mean&quot;</span>)</span>
-<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>direclist2pl</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>direclist2pl <span class="ot">&lt;-</span> <span class="fu">alldirec</span>(<span class="at">mods =</span> mod2pl, <span class="at">method =</span> <span class="st">&quot;mean-mean&quot;</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>direclist2pl</span></code></pre></div>
 <pre><code>## Direct equating coefficients 
 ## Method: mean-mean 
 ## Links: 
@@ -1693,7 +1676,7 @@ common items using the mean-mean method</p>
 ## test5.test1 
 ## test5.test4</code></pre>
 <p>Direct equating coefficients for Forms 1 and 2</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="fu">summary</span>(direclist2pl, <span class="at">link=</span><span class="st">&quot;test1.test2&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">summary</span>(direclist2pl, <span class="at">link=</span><span class="st">&quot;test1.test2&quot;</span>)</span></code></pre></div>
 <pre><code>## Link: test1.test2 
 ## Method: mean-mean 
 ## Equating coefficients:
@@ -1705,8 +1688,8 @@ common items using the mean-mean method</p>
 <h1><span class="header-section-number">4</span> Chain equating
 coefficients</h1>
 <p>Estimation of all chain equating coefficients of length 4</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>cec4 <span class="ot">&lt;-</span> <span class="fu">chainec</span>(<span class="at">r =</span> <span class="dv">4</span>, <span class="at">direclist =</span> direclist2pl)</span>
-<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>cec4</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>cec4 <span class="ot">&lt;-</span> <span class="fu">chainec</span>(<span class="at">r =</span> <span class="dv">4</span>, <span class="at">direclist =</span> direclist2pl)</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>cec4</span></code></pre></div>
 <pre><code>## Chain equating coefficients 
 ## Method: mean-mean 
 ## Paths: 
@@ -1720,15 +1703,8 @@ coefficients</h1>
 ## test2.test3.test4.test5 
 ## test2.test1.test5.test4 
 ## test3.test4.test5.test1</code></pre>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="fu">summary</span>(cec4, <span class="at">path=</span><span class="st">&quot;test1.test2.test3.test4&quot;</span>)</span></code></pre></div>
-<pre><code>## Path: test1.test2.test3.test4 
-## Method: mean-mean 
-## Equating coefficients:
-##   Estimate   StdErr
-## A  1.25371 0.046538
-## B -0.49825 0.038497</code></pre>
 <p>Chain equating coefficients for path {1, 2, 3, 4}</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="fu">summary</span>(cec4, <span class="at">path=</span><span class="st">&quot;test1.test2.test3.test4&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="fu">summary</span>(cec4, <span class="at">path=</span><span class="st">&quot;test1.test2.test3.test4&quot;</span>)</span></code></pre></div>
 <pre><code>## Path: test1.test2.test3.test4 
 ## Method: mean-mean 
 ## Equating coefficients:
@@ -1737,13 +1713,13 @@ coefficients</h1>
 ## B -0.49825 0.038497</code></pre>
 <p>Estimation of all chain equating coefficients of length 4 from Form 1
 to Form 4</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a>cec14 <span class="ot">&lt;-</span> <span class="fu">chainec</span>(<span class="at">r =</span> <span class="dv">4</span>, <span class="at">direclist =</span> direclist2pl, <span class="at">f1 =</span> <span class="st">&quot;test1&quot;</span>, <span class="at">f2 =</span> <span class="st">&quot;test4&quot;</span>)</span>
-<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a>cec14</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>cec14 <span class="ot">&lt;-</span> <span class="fu">chainec</span>(<span class="at">r =</span> <span class="dv">4</span>, <span class="at">direclist =</span> direclist2pl, <span class="at">f1 =</span> <span class="st">&quot;test1&quot;</span>, <span class="at">f2 =</span> <span class="st">&quot;test4&quot;</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>cec14</span></code></pre></div>
 <pre><code>## Chain equating coefficients 
 ## Method: mean-mean 
 ## Paths: 
 ## test1.test2.test3.test4</code></pre>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="fu">summary</span>(cec14)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="fu">summary</span>(cec14)</span></code></pre></div>
 <pre><code>## Path: test1.test2.test3.test4 
 ## Method: mean-mean 
 ## Equating coefficients:
@@ -1751,9 +1727,9 @@ to Form 4</p>
 ## A  1.25371 0.046538
 ## B -0.49825 0.038497</code></pre>
 <p>Estimation of chain equating coefficient for path {1, 5, 4}</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a>pth <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">&quot;test&quot;</span>, <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">5</span>,<span class="dv">4</span>), <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span>
-<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a>chainec154 <span class="ot">&lt;-</span> <span class="fu">chainec</span>(<span class="at">direclist =</span> direclist2pl, <span class="at">pths =</span> pth)</span>
-<span id="cb31-3"><a href="#cb31-3" tabindex="-1"></a><span class="fu">summary</span>(chainec154)</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a>pth <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">&quot;test&quot;</span>, <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">5</span>,<span class="dv">4</span>), <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a>chainec154 <span class="ot">&lt;-</span> <span class="fu">chainec</span>(<span class="at">direclist =</span> direclist2pl, <span class="at">pths =</span> pth)</span>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a><span class="fu">summary</span>(chainec154)</span></code></pre></div>
 <pre><code>## Path: test1.test5.test4 
 ## Method: mean-mean 
 ## Equating coefficients:
@@ -1766,10 +1742,12 @@ to Form 4</p>
 <div id="average-equating-coefficients" class="section level1" number="5">
 <h1><span class="header-section-number">5</span> Average equating
 coefficients</h1>
-<p>Estimation of bisector equating coefficients</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" tabindex="-1"></a>ecall <span class="ot">&lt;-</span> <span class="fu">c</span>(cec14, chainec154)</span>
-<span id="cb33-2"><a href="#cb33-2" tabindex="-1"></a>fec <span class="ot">&lt;-</span> <span class="fu">bisectorec</span>(<span class="at">ecall =</span> ecall, <span class="at">weighted =</span> <span class="cn">TRUE</span>, <span class="at">unweighted =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb33-3"><a href="#cb33-3" tabindex="-1"></a>fec</span></code></pre></div>
+<p>When two forms are linked through more than one path, the equating
+coefficients can be averaged using the bisector method. Estimation of
+bisector equating coefficients:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a>ecall <span class="ot">&lt;-</span> <span class="fu">c</span>(cec14, chainec154)</span>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>fec <span class="ot">&lt;-</span> <span class="fu">bisectorec</span>(<span class="at">ecall =</span> ecall, <span class="at">weighted =</span> <span class="cn">TRUE</span>, <span class="at">unweighted =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a>fec</span></code></pre></div>
 <pre><code>## Bisector and weighted bisector equating coefficients 
 ## Method: mean-mean 
 ## 
@@ -1777,7 +1755,7 @@ coefficients</h1>
 ##  Paths: 
 ##   test1.test2.test3.test4 
 ##   test1.test5.test4</code></pre>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" tabindex="-1"></a><span class="fu">summary</span>(fec)</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a><span class="fu">summary</span>(fec)</span></code></pre></div>
 <pre><code>## Link: test1.test4 
 ## Method: mean-mean 
 ## Equating coefficients:
@@ -1791,7 +1769,7 @@ coefficients</h1>
 ##  B                bisector -0.44814 0.029917
 ##  B       weighted bisector -0.43163 0.029704</code></pre>
 <p>Extract the equating coefficients</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a> <span class="fu">eqc</span>(fec)</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a> <span class="fu">eqc</span>(fec)</span></code></pre></div>
 <pre><code>##          link                    path        A          B
 ## 1 test1.test4 test1.test2.test3.test4 1.253712 -0.4982537
 ## 2 test1.test4       test1.test5.test4 1.159638 -0.4002830
@@ -1800,7 +1778,7 @@ coefficients</h1>
 <p>Extract item parameters of two forms being equated in the original
 scale and item parameters of the first form converted to the scale of
 the second form.</p>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" tabindex="-1"></a><span class="fu">itm</span>(fec, <span class="at">bistype =</span> <span class="st">&quot;weighted&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a><span class="fu">itm</span>(fec, <span class="at">bistype =</span> <span class="st">&quot;weighted&quot;</span>)</span></code></pre></div>
 <pre><code>##          Item        test1       test4 test1.as.test4
 ## 1   Dffclt.I1  0.058224616          NA    -0.36235841
 ## 2  Dffclt.I10  0.654862838          NA     0.34748486
@@ -1886,7 +1864,7 @@ the second form.</p>
 <div id="equated-scores" class="section level1" number="6">
 <h1><span class="header-section-number">6</span> Equated scores</h1>
 <p>Equated scores with the true score equating method</p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" tabindex="-1"></a><span class="fu">score</span>(fec, <span class="at">bistype =</span> <span class="st">&quot;weighted&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" tabindex="-1"></a><span class="fu">score</span>(fec, <span class="at">bistype =</span> <span class="st">&quot;weighted&quot;</span>)</span></code></pre></div>
 <pre><code>## The following scores are not attainable: 0</code></pre>
 <pre><code>##         theta test4 test1.as.test4       StdErr
 ## 1  -3.2018628     1       1.015953 5.003132e-02
@@ -1910,7 +1888,7 @@ the second form.</p>
 ## 19  3.0012603    19      19.111255 4.258250e-02
 ## 20 42.1302143    20      20.000000 4.009435e-15</code></pre>
 <p>Equated scores with the observed score equating method</p>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" tabindex="-1"></a><span class="fu">score</span>(fec, <span class="at">method =</span> <span class="st">&quot;OSE&quot;</span>, <span class="at">bistype =</span> <span class="st">&quot;weighted&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a><span class="fu">score</span>(fec, <span class="at">method =</span> <span class="st">&quot;OSE&quot;</span>, <span class="at">bistype =</span> <span class="st">&quot;weighted&quot;</span>)</span></code></pre></div>
 <pre><code>##    test4 test1.as.test4     StdErr
 ## 1      0    -0.01421594 0.03617689
 ## 2      1     0.95379681 0.05480849
@@ -1935,39 +1913,35 @@ the second form.</p>
 ## 21    20    20.09342215 0.02877984</code></pre>
 <p>A comparison of equated scores obtained with 2 different chains,
 bisector and weighted bisector methods.</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" tabindex="-1"></a><span class="fu">score</span>(chainec154, <span class="at">scores =</span> <span class="dv">17</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" tabindex="-1"></a><span class="fu">score</span>(chainec154, <span class="at">scores =</span> <span class="dv">17</span>)</span></code></pre></div>
 <pre><code>##      theta test4 test1.as.test4     StdErr
 ## 1 1.741036    17        17.2431 0.09998233</code></pre>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" tabindex="-1"></a><span class="fu">score</span>(cec4, <span class="at">path =</span> <span class="st">&quot;test1.test2.test3.test4&quot;</span>, <span class="at">scores =</span> <span class="dv">17</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" tabindex="-1"></a><span class="fu">score</span>(cec4, <span class="at">path =</span> <span class="st">&quot;test1.test2.test3.test4&quot;</span>, <span class="at">scores =</span> <span class="dv">17</span>)</span></code></pre></div>
 <pre><code>##      theta test4 test1.as.test4    StdErr
 ## 1 1.741036    17       17.06712 0.1618202</code></pre>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" tabindex="-1"></a><span class="fu">score</span>(fec, <span class="at">bistype =</span> <span class="st">&quot;unweighted&quot;</span>, <span class="at">scores =</span> <span class="dv">17</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" tabindex="-1"></a><span class="fu">score</span>(fec, <span class="at">bistype =</span> <span class="st">&quot;unweighted&quot;</span>, <span class="at">scores =</span> <span class="dv">17</span>)</span></code></pre></div>
 <pre><code>##      theta test4 test1.as.test4     StdErr
 ## 1 1.741036    17       17.15485 0.08281067</code></pre>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" tabindex="-1"></a><span class="fu">score</span>(fec, <span class="at">bistype =</span> <span class="st">&quot;weighted&quot;</span>, <span class="at">scores =</span> <span class="dv">17</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" tabindex="-1"></a><span class="fu">score</span>(fec, <span class="at">bistype =</span> <span class="st">&quot;weighted&quot;</span>, <span class="at">scores =</span> <span class="dv">17</span>)</span></code></pre></div>
 <pre><code>##      theta test4 test1.as.test4     StdErr
 ## 1 1.741036    17       17.18478 0.07366228</code></pre>
 </div>
 <div id="test-for-dif" class="section level1" number="7">
 <h1><span class="header-section-number">7</span> Test for DIF</h1>
 <p>Load the data</p>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" tabindex="-1"></a><span class="fu">data</span>(dataDIF)</span></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" tabindex="-1"></a><span class="fu">data</span>(dataDIF)</span></code></pre></div>
 <p>Create a dataset for each group and estimate a 2PL model for each
 group using the R package mirt</p>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" tabindex="-1"></a><span class="fu">library</span>(mirt)</span>
-<span id="cb55-2"><a href="#cb55-2" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> dataDIF[dataDIF<span class="sc">$</span>group <span class="sc">==</span> <span class="dv">1</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>]</span>
-<span id="cb55-3"><a href="#cb55-3" tabindex="-1"></a>data2 <span class="ot">&lt;-</span> dataDIF[dataDIF<span class="sc">$</span>group <span class="sc">==</span> <span class="dv">2</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>]</span>
-<span id="cb55-4"><a href="#cb55-4" tabindex="-1"></a>data3 <span class="ot">&lt;-</span> dataDIF[dataDIF<span class="sc">$</span>group <span class="sc">==</span> <span class="dv">3</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>]</span>
-<span id="cb55-5"><a href="#cb55-5" tabindex="-1"></a>mod1 <span class="ot">&lt;-</span> <span class="fu">mirt</span>(data1, <span class="at">SE =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb55-6"><a href="#cb55-6" tabindex="-1"></a>mod2 <span class="ot">&lt;-</span> <span class="fu">mirt</span>(data2, <span class="at">SE =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb55-7"><a href="#cb55-7" tabindex="-1"></a>mod3 <span class="ot">&lt;-</span> <span class="fu">mirt</span>(data3, <span class="at">SE =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
-<p>Extract the coefficients and the covariance matrix</p>
-<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" tabindex="-1"></a>est1 <span class="ot">&lt;-</span> <span class="fu">import.mirt</span>(mod1, <span class="at">display =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb56-2"><a href="#cb56-2" tabindex="-1"></a>est2 <span class="ot">&lt;-</span> <span class="fu">import.mirt</span>(mod2, <span class="at">display =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb56-3"><a href="#cb56-3" tabindex="-1"></a>est3 <span class="ot">&lt;-</span> <span class="fu">import.mirt</span>(mod3, <span class="at">display =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" tabindex="-1"></a><span class="fu">library</span>(mirt)</span>
+<span id="cb48-2"><a href="#cb48-2" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> dataDIF[dataDIF<span class="sc">$</span>group <span class="sc">==</span> <span class="dv">1</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>]</span>
+<span id="cb48-3"><a href="#cb48-3" tabindex="-1"></a>data2 <span class="ot">&lt;-</span> dataDIF[dataDIF<span class="sc">$</span>group <span class="sc">==</span> <span class="dv">2</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>]</span>
+<span id="cb48-4"><a href="#cb48-4" tabindex="-1"></a>data3 <span class="ot">&lt;-</span> dataDIF[dataDIF<span class="sc">$</span>group <span class="sc">==</span> <span class="dv">3</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>]</span>
+<span id="cb48-5"><a href="#cb48-5" tabindex="-1"></a>mod1 <span class="ot">&lt;-</span> <span class="fu">mirt</span>(data1, <span class="at">SE =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb48-6"><a href="#cb48-6" tabindex="-1"></a>mod2 <span class="ot">&lt;-</span> <span class="fu">mirt</span>(data2, <span class="at">SE =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb48-7"><a href="#cb48-7" tabindex="-1"></a>mod3 <span class="ot">&lt;-</span> <span class="fu">mirt</span>(data3, <span class="at">SE =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 <p>Perform the test for DIF on two groups</p>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" tabindex="-1"></a>res_diftest2 <span class="ot">&lt;-</span> <span class="fu">dif.test</span>(<span class="at">coef =</span> <span class="fu">list</span>(est1<span class="sc">$</span>coef, est2<span class="sc">$</span>coef), <span class="at">var =</span> <span class="fu">list</span>(est1<span class="sc">$</span>var, est2<span class="sc">$</span>var))</span>
-<span id="cb57-2"><a href="#cb57-2" tabindex="-1"></a>res_diftest2</span></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" tabindex="-1"></a>res_diftest2 <span class="ot">&lt;-</span> <span class="fu">dif.test</span>(<span class="at">est.mods =</span> <span class="fu">list</span>(mod1, mod2))</span>
+<span id="cb49-2"><a href="#cb49-2" tabindex="-1"></a>res_diftest2</span></code></pre></div>
 <pre><code>## 
 ##   Test for Differential Item Functioning
 ## 
@@ -2000,9 +1974,8 @@ group using the R package mirt</p>
 ## ---
 ## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>Perform the test for DIF on three groups</p>
-<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" tabindex="-1"></a>res_diftest3 <span class="ot">&lt;-</span> <span class="fu">dif.test</span>(<span class="at">coef =</span> <span class="fu">list</span>(est1<span class="sc">$</span>coef, est2<span class="sc">$</span>coef, est3<span class="sc">$</span>coef), </span>
-<span id="cb59-2"><a href="#cb59-2" tabindex="-1"></a>                         <span class="at">var =</span> <span class="fu">list</span>(est1<span class="sc">$</span>var, est2<span class="sc">$</span>var, est3<span class="sc">$</span>var))</span>
-<span id="cb59-3"><a href="#cb59-3" tabindex="-1"></a>res_diftest3</span></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" tabindex="-1"></a>res_diftest3 <span class="ot">&lt;-</span> <span class="fu">dif.test</span>(<span class="at">est.mods =</span> <span class="fu">list</span>(mod1, mod2, mod3))</span>
+<span id="cb51-2"><a href="#cb51-2" tabindex="-1"></a>res_diftest3</span></code></pre></div>
 <pre><code>## 
 ##   Test for Differential Item Functioning
 ## 
@@ -2036,10 +2009,9 @@ group using the R package mirt</p>
 ## Signif. codes: 0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <p>It is possible to change the reference group, the equating method
 used, and to apply purification.</p>
-<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" tabindex="-1"></a>res_diftest3 <span class="ot">&lt;-</span> <span class="fu">dif.test</span>(<span class="at">coef =</span> <span class="fu">list</span>(est1<span class="sc">$</span>coef, est2<span class="sc">$</span>coef, est3<span class="sc">$</span>coef), </span>
-<span id="cb61-2"><a href="#cb61-2" tabindex="-1"></a>                         <span class="at">var =</span> <span class="fu">list</span>(est1<span class="sc">$</span>var, est2<span class="sc">$</span>var, est3<span class="sc">$</span>var), </span>
-<span id="cb61-3"><a href="#cb61-3" tabindex="-1"></a>                         <span class="at">reference =</span> <span class="dv">2</span>, <span class="at">method =</span> <span class="st">&quot;Haebara&quot;</span>, <span class="at">purification =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb61-4"><a href="#cb61-4" tabindex="-1"></a>res_diftest3</span></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" tabindex="-1"></a>res_diftest3 <span class="ot">&lt;-</span> <span class="fu">dif.test</span>(<span class="at">est.mods =</span> <span class="fu">list</span>(mod1, mod2, mod3), <span class="at">reference =</span> <span class="dv">2</span>, </span>
+<span id="cb53-2"><a href="#cb53-2" tabindex="-1"></a>                         <span class="at">method =</span> <span class="st">&quot;Haebara&quot;</span>, <span class="at">purification =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb53-3"><a href="#cb53-3" tabindex="-1"></a>res_diftest3</span></code></pre></div>
 <pre><code>## 
 ##   Test for Differential Item Functioning
 ## 
@@ -2075,21 +2047,21 @@ used, and to apply purification.</p>
 <div id="tests-for-drifts" class="section level1" number="8">
 <h1><span class="header-section-number">8</span> Tests for drifts</h1>
 <p>The identity test performs a statistical test to verify if the chain
-equating coeffients from one form to itself are A=1 and B=0.</p>
-<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" tabindex="-1"></a><span class="fu">data</span>(est3pl)</span>
-<span id="cb63-2"><a href="#cb63-2" tabindex="-1"></a>test <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">&quot;test&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span>
-<span id="cb63-3"><a href="#cb63-3" tabindex="-1"></a>mod3pl <span class="ot">&lt;-</span> <span class="fu">modIRT</span>(<span class="at">coef =</span> est3pl<span class="sc">$</span>coef, <span class="at">var =</span> est3pl<span class="sc">$</span>var, <span class="at">names =</span> test, <span class="at">display =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb63-4"><a href="#cb63-4" tabindex="-1"></a>direclist3pl <span class="ot">&lt;-</span> <span class="fu">alldirec</span>(<span class="at">mods =</span> mod3pl, <span class="at">method =</span> <span class="st">&quot;Haebara&quot;</span>)</span>
-<span id="cb63-5"><a href="#cb63-5" tabindex="-1"></a>pth3 <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">&quot;test&quot;</span>, <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span>), <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span>
-<span id="cb63-6"><a href="#cb63-6" tabindex="-1"></a>chainec_circle <span class="ot">&lt;-</span> <span class="fu">chainec</span>(<span class="at">direclist =</span> direclist3pl, <span class="at">pths =</span> pth3)</span>
-<span id="cb63-7"><a href="#cb63-7" tabindex="-1"></a><span class="fu">summary</span>(chainec_circle)</span></code></pre></div>
+equating coefficients from one form to itself are A=1 and B=0.</p>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" tabindex="-1"></a><span class="fu">data</span>(est3pl)</span>
+<span id="cb55-2"><a href="#cb55-2" tabindex="-1"></a>test <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">&quot;test&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb55-3"><a href="#cb55-3" tabindex="-1"></a>mod3pl <span class="ot">&lt;-</span> <span class="fu">modIRT</span>(<span class="at">coef =</span> est3pl<span class="sc">$</span>coef, <span class="at">var =</span> est3pl<span class="sc">$</span>var, <span class="at">names =</span> test, <span class="at">display =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb55-4"><a href="#cb55-4" tabindex="-1"></a>direclist3pl <span class="ot">&lt;-</span> <span class="fu">alldirec</span>(<span class="at">mods =</span> mod3pl, <span class="at">method =</span> <span class="st">&quot;Haebara&quot;</span>)</span>
+<span id="cb55-5"><a href="#cb55-5" tabindex="-1"></a>pth3 <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">&quot;test&quot;</span>, <span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span>), <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb55-6"><a href="#cb55-6" tabindex="-1"></a>chainec_circle <span class="ot">&lt;-</span> <span class="fu">chainec</span>(<span class="at">direclist =</span> direclist3pl, <span class="at">pths =</span> pth3)</span>
+<span id="cb55-7"><a href="#cb55-7" tabindex="-1"></a><span class="fu">summary</span>(chainec_circle)</span></code></pre></div>
 <pre><code>## Path: test1.test2.test3.test4.test5.test1 
 ## Method: Haebara 
 ## Equating coefficients:
 ##    Estimate   StdErr
 ## A 1.0868759 0.063585
 ## B 0.0022126 0.041833</code></pre>
-<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" tabindex="-1"></a><span class="fu">id.test</span>(chainec_circle)</span></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" tabindex="-1"></a><span class="fu">id.test</span>(chainec_circle)</span></code></pre></div>
 <pre><code>## 
 ##   Identity test 
 ## 
@@ -2097,29 +2069,29 @@ equating coeffients from one form to itself are A=1 and B=0.</p>
 ## statistic = 2.349279, df = 2, p-value = 0.3089304</code></pre>
 <p>The null hypothesis A=1 and B=0 is not rejected.</p>
 <p>It is also possible to performs a statistical test to verify if the
-chain equating coeffients that link the same two forms are equal.</p>
+chain equating coefficients that link the same two forms are equal.</p>
 <p>In the following example test 1 and 5 are linked through two
 different paths giving two different pairs of equating coefficients. The
 example uses the 3PL models and the Haebara method, though other options
 are possible.</p>
-<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" tabindex="-1"></a>pth3 <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">&quot;test&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span>
-<span id="cb67-2"><a href="#cb67-2" tabindex="-1"></a>chainec3 <span class="ot">&lt;-</span> <span class="fu">chainec</span>(<span class="at">direclist =</span> direclist3pl, <span class="at">pths =</span> pth3)</span>
-<span id="cb67-3"><a href="#cb67-3" tabindex="-1"></a>ecall <span class="ot">&lt;-</span> <span class="fu">c</span>(chainec3, direclist3pl[<span class="st">&quot;test1.test5&quot;</span>])</span>
-<span id="cb67-4"><a href="#cb67-4" tabindex="-1"></a><span class="fu">summary</span>(chainec3)</span></code></pre></div>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" tabindex="-1"></a>pth3 <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">&quot;test&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb59-2"><a href="#cb59-2" tabindex="-1"></a>chainec3 <span class="ot">&lt;-</span> <span class="fu">chainec</span>(<span class="at">direclist =</span> direclist3pl, <span class="at">pths =</span> pth3)</span>
+<span id="cb59-3"><a href="#cb59-3" tabindex="-1"></a>ecall <span class="ot">&lt;-</span> <span class="fu">c</span>(chainec3, direclist3pl[<span class="st">&quot;test1.test5&quot;</span>])</span>
+<span id="cb59-4"><a href="#cb59-4" tabindex="-1"></a><span class="fu">summary</span>(chainec3)</span></code></pre></div>
 <pre><code>## Path: test1.test2.test3.test4.test5 
 ## Method: Haebara 
 ## Equating coefficients:
 ##   Estimate   StdErr
 ## A  1.06595 0.056590
 ## B -0.50368 0.042982</code></pre>
-<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" tabindex="-1"></a><span class="fu">summary</span>(direclist3pl<span class="sc">$</span>test1.test5)</span></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" tabindex="-1"></a><span class="fu">summary</span>(direclist3pl<span class="sc">$</span>test1.test5)</span></code></pre></div>
 <pre><code>## Link: test1.test5 
 ## Method: Haebara 
 ## Equating coefficients:
 ##   Estimate   StdErr
 ## A  1.00935 0.029052
 ## B -0.51886 0.027863</code></pre>
-<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" tabindex="-1"></a><span class="fu">sd.test</span>(ecall)</span></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" tabindex="-1"></a><span class="fu">sd.test</span>(ecall)</span></code></pre></div>
 <pre><code>## 
 ##   Scale drift test 
 ## 

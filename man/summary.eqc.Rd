@@ -35,9 +35,12 @@
 	Michela Battauz
 }
 \seealso{
-	\code{\link{direc}}
+	\code{\link{direc}}, \code{\link{modIRT}}
 }
 \examples{
+# the following code uses item parameter estimates previously obtained
+# for examples that start from item response data see function modIRT
+
 # three-parameter logistic model
 # direct equating coefficients between forms 1 and 2 using the Stocking-Lord method
 data(est3pl)

@@ -44,37 +44,19 @@ m4 <- mirt(data2pl[[4]], SE = TRUE)
 m5 <- mirt(data2pl[[5]], SE = TRUE)
 ```
 
-Extract the item parameter estimates and the covariance matrices
+Create an object of class `modIRT` (since package versione 2.5.0 it is possible to skip the import.mirt function)
 
 ```{r}
-estm1 <- import.mirt(m1, display = FALSE)
-estm2 <- import.mirt(m2, display = FALSE)
-estm3 <- import.mirt(m3, display = FALSE)
-estm4 <- import.mirt(m4, display = FALSE)
-estm5 <- import.mirt(m5, display = FALSE)
-estm1$coef[1:3, ]
-estm1$var[1:3, 1:3]
-```
-
-Create a list of coefficients and covariance matrices
-
-```{r}
-estc <- list(estm1$coef, estm2$coef, estm3$coef, estm4$coef, estm5$coef)
-estv <- list(estm1$var, estm2$var, estm3$var, estm4$var, estm5$var)
+mlist<- list(m1, m2, m3, m4, m5)
 test <- paste("test", 1:5, sep = "")
-```
-
-Create an object of class `modIRT`
-
-```{r}
-mod2pl <- modIRT(coef = estc, var = estv, names = test, display = FALSE)
+mod2pl <- modIRT(est.mods = mlist, names = test, display = FALSE)
 coef(mod2pl$test1)[1:5]
 ```
 
 The linkage plan
 
 ```{r}
-lplan<-linkp(coef = estc)
+lplan<-linkp(mods = mod2pl)
 lplan
 ```
 
@@ -125,7 +107,6 @@ Estimation of all chain equating coefficients of length 4
 ```{r}
 cec4 <- chainec(r = 4, direclist = direclist2pl)
 cec4
-summary(cec4, path="test1.test2.test3.test4")
 ```
 
 Chain equating coefficients for path {1, 2, 3, 4} 
@@ -155,7 +136,9 @@ __NOTE: Item parameters are converted to the scale of Form 4.__
 
 # Average equating coefficients
 
-Estimation of bisector equating coefficients
+When two forms are linked through more than one path, the equating coefficients can be averaged
+using the bisector method.
+Estimation of bisector equating coefficients:
 
 ```{r}
 ecall <- c(cec14, chainec154)
@@ -221,42 +204,32 @@ mod2 <- mirt(data2, SE = TRUE)
 mod3 <- mirt(data3, SE = TRUE)
 ```
 
-Extract the coefficients and the covariance matrix
-
-```{r}
-est1 <- import.mirt(mod1, display = FALSE)
-est2 <- import.mirt(mod2, display = FALSE)
-est3 <- import.mirt(mod3, display = FALSE)
-```
-
 Perform the test for DIF on two groups
 
 ```{r}
-res_diftest2 <- dif.test(coef = list(est1$coef, est2$coef), var = list(est1$var, est2$var))
+res_diftest2 <- dif.test(est.mods = list(mod1, mod2))
 res_diftest2
 ```
 
 Perform the test for DIF on three groups
 
 ```{r}
-res_diftest3 <- dif.test(coef = list(est1$coef, est2$coef, est3$coef), 
-                         var = list(est1$var, est2$var, est3$var))
+res_diftest3 <- dif.test(est.mods = list(mod1, mod2, mod3))
 res_diftest3
 ```
 
 It is possible to change the reference group, the equating method used, and to apply purification.
 
 ```{r}
-res_diftest3 <- dif.test(coef = list(est1$coef, est2$coef, est3$coef), 
-                         var = list(est1$var, est2$var, est3$var), 
-                         reference = 2, method = "Haebara", purification = TRUE)
+res_diftest3 <- dif.test(est.mods = list(mod1, mod2, mod3), reference = 2, 
+                         method = "Haebara", purification = TRUE)
 res_diftest3
 ```
 
 
 # Tests for drifts
 
-The identity test performs a statistical test to verify if the chain equating coeffients from one form to itself are A=1 and B=0.
+The identity test performs a statistical test to verify if the chain equating coefficients from one form to itself are A=1 and B=0.
 
 
 ```{r}
@@ -273,7 +246,7 @@ id.test(chainec_circle)
 The null hypothesis A=1 and B=0 is not rejected.
 
 
-It is also possible to performs a statistical test to verify if the chain equating coeffients that link the same two forms are equal.
+It is also possible to performs a statistical test to verify if the chain equating coefficients that link the same two forms are equal.
 
 In the following example test 1 and 5 are linked through two different paths giving
 two different pairs of equating coefficients.

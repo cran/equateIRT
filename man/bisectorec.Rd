@@ -58,6 +58,41 @@ bisectorec(ecall, mods = NULL, weighted = TRUE, unweighted = TRUE)
 	\code{\link{chainec}}, \code{\link{convert}}, \code{\link{direc}}, \code{\link{eqc}}, \code{\link{summary.meqc}}
 }
 \examples{
+
+# the following code can be used to start from item response data
+
+\dontrun{
+library("mirt")
+data("data2pl")
+
+m1 <- mirt(data2pl[[1]], SE = TRUE)
+m2 <- mirt(data2pl[[2]], SE = TRUE)
+m3 <- mirt(data2pl[[3]], SE = TRUE)
+m4 <- mirt(data2pl[[4]], SE = TRUE)
+m5 <- mirt(data2pl[[5]], SE = TRUE)
+
+mlist<- list(m1,m2,m3,m4,m5)
+test <- paste("test", 1:5, sep = "")
+mod2pl <- modIRT(est.mods = mlist, names = test, display = FALSE)
+
+direclist2pl <- alldirec(mods = mod2pl, method = "Haebara")
+
+# compute chain equating coefficients for path 1,2,3,4
+pth1 <- paste("test", 1:4, sep = "")
+chainec1 <- chainec(direclist = direclist2pl, pths = pth1)
+# compute chain equating coefficients for path 1,5,4
+pth2 <- c(paste("test", c(1,5,4), sep = ""))
+chainec2 <- chainec(direclist = direclist2pl, pths = pth2)
+# create a list of objects of class ceqc
+ecall <- c(chainec1, chainec2)
+# compute bisector and weighted bisector coefficients
+allec <- bisectorec(ecall = ecall, weighted = TRUE, unweighted = TRUE)
+summary(allec)
+}
+
+# ===========================================================================
+# the following code uses item parameter estimates previously obtained
+
 # three-parameter logistic model
 # direct equating coefficients using the "Stocking-Lord" method
 data(est3pl)

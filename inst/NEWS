@@ -1,5 +1,4 @@
-Changes in version: equateIRT_2.4.0
+Changes in version: equateIRT_2.5.0
 
-* added scoring with external anchors
+* added new argument in function modIRT, so that the input can be the output of function mirt or ltm, skipping function import.mirt or import.ltm
 
- 

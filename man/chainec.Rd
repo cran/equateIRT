@@ -82,6 +82,34 @@ chainec(r = NULL, direclist, f1 = NULL, f2 = NULL, pths = NULL)
 	\code{\link{alldirec}}, \code{\link{eqc}}, \code{\link{itm}}, \code{\link{summary.ceqc}}, \code{\link{summary.ceqclist}}
 }
 \examples{
+
+# the following code can be used to start from item response data
+
+\dontrun{
+library("mirt")
+data("data2pl")
+
+m1 <- mirt(data2pl[[1]], SE = TRUE)
+m2 <- mirt(data2pl[[2]], SE = TRUE)
+m3 <- mirt(data2pl[[3]], SE = TRUE)
+m4 <- mirt(data2pl[[4]], SE = TRUE)
+m5 <- mirt(data2pl[[5]], SE = TRUE)
+
+mlist<- list(m1,m2,m3,m4,m5)
+test <- paste("test", 1:5, sep = "")
+mod2pl <- modIRT(est.mods = mlist, names = test, display = FALSE)
+
+direclist2pl <- alldirec(mods = mod2pl, method = "Haebara")
+
+# compute chain equating coefficients for path 1,2,3,4
+pth1 <- paste("test", 1:4, sep = "")
+chainec1 <- chainec(direclist = direclist2pl, pths = pth1)
+summary(chainec1)
+}
+
+# ===========================================================================
+# the following code uses item parameter estimates previously obtained
+
 # three-parameter logistic model
 # direct equating coefficients using the "Stocking-Lord" method
 data(est3pl)

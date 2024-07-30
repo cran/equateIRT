@@ -35,6 +35,9 @@ import.flexmirt(fnamep, fnamev = NULL, fnameirt = NULL, display = TRUE, digits =
 	Item parameters are imported with the parameterization used by the software to
 	estimate the IRT model. The usual IRT parameterization can be obtained later
 	by using function \code{\link{modIRT}}.
+	
+	Since package version 2.5.0 this function can be skipped if the item parameters are estimated
+	with packages ltm or mirt. See \code{\link{modIRT}}.
 }
 \value{
 	A list with components

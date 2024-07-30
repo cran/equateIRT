@@ -11,35 +11,45 @@
 	logistic models	are included.
 }
 \usage{
-modIRT(coef, var = NULL, names = NULL, ltparam = TRUE, lparam = TRUE, 
-	display = TRUE, digits = 2)
+modIRT(est.mods = NULL, coef = NULL, var = NULL, names = NULL, ltparam = TRUE, 
+lparam = TRUE, display = TRUE, digits = 2)
 }
 \arguments{
-	\item{coef}{list of matrices (one for each form) containing 
+  \item{est.mods}{list of output objects from functions \code{rasch}, \code{ltm}, or \code{tpm} 
+		of the \code{ltm} package or from function \code{mirt} of the \code{mirt} package.}
+	\item{coef}{necessary only if \code{est.mods} is \code{NULL}.
+	  List of matrices (one for each form) containing 
 		item parameter estimates. Guessing, difficulty and discrimination 
 		parameters should strictly be given in this order and they are 
 		contained in different columns of the matrix.
 		The names of the	rows of each matrix should be the names of the items.}
-	\item{var}{list of matrices (one for each form) containing the 
+	\item{var}{necessary only if \code{est.mods} is \code{NULL}.
+	  list of matrices (one for each form) containing the 
 		covariance matrix of item parameter estimates. They should be
 		given in the same order of coefficients.}
 	\item{names}{character vector containing the names of the forms. 
-		This should have the same length of \code{coef} and \code{var}.
+		This should have the same length of \code{est.mods}, \code{coef} and \code{var}.
 		If NULL, the names of the forms are assigned by 
 		function \code{modIRT}.}
 	\item{ltparam}{logical; if TRUE the latent trait parameterization is used
 		for difficulty parameters and the \code{modIRT} function performs a 
 		transformation of item parameters to return them in the usual IRT
-		parameterization. Set to FALSE to avoid transformations. See below for more details.}
+		parameterization. Set to FALSE to avoid transformations. 
+		Not necessary if \code{est.mods} is not \code{NULL}.
+		See below for more details.}
 	\item{lparam}{logical; if TRUE the logistic parameterization is used
 		for guessing parameters and the \code{modIRT} function performs a 
 		transformation of item parameters to return them in the usual IRT
-		parameterization. Set to FALSE to avoid transformations. See below for more details.}
+		parameterization. Set to FALSE to avoid transformations. 
+		Not necessary if \code{est.mods} is not \code{NULL}.
+		See below for more details.}
 	\item{display}{logical; if TRUE coefficients and standard errors are printed.}
 	\item{digits}{integer indicating the number of decimal places to be used
 		if \code{display} is \code{TRUE}.}
 }
 \details{
+	Since package version 2.5.0 this function takes as input \code{est.mods}.
+
 	\code{ltparam} and \code{lparam} refers the the parameterization used
 	by the software used to estimate item parameters. The R package \code{ltm},
 	and the programs IRTPRO and flexMIRT use these parameterizations.
@@ -110,18 +120,40 @@ modIRT(coef, var = NULL, names = NULL, ltparam = TRUE, lparam = TRUE,
 	\code{\link{direc}}, \code{\link{import.ltm}}
 }
 \examples{
+
+# the following code can be used to estimate the item parameters and then 
+# extract the coefficients and their covariance matrices
+# skipping functions import.mirt or import.ltm
+\dontrun{
+library("mirt")
+data("data2pl")
+
+m1 <- mirt(data2pl[[1]], SE = TRUE)
+m2 <- mirt(data2pl[[2]], SE = TRUE)
+m3 <- mirt(data2pl[[3]], SE = TRUE)
+m4 <- mirt(data2pl[[4]], SE = TRUE)
+m5 <- mirt(data2pl[[5]], SE = TRUE)
+
+mlist<- list(m1,m2,m3,m4,m5)
+test <- paste("test", 1:5, sep = "")
+mod2pl <- modIRT(est.mods = mlist, names = test, display = FALSE)
+}
+
+# ===========================================================================
+# the following code uses item parameter estimates previously obtained
+
 # three-parameter logistic model
-data(est3pl)
+data(est3pl) # includes item parameter estimates
 test <- paste("test", 1:5, sep = "")
 mod3pl <- modIRT(coef = est3pl$coef, var = est3pl$var, names = test, display = FALSE)
 
 # two-parameter logistic model
-data(est2pl)
+data(est2pl) # includes item parameter estimates
 test <- paste("test", 1:5, sep = "")
 mod2pl <- modIRT(coef = est2pl$coef, var = est2pl$var, names = test, display = FALSE)
 
 # Rasch model
-data(estrasch)
+data(estrasch) # includes item parameter estimates
 test <- paste("test", 1:5, sep = "")
 modrasch <- modIRT(coef = estrasch$coef, var = estrasch$var, names = test, 
 	display = FALSE)

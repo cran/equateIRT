@@ -73,6 +73,31 @@ alldirec(mods, method = "mean-mean", all = FALSE, quadrature = TRUE, nq = 30,
 	\code{\link{direc}}, \code{\link{eqc}}, \code{\link{itm}}, \code{\link{modIRT}}, \code{\link{summary.eqclist}}
 }
 \examples{
+
+# the following code can be used to start from item response data
+
+\dontrun{
+library("mirt")
+data("data2pl")
+
+m1 <- mirt(data2pl[[1]], SE = TRUE)
+m2 <- mirt(data2pl[[2]], SE = TRUE)
+m3 <- mirt(data2pl[[3]], SE = TRUE)
+m4 <- mirt(data2pl[[4]], SE = TRUE)
+m5 <- mirt(data2pl[[5]], SE = TRUE)
+
+mlist<- list(m1,m2,m3,m4,m5)
+test <- paste("test", 1:5, sep = "")
+mod2pl <- modIRT(est.mods = mlist, names = test, display = FALSE)
+
+direclist2pl <- alldirec(mods = mod2pl, method = "Haebara")
+summary(direclist2pl)
+summary(direclist2pl$test2.test1)
+}
+
+# ===========================================================================
+# the following code uses item parameter estimates previously obtained
+
 # three-parameter logistic model
 # direct equating coefficients using the "Stocking-Lord" method
 data(est3pl)

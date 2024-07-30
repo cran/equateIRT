@@ -37,9 +37,12 @@
 	Michela Battauz
 }
 \seealso{
-	\code{\link{bisectorec}}
+	\code{\link{bisectorec}}, \code{\link{modIRT}}
 }
 \examples{
+# the following code uses item parameter estimates previously obtained
+# for examples that start from item response data see function modIRT
+
 # three-parameter logistic model
 # direct equating coefficients using the "Stocking-Lord" method
 data(est3pl)

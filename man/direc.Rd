@@ -126,6 +126,32 @@ direc(mods, which, mod1, mod2, method = "mean-mean", suff1 = ".1", suff2 = ".2",
 	\code{\link{eqc}}, \code{\link{itm}}, \code{\link{modIRT}}, \code{\link{summary.eqc}}
 }
 \examples{
+
+# the following code can be used to start from item response data
+
+\dontrun{
+library("mirt")
+data("data2pl")
+
+m1 <- mirt(data2pl[[1]], SE = TRUE)
+m2 <- mirt(data2pl[[2]], SE = TRUE)
+m3 <- mirt(data2pl[[3]], SE = TRUE)
+m4 <- mirt(data2pl[[4]], SE = TRUE)
+m5 <- mirt(data2pl[[5]], SE = TRUE)
+
+mlist<- list(m1,m2,m3,m4,m5)
+test <- paste("test", 1:5, sep = "")
+mod2pl <- modIRT(est.mods = mlist, names = test, display = FALSE)
+
+# two-parameter logistic model
+# direct equating coefficients between forms 2 and 3 using the Haebara method
+l23 <- direc(mods = mod2pl, which = c(2,3), method = "Haebara")
+summary(l23)
+}
+
+# ===========================================================================
+# the following code uses item parameter estimates previously obtained
+
 # three-parameter logistic model
 # direct equating coefficients between forms 1 and 2 using the Stocking-Lord method
 data(est3pl)

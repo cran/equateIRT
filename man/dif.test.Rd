@@ -9,12 +9,16 @@
 	Performs a Wald-type test for Differential Item Functioning detection.
 }
 \usage{
-dif.test(coef, var, names = NULL, reference = NULL, method = "mean-mean",
+dif.test(est.mods = NULL, coef = NULL, var = NULL, names = NULL, 
+  reference = NULL, method = "mean-mean",
   quadrature = TRUE, nq = 30, DIFtype = NULL, purification = FALSE, 
   signif.level = 0.05, trace = FALSE, maxiter = 30, anchor = NULL)
 }
 
 \arguments{
+  \item{est.mods}{list of output objects from functions 
+    \code{rasch}, \code{ltm}, or \code{tpm} 
+		of the \code{ltm} package or from function \code{mirt} of the \code{mirt} package.}
 	\item{coef}{list of matrices (one for each group) containing 
 		the item parameter estimates. Guessing, difficulty and discrimination 
 		parameters should strictly be given in this order and they are 
@@ -135,28 +139,24 @@ data3 <- dataDIF[dataDIF$group == 3, 1:20]
 mod1 <- mirt(data1, SE = TRUE)
 mod2 <- mirt(data2, SE = TRUE)
 mod3 <- mirt(data3, SE = TRUE)
-# extract the coefficients and the covariance matrix
-est1 <- import.mirt(mod1, display = FALSE)
-est2 <- import.mirt(mod2, display = FALSE)
-est3 <- import.mirt(mod3, display = FALSE)
+
+# since package version 2.5.0 it is possible to skip function import.mirt
+# as follows
 
 # perform the test for DIF on two groups
-res_diftest2 <- dif.test(coef = list(est1$coef, est2$coef),
-  var = list(est1$var, est2$var))
+res_diftest2 <- dif.test(est.mods = list(mod1, mod2))
 res_diftest2
 
 # perform the test for DIF on three groups
-res_diftest3 <- dif.test(coef = list(est1$coef, est2$coef, est3$coef),
-  var = list(est1$var, est2$var, est3$var))
+res_diftest3 <- dif.test(est.mods = list(mod1, mod2, mod3))
 res_diftest3
 
 # perform the test for DIF on three groups
 # reference group: 2
 # equating method: Haebara
 # purification applied
-res_diftest3 <- dif.test(coef = list(est1$coef, est2$coef, est3$coef),
-  var = list(est1$var, est2$var, est3$var), reference = 2,
-  method = "Haebara", purification = TRUE)
+res_diftest3 <- dif.test(est.mods = list(mod1, mod2, mod3), 
+  reference = 2, method = "Haebara", purification = TRUE)
 res_diftest3
 }
 

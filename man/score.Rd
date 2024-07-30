@@ -96,6 +96,9 @@ score(obj, \dots)
 	\code{\link{alldirec}}, \code{\link{bisectorec}}, \code{\link{chainec}}, \code{\link{direc}}
 }
 \examples{
+# the following code uses item parameter estimates previously obtained
+# for examples that start from item response data see function modIRT
+
 # two-parameter logistic model
 data(est2pl)
 test<-paste("test", 1:5, sep = "")
