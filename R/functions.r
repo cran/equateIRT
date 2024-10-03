@@ -1158,7 +1158,7 @@ print.summary.ceqclist <- function(x, ...)
 
 bisectorec <- function(ecall, mods = NULL, weighted = TRUE, unweighted = TRUE)
 {
-	if (!is.null(mods)) cat("Note: from version 2.0 argument mods can be left unspecified.\n")
+	if (!is.null(mods)) message("Note: from version 2.0 argument mods can be left unspecified.\n")
 	if (length(table(sapply(ecall, FUN = function(x) x$method)))!= 1) stop("ecall contains different methods.")
 	itmp <- sapply(ecall, FUN = function(x) x$itmp)
 	if (length(table(itmp))>1) stop("Mixed models not allowed. Number of item parameters differs.")
@@ -2046,7 +2046,7 @@ score_prepare <- function(itmpar, suff1, suff2, anchor.type="internal", commonit
 
 
 
-score_compute <- function(method, itm_prepare, D, varFull, partial, varAB, itmp, A, B, scores, se, nq, w, theta, weights, names)
+score_compute <- function(method, itm_prepare, D, varFull, partial, varAB, itmp, A, B, scores, se, nq, w, theta, weights, names, printmessages = TRUE)
 {
 	diffX <- itm_prepare$diffX
 	discrX <- itm_prepare$discrX
@@ -2066,12 +2066,18 @@ score_compute <- function(method, itm_prepare, D, varFull, partial, varAB, itmp,
 		if (!is.null(scores)) scores <- sort(scores)
 		if (is.null(scores)) scores <- scoresall
 		outbound <- scores[!scores%in%scoresall]
-		if (any(!scores%in%scoresall)) cat("The following scores are out of the range:", outbound, "\n")
 		scores <- scores[scores%in%scoresall]
 		smin <- truescore(person.par = -100, diff = diffX, discr = discrX, guess = guessX, D = D)
+		smax <- truescore(person.par =  100, diff = diffX, discr = discrX, guess = guessX, D = D)
 		undermin <- scores[scores<smin]
-		if (any(scores<smin)) cat("The following scores are not attainable:", undermin, "\n")
-		scores <- scores[scores >= smin]
+		overmax <- scores[scores>smax]
+		if (printmessages)
+		{
+		  if (any(!scores%in%scoresall)) cat("The following scores are out of the range:", outbound, "\n")
+		  if (any(scores<smin)) cat("The following scores are not attainable:", undermin, "\n")
+		  if (any(scores>smax)) cat("The following scores are not attainable:", overmax, "\n")
+		}
+		scores <- scores[scores >= smin & scores <= smax]
 		st <- seq(-3, 3, l = (rX+1)) # starting values
 		st <- st[scoresall%in%scores]
 		theta1 <- st
@@ -2392,7 +2398,7 @@ score_compute <- function(method, itm_prepare, D, varFull, partial, varAB, itmp,
 			out$StdErr <- se
 		}
 		outbound <- scores[!scores%in%xx]
-		if (any(!scores%in%xx)) cat("The following scores are out of the range:", outbound, "\n")
+		if (any(!scores%in%xx) & printmessages) cat("The following scores are out of the range:", outbound, "\n")
 		out <- out[xx%in%scores, ]
 	}
 	return(out)

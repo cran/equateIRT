@@ -1,4 +1,3 @@
-Changes in version: equateIRT_2.5.0
+Changes in version: equateIRT_2.5.1
 
-* added new argument in function modIRT, so that the input can be the output of function mirt or ltm, skipping function import.mirt or import.ltm
-
+* fixed bug in function score

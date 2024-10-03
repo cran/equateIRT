@@ -1,6 +1,6 @@
-51b70409c62586bb003e78c7f1d1d850 *DESCRIPTION
+906f0fc369e82d5e0fd577237b099fc6 *DESCRIPTION
 5af60543d943421ba199fd15063a01b8 *NAMESPACE
-a5d712a2f7b8454d4539e4029ea2a620 *R/functions.r
+32c85079cd7fe0447a25027284bbc600 *R/functions.r
 127b64d0e3884df185a9b2ec558d3b5e *build/vignette.rds
 da4fadbe9fa9f481560faa629030ddd9 *data/data2pl.rda
 ca7f579e3827dab0deb8ae5a16a9e7e3 *data/dataDIF.rda
@@ -8,13 +8,13 @@ ddb31b4e8144bdcca5cd6c3b712c8ad7 *data/est2pl.rda
 55ae5f9ecbcccb14ac72130cd1c223b9 *data/est3pl.rda
 99e51e69216e0412931fa38dfcbdaebd *data/estrasch.rda
 0623a1b2f09a460cf6aa6dcda7a332fd *inst/CITATION
-d2599d5c40ba671ba13edc827f520620 *inst/NEWS
+d09e6c854aaebe401b7a650519169b21 *inst/NEWS
 a8d49de9b340f273004fa8fc9fa8435f *inst/doc/equateIRT_paper.R
 bd47ea8bc89251dbd1a0f3677e84bdac *inst/doc/equateIRT_paper.Rnw
-cb2df7cc27970e39e51009d5bc5eab68 *inst/doc/equateIRT_paper.pdf
+d53a586ea2aa67c3bb1056489b053a76 *inst/doc/equateIRT_paper.pdf
 de967f6567c1fc0058aae19c5fc7340b *inst/doc/equateIRT_tutorial.R
 ad7485396e07af8a6b1b197392bbeaa6 *inst/doc/equateIRT_tutorial.Rmd
-201d7b328b5893cf05cff7ec1b7ef882 *inst/doc/equateIRT_tutorial.html
+156ef49ecc0a8c90bb05b18d293ceaa0 *inst/doc/equateIRT_tutorial.html
 01d1aa09f6b46d0aae0bdd9fcea9b4d9 *man/alldirec.Rd
 71520cc3c5a0b7d3d56325a25351f9a2 *man/bisectorec.Rd
 07f5fef65f8967b707ddfc4b9fc4ceaf *man/chainec.Rd
