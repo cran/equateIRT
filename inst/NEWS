@@ -1,3 +1,3 @@
-Changes in version: equateIRT_2.5.1
+Changes in version: equateIRT_2.5.2
 
-* fixed bug in function score
+* fixed bug in function dif.test

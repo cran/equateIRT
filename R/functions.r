@@ -111,6 +111,7 @@ modIRT <- function(est.mods = NULL, coef = NULL, var = NULL, names = NULL, ltpar
 irtp1 <- function(ab, diff, discr, guess, D)
 {
 	elp <- exp(D*discr*(ab-diff))
+	if(any(is.infinite(elp))) elp[is.infinite(elp)] <- 1e10
 	guess+(1-guess)*elp/(1+elp)
 }
 
@@ -464,7 +465,10 @@ dif.test.compute <- function(DIFtype, alleq, coef_trasf, var_trasf)
   if (l>1) for (j in 1:(ng-1)) diag(C[((j-1)*l+1):(j*l), 1:l]) <- 1
   else C[, 1] <- 1
   diffr <- C%*%coefi
-  sel <- apply(expand.grid(wh, c(ref, foc)), 1, paste, collapse = ".")
+  eg <- expand.grid(wh, c(ref, foc), stringsAsFactors = FALSE)
+  sel <- rep(NA, nrow(eg))
+  for (k in 1:nrow(eg))
+  sel[k] <- paste(eg[k, ], collapse = ".")
   vv <- var_trasf[sel, sel]
   vv[upper.tri(vv)] <- t(vv)[upper.tri(vv)]
   chi2stat <- t(diffr)%*%solve(C%*% vv %*%t(C))%*%diffr
